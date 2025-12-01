@@ -12,34 +12,18 @@ import Toast from "@/components/Toast";
 import "@/styles/game.scss";
 import "@/styles/poker-table.scss";
 
-const STORAGE_KEY = "planning-poker-username";
-
-function getInitialState() {
-  if (typeof window === "undefined") {
-    return { name: "", hasJoined: false, showJoinForm: true };
-  }
-
-  const savedName = localStorage.getItem(STORAGE_KEY);
-  const hasJoined = !!savedName;
-
-  return {
-    name: savedName || "",
-    hasJoined,
-    showJoinForm: !hasJoined,
-  };
-}
-
 export default function GamePage() {
   const params = useParams();
   const gameId = params.id as string;
   const [copied, setCopied] = useState(false);
-  const initialState = getInitialState();
-  const [showJoinForm, setShowJoinForm] = useState(initialState.showJoinForm);
-  const [name, setName] = useState(initialState.name);
-  const [hasJoined, setHasJoined] = useState(initialState.hasJoined);
+  const [name, setName] = useState("");
+  const [submittedName, setSubmittedName] = useState<string | undefined>(
+    undefined
+  );
 
   const {
     userId,
+    username,
     users,
     votes,
     revealed,
@@ -48,7 +32,7 @@ export default function GamePage() {
     setSelectedVote,
   } = useGameStore();
 
-  const socket = useSocket(gameId, hasJoined ? name : undefined, hasJoined);
+  const socket = useSocket(gameId, submittedName, true);
 
   useEffect(() => {
     setGameId(gameId);
@@ -57,9 +41,7 @@ export default function GamePage() {
   const handleJoin = () => {
     const trimmedName = name.trim();
     if (!trimmedName) return;
-    localStorage.setItem(STORAGE_KEY, trimmedName);
-    setShowJoinForm(false);
-    setHasJoined(true);
+    setSubmittedName(trimmedName);
   };
 
   const handleVote = (value: string) => {
@@ -83,7 +65,17 @@ export default function GamePage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (showJoinForm) {
+  if (!userId) {
+    return (
+      <div className="game-page">
+        <div className="join-card">
+          <p>Connecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!username) {
     return (
       <JoinGameForm
         gameId={gameId}

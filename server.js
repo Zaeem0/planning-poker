@@ -13,35 +13,10 @@ const handle = app.getRequestHandler();
 // Game state
 const games = new Map();
 const users = new Map();
+const userProfiles = new Map();
 
 function generateUserId() {
-  return `user_${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function generateUsername() {
-  const adjectives = [
-    "Happy",
-    "Clever",
-    "Swift",
-    "Brave",
-    "Wise",
-    "Kind",
-    "Bold",
-    "Calm",
-  ];
-  const animals = [
-    "Panda",
-    "Tiger",
-    "Eagle",
-    "Fox",
-    "Wolf",
-    "Bear",
-    "Lion",
-    "Hawk",
-  ];
-  return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${
-    animals[Math.floor(Math.random() * animals.length)]
-  }`;
+  return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 app.prepare().then(() => {
@@ -66,9 +41,32 @@ app.prepare().then(() => {
   io.on("connection", (socket) => {
     console.log("User connected:", socket.id);
 
-    socket.on("join-game", ({ gameId, username }) => {
-      const userId = generateUserId();
-      const finalUsername = username || generateUsername();
+    socket.on("join-game", ({ gameId, userId: clientUserId, username }) => {
+      let userId = clientUserId;
+      let finalUsername = null;
+      let isReconnection = false;
+
+      if (!userId) {
+        userId = generateUserId();
+      }
+
+      if (userProfiles.has(userId)) {
+        const profile = userProfiles.get(userId);
+        finalUsername = profile.username;
+        isReconnection = true;
+      } else if (username) {
+        finalUsername = username;
+        userProfiles.set(userId, { username: finalUsername });
+      } else {
+        socket.emit("user-joined", {
+          userId,
+          username: null,
+          users: [],
+          votes: [],
+          revealed: false,
+        });
+        return;
+      }
 
       socket.join(gameId);
 
@@ -83,16 +81,24 @@ app.prepare().then(() => {
 
       const game = games.get(gameId);
 
+      const existingUser = game.users.get(userId);
+      const hasVoted = existingUser ? existingUser.hasVoted : false;
+
       game.users.set(userId, {
         id: userId,
         socketId: socket.id,
         username: finalUsername,
-        hasVoted: false,
+        hasVoted,
       });
 
       users.set(socket.id, { userId, gameId });
 
-      // Send current game state to the new user
+      console.log(
+        `User ${
+          isReconnection ? "reconnected" : "joined"
+        }: ${finalUsername} (${userId})`
+      );
+
       socket.emit("user-joined", {
         userId,
         username: finalUsername,
@@ -106,7 +112,6 @@ app.prepare().then(() => {
         revealed: game.revealed,
       });
 
-      // Notify others
       socket.to(gameId).emit("user-list-updated", {
         users: Array.from(game.users.values()),
       });

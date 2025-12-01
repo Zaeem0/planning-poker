@@ -2,6 +2,21 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { io, Socket } from "socket.io-client";
 import { useGameStore } from "./store";
 
+const USER_ID_KEY = "planning-poker-user-id";
+
+function getUserId(): string {
+  if (typeof window === "undefined") return "";
+
+  let userId = localStorage.getItem(USER_ID_KEY);
+  if (!userId) {
+    userId = `user_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 11)}`;
+    localStorage.setItem(USER_ID_KEY, userId);
+  }
+  return userId;
+}
+
 export function useSocket(
   gameId: string,
   customUsername?: string,
@@ -26,8 +41,6 @@ export function useSocket(
   useEffect(() => {
     if (!gameId || !shouldConnect) return;
 
-    // Initialize socket connection
-    // In production, NEXT_PUBLIC_SOCKET_URL should be set to your deployed URL
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "";
     const newSocket = io(socketUrl, {
       path: "/socket.io",
@@ -37,8 +50,13 @@ export function useSocket(
     const listeners = listenersRef.current;
     listeners.forEach((listener) => listener());
 
-    // Join the game with optional custom username
-    newSocket.emit("join-game", { gameId, username: customUsername });
+    const userId = getUserId();
+
+    newSocket.emit("join-game", {
+      gameId,
+      userId,
+      username: customUsername,
+    });
 
     // Listen for user joined event
     newSocket.on(
