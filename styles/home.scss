@@ -1,0 +1,100 @@
+@use 'variables' as *;
+@use 'components';
+
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.home-content {
+  width: 100%;
+  max-width: 400px;
+}
+
+.home-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.home-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: $slate-800;
+  margin-bottom: 0.5rem;
+}
+
+.home-subtitle {
+  color: $slate-500;
+}
+
+.home-card {
+  @extend .card;
+  padding: 2.5rem;
+}
+
+.home-create-button {
+  @extend .button-primary;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+}
+
+.home-divider {
+  display: flex;
+  align-items: center;
+  margin: 1.75rem 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: $slate-200;
+  }
+}
+
+.home-divider-text {
+  padding: 0 1rem;
+  color: $slate-400;
+  font-size: 0.875rem;
+}
+
+.home-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.home-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.home-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $slate-600;
+}
+
+.home-input {
+  @extend .input;
+}
+
+.home-join-button {
+  @extend .button-secondary;
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+}
+
+.home-footer {
+  text-align: center;
+  margin-top: 1.75rem;
+  color: $slate-500;
+  font-size: 0.875rem;
+}
+

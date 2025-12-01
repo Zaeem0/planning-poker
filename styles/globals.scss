@@ -1,0 +1,24 @@
+@use 'variables' as *;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: $slate-50;
+  color: $slate-800;
+  min-height: 100vh;
+}
+
+button, input {
+  font-family: inherit;
+}
+

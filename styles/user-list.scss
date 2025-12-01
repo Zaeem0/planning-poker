@@ -1,0 +1,175 @@
+@use 'variables' as *;
+@use 'components';
+
+.user-list {
+  @extend .card;
+  padding: 1.5rem;
+  position: sticky;
+  top: 1.5rem;
+  overflow: visible;
+}
+
+.user-list-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: $slate-800;
+  margin-bottom: 1.25rem;
+}
+
+.user-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border-radius: $radius-lg;
+  background: $slate-50;
+  overflow: visible;
+  position: relative;
+
+  &.user-item-current {
+    background: $primary-light;
+    border: 1px solid rgba($primary, 0.2);
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: $white;
+  background: $slate-400;
+
+  .user-item-current & {
+    background: $primary;
+  }
+}
+
+.user-name {
+  font-weight: 500;
+  color: $slate-700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: visible;
+}
+
+.user-admin-badge {
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.user-you-badge {
+  font-size: 0.75rem;
+  color: $primary;
+  font-weight: 500;
+}
+
+.remove-user-button {
+  background: $slate-200 !important;
+
+  &:hover {
+    background: #fecaca !important;
+  }
+}
+
+.vote-status {
+  width: 48px;
+  height: 56px;
+  border-radius: $radius;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+
+  &.vote-status-revealed {
+    background: $primary;
+    color: $white;
+    font-size: 1.25rem;
+  }
+
+  &.vote-status-voted {
+    background: $success;
+    color: $white;
+    font-size: 1.125rem;
+  }
+
+  &.vote-status-waiting {
+    background: $slate-200;
+    color: $slate-400;
+  }
+}
+
+.user-list-empty {
+  text-align: center;
+  color: $slate-400;
+  padding: 1rem 0;
+}
+
+.user-name {
+  position: relative;
+}
+
+.emoji-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  height: 56px;
+}
+
+.emoji-picker-button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: $slate-100;
+  border-radius: $radius;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $slate-200;
+    transform: scale(1.15);
+  }
+}
+
+.emoji-projectile {
+  position: absolute;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  animation: projectile-fly 0.8s linear forwards;
+}
+
+@keyframes projectile-fly {
+  0% {
+    opacity: 1;
+    transform: translate(var(--start-x, -200px), var(--start-y, -100px)) rotate(var(--rotation, -180deg));
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--end-x, 0px), var(--end-y, 0px)) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--end-x, 0px), var(--end-y, 0px)) rotate(0deg);
+  }
+}

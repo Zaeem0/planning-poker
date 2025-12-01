@@ -1,0 +1,15 @@
+@use 'variables' as *;
+@use 'components';
+
+.reveal-button {
+  @extend .button-success;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.reset-button {
+  @extend .button-primary;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
