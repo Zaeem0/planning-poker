@@ -9,6 +9,7 @@ import JoinGameForm from "@/components/JoinGameForm";
 import GameHeader from "@/components/GameHeader";
 import VotingCards from "@/components/VotingCards";
 import Toast from "@/components/Toast";
+import Loader from "@/components/Loader";
 import "@/styles/game.scss";
 import "@/styles/poker-table.scss";
 
@@ -84,13 +85,7 @@ export default function GamePage() {
   };
 
   if (!userId) {
-    return (
-      <div className="game-page">
-        <div className="join-card">
-          <p>Connecting...</p>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   if (!username) {

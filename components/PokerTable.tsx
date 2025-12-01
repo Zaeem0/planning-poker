@@ -121,7 +121,10 @@ export default function PokerTable({
           }`}
         >
           {revealed && vote ? (
-            <span className="player-card-vote">{getVoteLabel(vote)}</span>
+            <div className="player-card-content">
+              <span className="player-card-emoji">{getVoteLabel(vote)}</span>
+              <span className="player-card-size">{vote.toUpperCase()}</span>
+            </div>
           ) : (
             <span className="player-card-back"></span>
           )}
