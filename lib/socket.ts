@@ -50,12 +50,6 @@ export function useSocket(
       setUsers(users);
     });
 
-    // Listen for being removed from game
-    socket.on("user-removed", () => {
-      alert("You have been removed from the game by the admin.");
-      window.location.href = "/";
-    });
-
     return () => {
       socket.disconnect();
     };
@@ -105,16 +99,5 @@ export function emitThrowEmoji(
 ) {
   if (socket) {
     socket.emit("throw-emoji", { gameId, targetUserId, emoji });
-  }
-}
-
-export function emitRemoveUser(
-  socket: Socket | null,
-  gameId: string,
-  targetUserId: string,
-  requesterId: string
-) {
-  if (socket) {
-    socket.emit("remove-user", { gameId, targetUserId, requesterId });
   }
 }

@@ -3,11 +3,6 @@
 
 .game-page {
   min-height: 100vh;
-  padding: 1.5rem;
-
-  @media (min-width: 768px) {
-    padding: 2.5rem 3rem;
-  }
 }
 
 .game-wrapper {
@@ -76,17 +71,32 @@
 }
 
 .game-header {
-  @extend .card;
+  position: relative;
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
 
   @media (min-width: 768px) {
-    flex-direction: row;
-    align-items: center;
     justify-content: space-between;
+  }
+}
+
+.game-header-left,
+.game-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.game-header-left {
+  order: 2;
+
+  @media (min-width: 768px) {
+    order: 0;
   }
 }
 
@@ -94,23 +104,24 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: $slate-800;
-  margin-bottom: 0.25rem;
-}
+  order: 0;
+  width: 100%;
+  text-align: center;
 
-.game-header-user {
-  color: $slate-500;
-  font-size: 0.875rem;
-
-  span {
-    font-weight: 500;
-    color: $slate-700;
+  @media (min-width: 768px) {
+    width: auto;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
-.game-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.game-header-right {
+  order: 3;
+
+  @media (min-width: 768px) {
+    order: 0;
+  }
 }
 
 .game-id-badge {
@@ -162,6 +173,13 @@
   @media (min-width: 1024px) {
     grid-template-columns: 2fr 1fr;
   }
+}
+
+.game-main-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 100px;
 }
 
 .game-content {

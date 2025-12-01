@@ -2,16 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import CreateGameButton from "@/components/CreateGameButton";
 import "@/styles/home.scss";
 
 export default function Home() {
   const router = useRouter();
   const [gameId, setGameId] = useState("");
-
-  const createNewGame = () => {
-    const newGameId = Math.random().toString(36).substring(2, 10);
-    router.push(`/game/${newGameId}`);
-  };
 
   const joinGame = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,9 +25,7 @@ export default function Home() {
         </header>
 
         <div className="home-card">
-          <button onClick={createNewGame} className="home-create-button">
-            Create New Game
-          </button>
+          <CreateGameButton />
 
           <div className="home-divider">
             <span className="home-divider-text">or join existing</span>

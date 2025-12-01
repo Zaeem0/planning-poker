@@ -4,7 +4,6 @@ export interface User {
   id: string;
   username: string;
   hasVoted: boolean;
-  isAdmin: boolean;
 }
 
 export interface Vote {

@@ -77,19 +77,16 @@ app.prepare().then(() => {
           users: new Map(),
           votes: new Map(),
           revealed: false,
-          adminId: userId,
         });
       }
 
       const game = games.get(gameId);
-      const isAdmin = game.adminId === userId;
 
       game.users.set(userId, {
         id: userId,
         socketId: socket.id,
         username: finalUsername,
         hasVoted: false,
-        isAdmin,
       });
 
       users.set(socket.id, { userId, gameId });
@@ -163,32 +160,6 @@ app.prepare().then(() => {
 
     socket.on("throw-emoji", ({ gameId, targetUserId, emoji }) => {
       io.to(gameId).emit("emoji-thrown", { targetUserId, emoji });
-    });
-
-    socket.on("remove-user", ({ gameId, targetUserId, requesterId }) => {
-      const game = games.get(gameId);
-      if (!game) return;
-
-      // Only admin can remove users
-      const requester = game.users.get(requesterId);
-      if (!requester || !requester.isAdmin) return;
-
-      const targetUser = game.users.get(targetUserId);
-      if (!targetUser) return;
-
-      // Find and disconnect the target user's socket
-      const targetSocketId = targetUser.socketId;
-      game.users.delete(targetUserId);
-      game.votes.delete(targetUserId);
-      users.delete(targetSocketId);
-
-      // Notify the removed user
-      io.to(targetSocketId).emit("user-removed");
-
-      // Update everyone else
-      io.to(gameId).emit("user-list-updated", {
-        users: Array.from(game.users.values()),
-      });
     });
 
     socket.on("disconnect", () => {

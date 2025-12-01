@@ -76,7 +76,7 @@ npm run dev
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: Tailwind CSS
+- **Styling**: SCSS
 - **Real-time**: Socket.io
 - **State Management**: Zustand
 - **Server**: Custom Node.js server with Socket.io
@@ -88,13 +88,19 @@ planning-poker/
 ├── app/
 │   ├── game/[id]/page.tsx    # Game room page
 │   ├── page.tsx               # Home page
-│   ├── layout.tsx             # Root layout
-│   └── globals.css            # Global styles
+│   └── layout.tsx             # Root layout
 ├── components/
-│   ├── VotingCard.tsx         # Individual voting card
-│   ├── UserList.tsx           # List of players
+│   ├── PokerTable.tsx         # Poker table with player cards
+│   ├── VotingCards.tsx        # Voting card selector with results
+│   ├── GameHeader.tsx         # Header with controls
 │   ├── GameControls.tsx       # Reveal/Reset buttons
-│   └── Results.tsx            # Statistics display
+│   ├── JoinGameForm.tsx       # Join game form
+│   └── Toast.tsx              # Toast notifications
+├── styles/
+│   ├── _variables.scss        # SCSS variables
+│   ├── globals.scss           # Global styles
+│   ├── game.scss              # Game page styles
+│   └── poker-table.scss       # Table and card styles
 ├── lib/
 │   ├── store.ts               # Zustand state management
 │   ├── socket.ts              # Socket.io client hooks

@@ -1,0 +1,238 @@
+@use 'variables' as *;
+
+.poker-table-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.table-players {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.table-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player-card {
+  width: 48px;
+  height: 72px;
+  background: $slate-200;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.player-card-voted {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      $primary 0px,
+      $primary 2px,
+      darken($primary, 8%) 2px,
+      darken($primary, 8%) 8px
+    );
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.player-card-revealed {
+  background: $white;
+}
+
+.player-card-vote {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $primary;
+}
+
+.player-card-back {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
+.player-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: $slate-700;
+  text-align: center;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-height: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.player-you {
+  display: block;
+  font-size: 0.75rem;
+  color: $primary;
+  font-weight: 400;
+}
+
+.poker-table {
+  width: 100%;
+  max-width: 500px;
+  margin: 1rem 0;
+}
+
+.table-surface {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+
+  &.table-surface-revealed {
+    padding: 1.5rem;
+  }
+}
+
+.table-message {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: $slate-600;
+}
+
+.voting-section-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: center;
+  z-index: 100;
+}
+
+.voting-cards-bottom {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.voting-card-small {
+  width: 68px;
+  height: 84px;
+  background: $white;
+  border: 1px solid $primary-light;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba($primary, 0.05);
+    transform: translateY(-2px);
+  }
+
+  &.selected {
+    background: $primary;
+
+    .voting-card-title {
+      color: $white;
+    }
+  }
+
+  &.most-common {
+    background: rgba($success, var(--vote-opacity, 0.5));
+    border-color: $success;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba($success, calc(var(--vote-opacity, 0.3) * 0.5));
+  }
+
+  &.has-votes {
+    background: rgba($success, var(--vote-opacity, 0.1));
+    border-color: rgba($success, calc(var(--vote-opacity, 0.1) + 0.2));
+  }
+
+  &.no-votes {
+    opacity: 0.4;
+  }
+}
+
+.voting-card-emoji {
+  font-size: 1.5rem;
+}
+
+.voting-card-title {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: $slate-500;
+  text-transform: uppercase;
+}
+
+.voting-card-percentage {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: darken($success, 75%);
+  text-shadow: 0 0 2px rgba($white, 0.8);
+}
+
+.emoji-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.5rem;
+}
+
+.emoji-picker-button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: $slate-100;
+  border-radius: $radius;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: $slate-200;
+    transform: scale(1.15);
+  }
+}
+
+.emoji-projectile {
+  position: absolute;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 10;
+  opacity: 0;
+  animation: projectile-fly 0.8s linear forwards;
+}
+
+@keyframes projectile-fly {
+  0% {
+    opacity: 1;
+    transform: translate(var(--start-x, -200px), var(--start-y, -100px)) rotate(var(--rotation, -180deg));
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--end-x, 0px), var(--end-y, 0px)) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--end-x, 0px), var(--end-y, 0px)) rotate(0deg);
+  }
+}

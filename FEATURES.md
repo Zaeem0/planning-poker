@@ -20,8 +20,8 @@
   - Custom username input on join
   - Auto-generated usernames if no name provided (e.g., "Happy Panda", "Brave Tiger")
   - Automatic user addition when visiting the page
-  - User list with vote status indicators
   - Visual distinction for current user
+  - Emoji throwing between players for fun interactions
 
 - [x] **Game Controls**
 
@@ -30,10 +30,10 @@
   - Copy game link functionality
 
 - [x] **Results & Statistics**
-  - Most common estimate highlighted
-  - Vote distribution chart with emoji labels
-  - Visual progress bars
-  - Full descriptions for each size estimate
+  - Results displayed directly on voting cards when revealed
+  - Most common estimate highlighted in green
+  - Percentage-based opacity to show vote distribution
+  - Cards with no votes are faded
 
 ### User Interface
 
@@ -46,15 +46,15 @@
 - [x] **Visual Feedback**
 
   - Selected card highlighting
-  - Vote status indicators (checkmark for voted, dash for not voted)
-  - Revealed votes displayed on user cards
-  - Color-coded statistics
+  - Striped pattern on cards when player has voted
+  - Revealed votes displayed on player cards
+  - Percentage overlays on voting cards when revealed
 
 - [x] **Modern Styling**
   - Clean, professional design
   - Gradient backgrounds
   - Shadow effects and transitions
-  - Tailwind CSS for consistent styling
+  - SCSS with design system variables
 
 ### Technical Features
 
