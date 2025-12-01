@@ -1,8 +1,8 @@
 @use 'variables' as *;
 
 .card {
-  background: $white;
-  border: 1px solid $slate-200;
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
   border-radius: $radius-lg;
   box-shadow: $shadow;
 }
@@ -21,8 +21,8 @@
   }
 
   &:disabled {
-    background: $slate-100;
-    color: $slate-400;
+    background: $dark-border;
+    color: $text-disabled;
     cursor: not-allowed;
   }
 }
@@ -34,8 +34,8 @@
 }
 
 .button-secondary {
-  background: $slate-800;
-  color: $white;
+  background: $dark-border;
+  color: $text-primary;
   border: none;
   border-radius: $radius;
   font-weight: 500;
@@ -43,12 +43,12 @@
   transition: background 150ms;
 
   &:hover:not(:disabled) {
-    background: $slate-700;
+    background: $dark-bg-hover;
   }
 
   &:disabled {
-    background: $slate-100;
-    color: $slate-400;
+    background: $dark-border;
+    color: $text-disabled;
     cursor: not-allowed;
   }
 }
@@ -70,19 +70,21 @@
 .input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid $slate-300;
+  background: $dark-bg;
+  border: 1px solid $dark-border;
   border-radius: $radius;
   font-size: 1rem;
+  color: $text-primary;
   outline: none;
   transition: border-color 150ms, box-shadow 150ms;
 
   &:focus {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    box-shadow: 0 0 0 3px rgba($primary, 0.2);
   }
 
   &::placeholder {
-    color: $slate-400;
+    color: $text-muted;
   }
 }
 

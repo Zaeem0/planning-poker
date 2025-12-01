@@ -96,6 +96,7 @@ export default function VotingCards({
               className={className}
               onClick={() => !revealed && onVote(card.value)}
               style={style}
+              data-card-size={card.value}
             >
               <span className="voting-card-emoji">{card.label}</span>
               {showPercentage && (

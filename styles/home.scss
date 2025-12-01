@@ -22,12 +22,12 @@
 .home-title {
   font-size: 2rem;
   font-weight: 600;
-  color: $slate-800;
+  color: $text-primary;
   margin-bottom: 0.5rem;
 }
 
 .home-subtitle {
-  color: $slate-500;
+  color: $text-secondary;
 }
 
 .home-card {
@@ -51,13 +51,13 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: $slate-200;
+    background: $dark-border;
   }
 }
 
 .home-divider-text {
   padding: 0 1rem;
-  color: $slate-400;
+  color: $text-muted;
   font-size: 0.875rem;
 }
 
@@ -76,7 +76,7 @@
 .home-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: $slate-600;
+  color: $text-secondary;
 }
 
 .home-input {
@@ -93,7 +93,7 @@
 .home-footer {
   text-align: center;
   margin-top: 1.75rem;
-  color: $slate-500;
+  color: $text-muted;
   font-size: 0.875rem;
 }
 

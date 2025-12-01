@@ -28,18 +28,18 @@
 .join-title {
   font-size: 1.5rem;
   font-weight: 600;
-  color: $slate-800;
+  color: $text-primary;
   margin-bottom: 0.5rem;
 }
 
 .join-subtitle {
-  color: $slate-500;
+  color: $text-secondary;
   margin-bottom: 2rem;
 }
 
 .join-game-id {
   font-family: $font-mono;
-  color: $slate-700;
+  color: $text-secondary;
 }
 
 .join-form {
@@ -57,7 +57,7 @@
 .join-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: $slate-600;
+  color: $text-secondary;
 }
 
 .join-input {
@@ -80,7 +80,7 @@
   justify-content: center;
   gap: 1rem;
 
-  @media (min-width: 768px) {
+  @media (min-width: 970px) {
     justify-content: space-between;
   }
 }
@@ -95,20 +95,20 @@
 .game-header-left {
   order: 2;
 
-  @media (min-width: 768px) {
+  @media (min-width: 970px) {
     order: 0;
   }
 }
 
 .game-header-title {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  color: $slate-800;
+  color: $text-primary;
   order: 0;
   width: 100%;
   text-align: center;
 
-  @media (min-width: 768px) {
+  @media (min-width: 970px) {
     width: auto;
     position: absolute;
     left: 50%;
@@ -119,7 +119,7 @@
 .game-header-right {
   order: 3;
 
-  @media (min-width: 768px) {
+  @media (min-width: 970px) {
     order: 0;
   }
 }
@@ -128,36 +128,36 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: $slate-100;
+  background: $dark-bg-elevated;
   padding: 0.5rem 0.875rem;
   border-radius: $radius;
   font-size: 0.875rem;
-  border: 1px solid $slate-200;
+  border: 1px solid $dark-border;
   cursor: pointer;
   transition: all 0.15s ease;
 
   &:hover {
-    background: $slate-200;
-    border-color: $slate-300;
+    background: $dark-bg-hover;
+    border-color: $dark-border-light;
   }
 }
 
 .game-id-label {
-  color: $slate-500;
+  color: $text-muted;
 }
 
 .game-id-value {
   font-family: $font-mono;
   font-weight: 500;
-  color: $slate-700;
+  color: $text-secondary;
 }
 
 .game-id-icon {
-  color: $slate-400;
+  color: $text-muted;
   transition: color 0.15s ease;
 
   .game-id-badge:hover & {
-    color: $slate-600;
+    color: $text-secondary;
   }
 }
 
@@ -196,13 +196,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: $slate-800;
-  color: $white;
+  background: $dark-bg-elevated;
+  color: $text-primary;
   padding: 0.75rem 1.25rem;
   border-radius: $radius;
   font-size: 0.875rem;
   font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid $dark-border;
+  box-shadow: $shadow-lg;
   animation: toast-slide-up 0.3s ease;
 
   svg {
