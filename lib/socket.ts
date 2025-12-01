@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { io, Socket } from "socket.io-client";
 import { useGameStore } from "./store";
 
@@ -8,8 +8,20 @@ export function useSocket(
   shouldConnect: boolean = true
 ) {
   const socketRef = useRef<Socket | null>(null);
+  const listenersRef = useRef<Set<() => void>>(new Set());
   const { setUserId, setUsername, setUsers, setVotes, setRevealed, reset } =
     useGameStore();
+
+  const subscribe = (callback: () => void) => {
+    listenersRef.current.add(callback);
+    return () => {
+      listenersRef.current.delete(callback);
+    };
+  };
+
+  const getSnapshot = () => {
+    return socketRef.current;
+  };
 
   useEffect(() => {
     if (!gameId || !shouldConnect) return;
@@ -17,43 +29,50 @@ export function useSocket(
     // Initialize socket connection
     // In production, NEXT_PUBLIC_SOCKET_URL should be set to your deployed URL
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "";
-    socketRef.current = io(socketUrl, {
+    const newSocket = io(socketUrl, {
       path: "/socket.io",
     });
 
-    const socket = socketRef.current;
+    socketRef.current = newSocket;
+    const listeners = listenersRef.current;
+    listeners.forEach((listener) => listener());
 
     // Join the game with optional custom username
-    socket.emit("join-game", { gameId, username: customUsername });
+    newSocket.emit("join-game", { gameId, username: customUsername });
 
     // Listen for user joined event
-    socket.on("user-joined", ({ userId, username, users, votes, revealed }) => {
-      setUserId(userId);
-      setUsername(username);
-      setUsers(users);
-      setVotes(votes);
-      setRevealed(revealed);
-    });
+    newSocket.on(
+      "user-joined",
+      ({ userId, username, users, votes, revealed }) => {
+        setUserId(userId);
+        setUsername(username);
+        setUsers(users);
+        setVotes(votes);
+        setRevealed(revealed);
+      }
+    );
 
     // Listen for user list updates
-    socket.on("user-list-updated", ({ users }) => {
+    newSocket.on("user-list-updated", ({ users }) => {
       setUsers(users);
     });
 
     // Listen for votes revealed
-    socket.on("votes-revealed", ({ votes, revealed }) => {
+    newSocket.on("votes-revealed", ({ votes, revealed }) => {
       setVotes(votes);
       setRevealed(revealed);
     });
 
     // Listen for votes reset
-    socket.on("votes-reset", ({ users }) => {
+    newSocket.on("votes-reset", ({ users }) => {
       reset();
       setUsers(users);
     });
 
     return () => {
-      socket.disconnect();
+      newSocket.disconnect();
+      socketRef.current = null;
+      listeners.forEach((listener) => listener());
     };
   }, [
     gameId,
@@ -67,7 +86,7 @@ export function useSocket(
     reset,
   ]);
 
-  return socketRef.current;
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
 export function emitVote(
