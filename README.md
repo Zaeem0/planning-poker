@@ -94,6 +94,7 @@ planning-poker/
 │   ├── VotingCards.tsx        # Voting card selector with results
 │   ├── GameHeader.tsx         # Header with controls
 │   ├── GameControls.tsx       # Reveal/Reset buttons
+│   ├── CreateGameButton.tsx   # Shared create game button
 │   ├── JoinGameForm.tsx       # Join game form
 │   └── Toast.tsx              # Toast notifications
 ├── styles/

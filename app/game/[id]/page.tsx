@@ -14,24 +14,29 @@ import "@/styles/poker-table.scss";
 
 const STORAGE_KEY = "planning-poker-username";
 
+function getInitialState() {
+  if (typeof window === "undefined") {
+    return { name: "", hasJoined: false, showJoinForm: true };
+  }
+
+  const savedName = localStorage.getItem(STORAGE_KEY);
+  const hasJoined = !!savedName;
+
+  return {
+    name: savedName || "",
+    hasJoined,
+    showJoinForm: !hasJoined,
+  };
+}
+
 export default function GamePage() {
   const params = useParams();
   const gameId = params.id as string;
   const [copied, setCopied] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [showJoinForm, setShowJoinForm] = useState(true);
-  const [name, setName] = useState("");
-  const [hasJoined, setHasJoined] = useState(false);
-
-  useEffect(() => {
-    const savedName = localStorage.getItem(STORAGE_KEY);
-    if (savedName) {
-      setName(savedName);
-      setShowJoinForm(false);
-      setHasJoined(true);
-    }
-    setIsLoading(false);
-  }, []);
+  const initialState = getInitialState();
+  const [showJoinForm, setShowJoinForm] = useState(initialState.showJoinForm);
+  const [name, setName] = useState(initialState.name);
+  const [hasJoined, setHasJoined] = useState(initialState.hasJoined);
 
   const {
     userId,
@@ -77,10 +82,6 @@ export default function GamePage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
-  if (isLoading) {
-    return null;
-  }
 
   if (showJoinForm) {
     return (

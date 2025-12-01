@@ -53,11 +53,12 @@ To test with multiple users on the same machine:
 
 - ✅ Enter custom username or use auto-generated name
 - ✅ Vote with size-based estimate cards (🐜 🐰 🐶 🦒 🦕)
-- ✅ See vote status indicators (checkmarks)
+- ✅ See striped pattern on cards when players have voted
 - ✅ Reveal all votes at once
-- ✅ View most common estimate and distribution
+- ✅ View most common estimate with percentage overlays
 - ✅ Reset and start a new round
 - ✅ Copy game link to share
+- ✅ Throw emojis at other players for fun
 
 ## Troubleshooting
 

@@ -83,7 +83,7 @@
 ✅ Real-time vote status indicators
 ✅ Reveal mechanism
 ✅ Reset functionality
-✅ User list display
+✅ Player cards on poker table
 ✅ Shareable game links
 ✅ Clean, modern UI
 
