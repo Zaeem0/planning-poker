@@ -24,8 +24,15 @@ export function useSocket(
 ) {
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Set<() => void>>(new Set());
-  const { setUserId, setUsername, setUsers, setVotes, setRevealed, reset } =
-    useGameStore();
+  const {
+    setUserId,
+    setUsername,
+    setUsers,
+    setVotes,
+    setRevealed,
+    setSelectedVote,
+    reset,
+  } = useGameStore();
 
   const subscribe = (callback: () => void) => {
     listenersRef.current.add(callback);
@@ -52,23 +59,42 @@ export function useSocket(
 
     const userId = getUserId();
 
-    newSocket.emit("join-game", {
-      gameId,
-      userId,
-      username: customUsername,
-    });
-
     // Listen for user joined event
     newSocket.on(
       "user-joined",
       ({ userId, username, users, votes, revealed }) => {
+        console.log("user-joined event received:", {
+          userId,
+          username,
+          usersCount: users.length,
+          votesCount: votes.length,
+          revealed,
+        });
         setUserId(userId);
         setUsername(username);
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
+
+        // Restore selectedVote if user has voted
+        const userVote = votes.find(
+          (v: { userId: string; vote: string }) => v.userId === userId
+        );
+        if (userVote) {
+          setSelectedVote(userVote.vote);
+        }
       }
     );
+
+    // Wait for socket to connect before joining game
+    newSocket.on("connect", () => {
+      console.log("Socket connected, joining game:", gameId);
+      newSocket.emit("join-game", {
+        gameId,
+        userId,
+        username: customUsername,
+      });
+    });
 
     // Listen for user list updates
     newSocket.on("user-list-updated", ({ users }) => {
@@ -101,6 +127,7 @@ export function useSocket(
     setUsers,
     setVotes,
     setRevealed,
+    setSelectedVote,
     reset,
   ]);
 

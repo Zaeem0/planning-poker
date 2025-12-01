@@ -1,55 +1,48 @@
 # 🚀 Deployment Guide
 
-This guide will help you deploy Planning Poker to Render.com for free.
+Complete guide for deploying Planning Poker to production.
 
 ## 📋 Prerequisites
 
-- A GitHub account
-- Your code pushed to a GitHub repository
-- A Render.com account (free to create)
+- GitHub account
+- Code pushed to GitHub repository
+- Render.com account (free to create)
 
-## 💻 Local Development Note
+## ⚡ Quick Deploy (5 Minutes)
 
-The repository includes a `.env.local` file configured for local development:
+### Step 1: Push to GitHub
 
-- Server runs on `localhost:3000`
-- No additional configuration needed
-- Just run `npm run dev` and you're ready!
+```bash
+git add .
+git commit -m "Ready for deployment"
+git push origin main
+```
 
-**Note:** `.env.local` is git-ignored and won't be deployed to production.
+### Step 2: Create Render Account
 
-## 🎯 Quick Deploy to Render
+1. Go to [render.com](https://render.com)
+2. Click "Get Started"
+3. Sign up with GitHub account
 
-### Option 1: Using render.yaml (Recommended)
+### Step 3: Deploy
 
-This is the easiest method as the configuration is already set up in `render.yaml`.
+1. In Render Dashboard, click **"New +"** → **"Web Service"**
+2. Connect your `planning-poker` repository
+3. Render detects `render.yaml` automatically
+4. Click **"Apply"** to use the configuration
+5. Click **"Create Web Service"**
+6. Wait 3-5 minutes for deployment ⏳
 
-1. **Push your code to GitHub**
+### Step 4: Test
 
-   ```bash
-   git add .
-   git commit -m "Prepare for Render deployment"
-   git push origin main
-   ```
+1. Click the URL (e.g., `https://planning-poker-xxxx.onrender.com`)
+2. Create a new game
+3. Open URL in another browser/tab
+4. Join and test voting! 🎉
 
-2. **Sign up/Login to Render**
+---
 
-   - Go to [render.com](https://render.com)
-   - Sign up or log in with your GitHub account
-
-3. **Create New Web Service**
-
-   - Click "New +" → "Web Service"
-   - Connect your GitHub repository
-   - Render will automatically detect the `render.yaml` file
-   - Click "Apply" to use the configuration
-
-4. **Deploy!**
-   - Render will automatically build and deploy your app
-   - Wait 3-5 minutes for the first deployment
-   - Your app will be live at `https://your-app-name.onrender.com`
-
-### Option 2: Manual Configuration
+## 🔧 Manual Configuration (Alternative)
 
 If you prefer to configure manually:
 

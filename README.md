@@ -2,84 +2,64 @@
 
 A real-time Planning Poker application built with Next.js, Socket.io, and TypeScript. Perfect for agile teams to estimate story points collaboratively.
 
-## ✨ Features
+## ✨ Key Features
 
 - **Real-time Collaboration** - Multiple users can join and vote simultaneously
-- **Custom Usernames** - Enter your own name or get a random one automatically
-- **Size-Based Voting Cards** - Intuitive size estimates:
-  - 🐜 Extra Small (< 1 day)
-  - 🐰 Small (1 - 2 days)
-  - 🐶 Medium (1 week)
-  - 🦒 Large (2 weeks)
-  - 🦕 Extra Large (2+ weeks)
-- **Vote Status Indicators** - See who has voted without revealing their choice
-- **Reveal Mechanism** - Show all votes at once when ready
-- **Results & Statistics** - View most common estimate and vote distribution
-- **Reset Functionality** - Start a new round with one click
-- **Shareable Game Links** - Easy game ID sharing for team collaboration
-- **Responsive Design** - Works on desktop, tablet, and mobile devices
+- **Persistent Sessions** - Votes and positions maintained across page refreshes
+- **Size-Based Voting** - Intuitive estimates (🐜 XS → 🦕 XL)
+- **Keyboard Shortcuts** - Quick voting with S, M, L, XS, XL, ? keys
+- **Vote Statistics** - View distribution and most common estimate
+- **Disconnection Handling** - See who's offline with visual indicators
 
-## 🚀 Getting Started
+📖 **[View Complete Feature List →](./FEATURES.md)**
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- Yarn package manager (1.22.0 or higher)
+- Node.js 18+
+- Yarn 1.22.0+
 
-### Installation
-
-1. Navigate to the project directory:
+### Local Development
 
 ```bash
-cd planning-poker
-```
-
-2. Install dependencies:
-
-```bash
+# Install dependencies
 yarn install
+
+# Start development server
+yarn dev
+
+# Open http://localhost:3000
 ```
 
-3. Run the development server:
+### Production Deployment
+
+Deploy to Render.com in 5 minutes:
 
 ```bash
-yarn dev
+# Push to GitHub
+git push origin main
+
+# Then follow the deployment guide
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+📚 **[Full Deployment Guide →](./DEPLOYMENT.md)**
 
 ## 🎮 How to Use
 
-1. **Create a Game**
-
-   - Click "Create New Game" on the home page
-   - Share the game ID or URL with your team
-
-2. **Join a Game**
-
-   - Enter the game ID on the home page, or
-   - Click the shared game link
-
-3. **Vote**
-
-   - Select a card value to cast your vote
-   - Your vote is hidden until revealed
-
-4. **Reveal**
-
-   - Once everyone has voted, click "Reveal Cards"
-   - View results and statistics
-
-5. **New Round**
-   - Click "New Round" to reset and start voting again
+1. **Create a Game** - Click "Create New Game" and share the URL
+2. **Vote** - Select a card or use keyboard shortcuts (S, M, L, etc.)
+3. **Reveal** - Click "Reveal Cards" to show all votes
+4. **New Round** - Reset and start over
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: Next.js 14, React, TypeScript
-- **Styling**: SCSS
-- **Real-time**: Socket.io
-- **State Management**: Zustand
+- **Frontend**: Next.js 16, React 19, TypeScript 5
+- **Styling**: SCSS (Sass)
+- **Real-time**: Socket.io 4.8
+- **State Management**: Zustand 5
 - **Server**: Custom Node.js server with Socket.io
+- **Runtime**: Node.js 18+, Yarn 1.22+
 
 ## 📁 Project Structure
 
@@ -96,6 +76,7 @@ planning-poker/
 │   ├── GameControls.tsx       # Reveal/Reset buttons
 │   ├── CreateGameButton.tsx   # Shared create game button
 │   ├── JoinGameForm.tsx       # Join game form
+│   ├── Loader.tsx             # Loading spinner component
 │   └── Toast.tsx              # Toast notifications
 ├── styles/
 │   ├── _variables.scss        # SCSS variables
@@ -106,65 +87,20 @@ planning-poker/
 │   ├── store.ts               # Zustand state management
 │   ├── socket.ts              # Socket.io client hooks
 │   └── constants.ts           # Card values
-└── server.js                  # Custom Socket.io server
+└── server.ts                  # Custom Socket.io server (TypeScript)
 ```
 
-## 🔧 Configuration
+## 📝 Available Scripts
 
-### Environment Variables
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn start` - Start production server
+- `yarn lint` - Run ESLint
 
-The app uses environment variables for configuration. See `.env.example` for all available options:
+## 📚 Documentation
 
-- `PORT` - Server port (default: 3000)
-- `HOSTNAME` - Server hostname (default: 0.0.0.0 for production)
-- `NODE_ENV` - Environment (development/production)
-- `CORS_ORIGIN` - CORS origin for Socket.IO (default: \*)
-- `NEXT_PUBLIC_SOCKET_URL` - WebSocket server URL (leave empty for same origin)
-
-### Local Development
-
-A `.env.local` file is included with sensible defaults for local development:
-
-- Server runs on `localhost:3000`
-- CORS allows all origins
-- Socket.IO connects to same origin
-
-You can customize these values by editing `.env.local` as needed.
-
-## 📝 Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run lint` - Run ESLint
-
-## 🚀 Deployment
-
-This app is ready to deploy to Render.com for free!
-
-### Quick Deploy
-
-1. Push your code to GitHub
-2. Sign up at [render.com](https://render.com)
-3. Create a new Web Service and connect your repository
-4. Render will automatically detect the `render.yaml` configuration
-5. Click "Apply" and deploy!
-
-Your app will be live at `https://your-app-name.onrender.com`
-
-### Detailed Instructions
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step deployment instructions, troubleshooting, and configuration options.
-
-### Other Platforms
-
-While this app is optimized for Render, you can also deploy to:
-
-- **Railway.app** - Similar to Render, supports WebSockets
-- **Fly.io** - Requires Docker configuration
-- **Any VPS** - DigitalOcean, Linode, AWS EC2, etc.
-
-**Note**: Vercel and Netlify are **not compatible** due to WebSocket requirements.
+- **[Features Guide](./FEATURES.md)** - Complete feature list and technical details
+- **[Deployment Guide](./DEPLOYMENT.md)** - Step-by-step deployment instructions
 
 ## 🤝 Contributing
 
@@ -172,4 +108,4 @@ Feel free to submit issues and enhancement requests!
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+MIT License - feel free to use this project for your team!

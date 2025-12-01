@@ -107,6 +107,7 @@ export default function PokerTable({
     const hasVoted = user.hasVoted;
     const isHovered = hoveredUserId === user.id;
     const userAnimations = getAnimationsForUser(user.id);
+    const isDisconnected = !user.connected;
 
     return (
       <div
@@ -118,12 +119,18 @@ export default function PokerTable({
         <div
           className={`player-card ${hasVoted ? "player-card-voted" : ""} ${
             revealed && vote ? "player-card-revealed" : ""
-          }`}
+          } ${isDisconnected ? "player-card-disconnected" : ""}`}
         >
-          {revealed && vote ? (
+          {isDisconnected ? (
+            <div className="player-card-content">
+              <span className="player-card-emoji">🔌</span>
+            </div>
+          ) : revealed && vote ? (
             <div className="player-card-content">
               <span className="player-card-emoji">{getVoteLabel(vote)}</span>
-              <span className="player-card-size">{vote.toUpperCase()}</span>
+              {vote !== "unknown" && (
+                <span className="player-card-size">{vote.toUpperCase()}</span>
+              )}
             </div>
           ) : (
             <span className="player-card-back"></span>

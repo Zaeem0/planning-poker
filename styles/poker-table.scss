@@ -53,6 +53,12 @@
   border-color: $primary;
 }
 
+.player-card-disconnected {
+  background: $dark-bg;
+  border-color: $slate-700;
+  opacity: 0.6;
+}
+
 .player-card-content {
   display: flex;
   flex-direction: column;

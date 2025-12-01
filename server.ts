@@ -16,12 +16,15 @@ interface User {
   socketId: string;
   username: string;
   hasVoted: boolean;
+  joinOrder: number;
+  connected: boolean;
 }
 
 interface Game {
   users: Map<string, User>;
   votes: Map<string, string>;
   revealed: boolean;
+  nextJoinOrder: number;
 }
 
 interface UserProfile {
@@ -65,7 +68,7 @@ const users = new Map<string, UserData>();
 const userProfiles = new Map<string, UserProfile>();
 
 function generateUserId(): string {
-  return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `user_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 }
 
 app.prepare().then(() => {
@@ -127,19 +130,28 @@ app.prepare().then(() => {
             users: new Map(),
             votes: new Map(),
             revealed: false,
+            nextJoinOrder: 0,
           });
         }
 
         const game = games.get(gameId)!;
 
+        // Check if user has voted by looking at game.votes
+        const hasVoted = game.votes.has(userId);
+
+        // Check if user already has a join order (reconnecting)
         const existingUser = game.users.get(userId);
-        const hasVoted = existingUser ? existingUser.hasVoted : false;
+        const joinOrder = existingUser
+          ? existingUser.joinOrder
+          : game.nextJoinOrder++;
 
         game.users.set(userId, {
           id: userId,
           socketId: socket.id,
           username: finalUsername,
           hasVoted,
+          joinOrder,
+          connected: true,
         });
 
         users.set(socket.id, { userId, gameId });
@@ -150,21 +162,38 @@ app.prepare().then(() => {
           }: ${finalUsername} (${userId})`
         );
 
+        const votesData = game.revealed
+          ? Array.from(game.votes.entries()).map(([id, vote]) => ({
+              userId: id,
+              vote,
+            }))
+          : [];
+
+        console.log("Sending user-joined event:", {
+          userId,
+          username: finalUsername,
+          usersCount: game.users.size,
+          votesCount: votesData.length,
+          revealed: game.revealed,
+          totalVotesInGame: game.votes.size,
+        });
+
+        // Sort users by join order to maintain consistent positioning
+        // Send all users (connected and disconnected) so client can show disconnected state
+        const sortedUsers = Array.from(game.users.values()).sort(
+          (a, b) => a.joinOrder - b.joinOrder
+        );
+
         socket.emit("user-joined", {
           userId,
           username: finalUsername,
-          users: Array.from(game.users.values()),
-          votes: game.revealed
-            ? Array.from(game.votes.entries()).map(([id, vote]) => ({
-                userId: id,
-                vote,
-              }))
-            : [],
+          users: sortedUsers,
+          votes: votesData,
           revealed: game.revealed,
         });
 
         socket.to(gameId).emit("user-list-updated", {
-          users: Array.from(game.users.values()),
+          users: sortedUsers,
         });
       }
     );
@@ -180,8 +209,11 @@ app.prepare().then(() => {
       }
 
       // Broadcast vote status (not the actual vote unless revealed)
+      const sortedUsers = Array.from(game.users.values()).sort(
+        (a, b) => a.joinOrder - b.joinOrder
+      );
       io.to(gameId).emit("user-list-updated", {
-        users: Array.from(game.users.values()),
+        users: sortedUsers,
       });
     });
 
@@ -211,8 +243,11 @@ app.prepare().then(() => {
         user.hasVoted = false;
       });
 
+      const sortedUsers = Array.from(game.users.values()).sort(
+        (a, b) => a.joinOrder - b.joinOrder
+      );
       io.to(gameId).emit("votes-reset", {
-        users: Array.from(game.users.values()),
+        users: sortedUsers,
       });
     });
 
@@ -232,11 +267,22 @@ app.prepare().then(() => {
         const game = games.get(gameId);
 
         if (game) {
-          game.users.delete(userId);
-          game.votes.delete(userId);
+          const user = game.users.get(userId);
+          if (user) {
+            // Mark user as disconnected instead of deleting
+            user.connected = false;
+          }
+
+          // Keep votes on disconnect to allow reconnection with vote intact
+          // Votes are only cleared when "New Round" is clicked
+
+          // Send all users so client can show disconnected state
+          const sortedUsers = Array.from(game.users.values()).sort(
+            (a, b) => a.joinOrder - b.joinOrder
+          );
 
           io.to(gameId).emit("user-list-updated", {
-            users: Array.from(game.users.values()),
+            users: sortedUsers,
           });
         }
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useGameStore } from "@/lib/store";
 import { useSocket, emitVote, emitReveal, emitReset } from "@/lib/socket";
 import PokerTable from "@/components/PokerTable";
@@ -45,12 +45,65 @@ export default function GamePage() {
     setSubmittedName(trimmedName);
   };
 
-  const handleVote = (value: string) => {
-    setSelectedVote(value);
-    if (socket && userId) {
-      emitVote(socket, gameId, userId, value);
-    }
-  };
+  const handleVote = useCallback(
+    (value: string) => {
+      setSelectedVote(value);
+      if (socket && userId) {
+        emitVote(socket, gameId, userId, value);
+      }
+    },
+    [socket, userId, gameId, setSelectedVote]
+  );
+
+  useEffect(() => {
+    if (!username || revealed) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      const validVotes = ["xs", "s", "m", "l", "xl"];
+
+      // Check if user is typing in an input field
+      const target = e.target as HTMLElement;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") {
+        return;
+      }
+
+      // Handle unknown vote with ?
+      if (e.key === "?") {
+        handleVote("unknown");
+        return;
+      }
+
+      // Handle single character votes
+      if (validVotes.includes(key)) {
+        handleVote(key);
+        return;
+      }
+
+      // Handle two-character votes (xs, xl)
+      if (key === "x") {
+        const handleSecondKey = (e2: KeyboardEvent) => {
+          const secondKey = e2.key.toLowerCase();
+          if (secondKey === "s") {
+            handleVote("xs");
+          } else if (secondKey === "l") {
+            handleVote("xl");
+          }
+          window.removeEventListener("keydown", handleSecondKey);
+        };
+
+        window.addEventListener("keydown", handleSecondKey);
+        setTimeout(() => {
+          window.removeEventListener("keydown", handleSecondKey);
+        }, 1000);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [username, revealed, handleVote]);
 
   const handleReveal = () => {
     if (socket) emitReveal(socket, gameId);
@@ -65,7 +118,7 @@ export default function GamePage() {
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(window.location.href);
       } else {
-        // Fallback for non-secure contexts
+        // Fallback for localhost
         const textArea = document.createElement("textarea");
         textArea.value = window.location.href;
         textArea.style.position = "fixed";
@@ -74,6 +127,7 @@ export default function GamePage() {
         document.body.appendChild(textArea);
         textArea.focus();
         textArea.select();
+        // Expected only used in insecure contexts (e.g. http://)
         document.execCommand("copy");
         textArea.remove();
       }

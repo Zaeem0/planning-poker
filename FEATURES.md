@@ -1,110 +1,126 @@
-# Planning Poker - Feature List
+# Planning Poker - Features Guide
 
-## ✅ Implemented Features
+## ✅ Core Features
 
-### Core Functionality
+### Real-time Voting System
 
-- [x] **Real-time Voting System**
+**Size-Based Estimates:**
 
-  - Users can select from size-based estimate cards:
-    - 🐜 Extra Small (< 1 day)
-    - 🐰 Small (1 - 2 days)
-    - 🐶 Medium (1 week)
-    - 🦒 Large (2 weeks)
-    - 🦕 Extra Large (2+ weeks)
-  - Votes are hidden until revealed
-  - Real-time synchronization across all users
+- 🐜 Extra Small (< 1 day)
+- 🐰 Small (1-2 days)
+- 🐶 Medium (1 week)
+- 🦒 Large (2 weeks)
+- 🦕 Extra Large (2+ weeks)
+- ❓ Unknown
 
-- [x] **User Management**
+**Voting Methods:**
 
-  - Custom username input on join
-  - Auto-generated usernames if no name provided (e.g., "Happy Panda", "Brave Tiger")
-  - Automatic user addition when visiting the page
-  - Visual distinction for current user
-  - Emoji throwing between players for fun interactions
+- Click voting cards at bottom of screen
+- Keyboard shortcuts:
+  - `S` → Small
+  - `M` → Medium
+  - `L` → Large
+  - `X` then `S` → Extra Small
+  - `X` then `L` → Extra Large
+  - `?` → Unknown
 
-- [x] **Game Controls**
+**Vote Display:**
 
-  - Reveal Cards button (enabled when votes exist)
-  - New Round button (resets all votes)
-  - Copy game link functionality
+- Votes hidden until revealed
+- Striped pattern shows who has voted
+- Real-time synchronization across all users
 
-- [x] **Results & Statistics**
-  - Results displayed directly on voting cards when revealed
-  - Most common estimate highlighted in green
-  - Percentage-based opacity to show vote distribution
-  - Cards with no votes are faded
+### User Management
 
-### User Interface
+**Username System:**
 
-- [x] **Responsive Design**
+- Custom username required on first visit
+- Username stored on server and persists across sessions
+- Automatic reconnection with stored username
+- No random username generation
 
-  - Mobile-friendly layout
-  - Tablet and desktop optimized
-  - Grid-based card layout
+**User Display:**
 
-- [x] **Visual Feedback**
+- Visual distinction for current user
+- Player cards arranged around poker table
+- Emoji throwing between players for fun interactions
+- Disconnected users shown with 🔌 plug icon
 
-  - Selected card highlighting
-  - Striped pattern on cards when player has voted
-  - Revealed votes displayed on player cards
-  - Percentage overlays on voting cards when revealed
+### Session Persistence
 
-- [x] **Modern Styling**
-  - Clean, professional design
-  - Gradient backgrounds
-  - Shadow effects and transitions
-  - SCSS with design system variables
+**Vote Persistence:**
 
-### Technical Features
+- Votes maintained across page refreshes
+- Works before and after votes are revealed
+- Votes only cleared when "New Round" is clicked
+- Selected vote restored on reconnection
 
-- [x] **WebSocket Communication**
+**Position Persistence:**
 
-  - Socket.io for real-time updates
-  - Automatic reconnection handling
-  - Event-based architecture
+- Users maintain their position around the table
+- Join order tracked and preserved
+- No visual "jumping" when users reconnect
+- Disconnected users hold their position as placeholders
 
-- [x] **State Management**
+**Connection State:**
 
-  - Zustand for client-side state
-  - Server-side game state management
-  - Synchronized state across clients
+- Disconnected users marked with reduced opacity
+- Plug icon (🔌) displayed for offline users
+- Automatic reconnection when user returns
+- Connection state visible to all players
 
-- [x] **Game Sessions**
-  - Unique game IDs
-  - Multiple concurrent games support
-  - Persistent game state during session
+### Game Controls
 
-## 🎯 How It Compares to Reference Site
+- **Reveal Cards** - Show all votes (enabled when votes exist)
+- **New Round** - Reset all votes and start over
+- **Copy Link** - Share game URL with team
+- **Game Header** - Shows game ID and player count
 
-### Matching Features
+### Results & Statistics
 
-✅ Voting cards with standard values
-✅ Real-time vote status indicators
-✅ Reveal mechanism
-✅ Reset functionality
-✅ Player cards on poker table
-✅ Shareable game links
-✅ Clean, modern UI
+**Vote Display:**
 
-### Simplified (for MVP)
+- Results shown directly on voting cards
+- Player cards show emoji + size text
+- Most common estimate highlighted in green
+- Percentage overlays on voting cards
 
-- No user authentication (anonymous by default)
-- No issue/story management
-- No integrations (Jira, Linear, etc.)
-- No voting history
-- No premium features
+**Statistics:**
 
-## 🚀 Usage Flow
+- Vote distribution percentages
+- Most common vote indicator
+- Cards with no votes are faded
+- "Votes revealed!" message when shown
 
-1. **Landing Page** → Create or join game
-2. **Game Room** → Auto-assigned username
-3. **Vote** → Select card value
-4. **Wait** → See who has voted (checkmarks)
-5. **Reveal** → View all votes and statistics
-6. **Reset** → Start new round
+### Visual Feedback
+
+- Selected card highlighting
+- Striped pattern when player has voted
+- Revealed votes on player cards
+- Percentage overlays on voting cards
+- Toast notifications for actions
+- Smooth transitions and animations
+
+### Modern Styling
+
+- Clean, professional design
+- Dark theme with gradient backgrounds
+- Shadow effects and hover states
+- SCSS with design system variables
+- Consistent spacing and typography
 
 ## 🔧 Technical Architecture
+
+### Stack
+
+- **Frontend**: Next.js 16, React 19, TypeScript 5
+- **Styling**: SCSS (Sass)
+- **Real-time**: Socket.io 4.8
+- **State**: Zustand 5
+- **Server**: Custom Node.js server with Socket.io
+- **Runtime**: Node.js 18+
+
+### Communication Flow
 
 ```
 Client (Browser)
@@ -117,20 +133,98 @@ WebSocket Connection
     ↓
 Socket.io Server (Node.js)
     ↓
-Game State (In-Memory Map)
+Game State (In-Memory)
 ```
 
-## 📊 Data Flow
+### State Management
 
-1. User joins → Server assigns ID and username
-2. User votes → Server stores vote, broadcasts status
-3. Reveal clicked → Server broadcasts all votes
-4. Reset clicked → Server clears votes, broadcasts reset
+**Client-side (Zustand):**
 
-## 🎨 Design Principles
+- Game ID, User ID, Username
+- Users list, Votes, Revealed state
+- Selected vote, UI state
 
-- **Simplicity**: Easy to understand and use
-- **Real-time**: Instant feedback and updates
-- **Responsive**: Works on all devices
-- **Accessible**: Clear visual indicators
-- **Professional**: Clean, modern aesthetic
+**Server-side (In-Memory Maps):**
+
+- `games` - Game state by game ID
+- `users` - Socket ID to user data mapping
+- `userProfiles` - User ID to username mapping
+
+### Data Persistence
+
+**Persisted Across Disconnects:**
+
+- User ID (localStorage)
+- Username (server)
+- Join order (server)
+- Votes (server)
+- Revealed state (server)
+
+**Cleared on "New Round":**
+
+- All votes
+- Revealed state
+- hasVoted flags
+
+**Never Cleared:**
+
+- User profiles
+- Join order
+- User list
+
+## 🔌 Reconnection & Persistence
+
+### How It Works
+
+1. **First Visit:**
+
+   - User provides username
+   - Assigned unique user ID (stored in localStorage)
+   - Username stored on server
+   - Assigned join order position
+
+2. **Subsequent Visits:**
+
+   - User ID retrieved from localStorage
+   - Username retrieved from server
+   - Join order preserved
+   - Vote restored if exists
+
+3. **During Disconnect:**
+
+   - User marked as `connected: false`
+   - User kept in game state
+   - Vote preserved
+   - Position held with plug icon (🔌)
+
+4. **On Reconnection:**
+   - User marked as `connected: true`
+   - Same position in table
+   - Vote restored
+   - UI state synchronized
+
+### Benefits
+
+- ✅ Seamless page refreshes
+- ✅ No lost votes
+- ✅ Stable player positions
+- ✅ Transparent connection state
+- ✅ Better user experience
+
+## 🚀 Usage Flow
+
+1. **Landing Page** → Create or join game
+2. **Enter Username** → Required on first visit
+3. **Vote** → Click card or use keyboard
+4. **Wait** → See who has voted (striped cards)
+5. **Reveal** → View all votes and statistics
+6. **New Round** → Reset and start over
+
+## 🎯 Design Principles
+
+- **Simplicity** - Easy to understand and use
+- **Real-time** - Instant feedback and updates
+- **Persistence** - Seamless across refreshes
+- **Responsive** - Works on all devices
+- **Accessible** - Clear visual indicators
+- **Professional** - Clean, modern aesthetic

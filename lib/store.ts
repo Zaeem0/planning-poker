@@ -4,6 +4,8 @@ export interface User {
   id: string;
   username: string;
   hasVoted: boolean;
+  joinOrder: number;
+  connected: boolean;
 }
 
 export interface Vote {
