@@ -24,7 +24,7 @@ A real-time Planning Poker application built with Next.js, Socket.io, and TypeSc
 ### Prerequisites
 
 - Node.js 18+ installed
-- npm or yarn package manager
+- Yarn package manager (1.22.0 or higher)
 
 ### Installation
 
@@ -37,13 +37,13 @@ cd planning-poker
 2. Install dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 3. Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
@@ -111,7 +111,25 @@ planning-poker/
 
 ## 🔧 Configuration
 
-The app runs on port 3000 by default. To change this, modify the `port` variable in `server.js`.
+### Environment Variables
+
+The app uses environment variables for configuration. See `.env.example` for all available options:
+
+- `PORT` - Server port (default: 3000)
+- `HOSTNAME` - Server hostname (default: 0.0.0.0 for production)
+- `NODE_ENV` - Environment (development/production)
+- `CORS_ORIGIN` - CORS origin for Socket.IO (default: \*)
+- `NEXT_PUBLIC_SOCKET_URL` - WebSocket server URL (leave empty for same origin)
+
+### Local Development
+
+A `.env.local` file is included with sensible defaults for local development:
+
+- Server runs on `localhost:3000`
+- CORS allows all origins
+- Socket.IO connects to same origin
+
+You can customize these values by editing `.env.local` as needed.
 
 ## 📝 Scripts
 
@@ -119,6 +137,34 @@ The app runs on port 3000 by default. To change this, modify the `port` variable
 - `npm run build` - Build for production
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint
+
+## 🚀 Deployment
+
+This app is ready to deploy to Render.com for free!
+
+### Quick Deploy
+
+1. Push your code to GitHub
+2. Sign up at [render.com](https://render.com)
+3. Create a new Web Service and connect your repository
+4. Render will automatically detect the `render.yaml` configuration
+5. Click "Apply" and deploy!
+
+Your app will be live at `https://your-app-name.onrender.com`
+
+### Detailed Instructions
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step deployment instructions, troubleshooting, and configuration options.
+
+### Other Platforms
+
+While this app is optimized for Render, you can also deploy to:
+
+- **Railway.app** - Similar to Render, supports WebSockets
+- **Fly.io** - Requires Docker configuration
+- **Any VPS** - DigitalOcean, Linode, AWS EC2, etc.
+
+**Note**: Vercel and Netlify are **not compatible** due to WebSocket requirements.
 
 ## 🤝 Contributing
 

@@ -15,7 +15,9 @@ export function useSocket(
     if (!gameId || !shouldConnect) return;
 
     // Initialize socket connection
-    socketRef.current = io({
+    // In production, NEXT_PUBLIC_SOCKET_URL should be set to your deployed URL
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "";
+    socketRef.current = io(socketUrl, {
       path: "/socket.io",
     });
 
