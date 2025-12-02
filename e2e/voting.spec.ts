@@ -4,6 +4,7 @@ import {
   joinGameAsUser,
   selectVoteCard,
   pressVoteKey,
+  pressDeselectKey,
   clickRevealVotes,
   clickNewRound,
   navigateToGame,
@@ -148,6 +149,36 @@ test.describe('Voting', () => {
       await expect(usernameInput).toHaveValue('Sam');
 
       await closeContexts(context);
+    });
+
+    test('should deselect vote with Escape key', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      const username = 'EscapeVoter';
+      await joinGameAsUser(page, gameId, username);
+
+      await pressVoteKey(page, 'm');
+      await expect(getVoteCard(page, 'm')).toHaveClass(/selected/);
+
+      await pressDeselectKey(page, 'Escape');
+      await expect(getVoteCard(page, 'm')).not.toHaveClass(/selected/);
+
+      const playerCard = getPlayerCard(page, username);
+      await expect(playerCard.locator('.player-card-voted')).not.toBeVisible();
+    });
+
+    test('should deselect vote with Backspace key', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      const username = 'BackspaceVoter';
+      await joinGameAsUser(page, gameId, username);
+
+      await pressVoteKey(page, 'l');
+      await expect(getVoteCard(page, 'l')).toHaveClass(/selected/);
+
+      await pressDeselectKey(page, 'Backspace');
+      await expect(getVoteCard(page, 'l')).not.toHaveClass(/selected/);
+
+      const playerCard = getPlayerCard(page, username);
+      await expect(playerCard.locator('.player-card-voted')).not.toBeVisible();
     });
   });
 

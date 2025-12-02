@@ -4,16 +4,21 @@ import { VoteSize, SINGLE_KEY_VOTES, VoteSizeValue } from '@/lib/constants';
 const isSingleKeyVote = (key: string): key is VoteSizeValue =>
   (SINGLE_KEY_VOTES as readonly string[]).includes(key);
 
+const isDeselectKey = (key: string): boolean =>
+  key === 'Escape' || key === 'Backspace';
+
 const TWO_CHAR_TIMEOUT_MS = 1000;
 
 interface UseKeyboardVotingOptions {
   enabled: boolean;
   onVote: (value: VoteSizeValue) => void;
+  onDeselect: () => void;
 }
 
 export function useKeyboardVoting({
   enabled,
   onVote,
+  onDeselect,
 }: UseKeyboardVotingOptions): void {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const secondKeyListenerRef = useRef<((e: KeyboardEvent) => void) | null>(
@@ -62,6 +67,7 @@ export function useKeyboardVoting({
       const key = e.key.toLowerCase();
 
       if (isTypingInFormField(e.target as HTMLElement)) return;
+      if (isDeselectKey(e.key)) return onDeselect();
       if (e.key === '?') return onVote(VoteSize.UNKNOWN);
       if (isSingleKeyVote(key)) return onVote(key);
       handleTwoCharacterVote(key);
@@ -73,5 +79,5 @@ export function useKeyboardVoting({
       window.removeEventListener('keydown', handleKeyboardVote);
       clearPendingTimeout();
     };
-  }, [enabled, onVote, clearPendingTimeout]);
+  }, [enabled, onVote, onDeselect, clearPendingTimeout]);
 }

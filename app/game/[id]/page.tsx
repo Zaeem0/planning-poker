@@ -72,12 +72,20 @@ export default function GamePage() {
     [socket, userId, gameId, setSelectedVote]
   );
 
+  const handleKeyboardDeselect = useCallback(() => {
+    setSelectedVote(null);
+    if (socket && userId) {
+      emitVote(socket, gameId, userId, null);
+    }
+  }, [socket, userId, gameId, setSelectedVote]);
+
   const currentUser = users.find((u) => u.id === userId);
   const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
 
   useKeyboardVoting({
     enabled: !!username && !revealed && !isCurrentUserSpectator,
     onVote: handleKeyboardVote,
+    onDeselect: handleKeyboardDeselect,
   });
 
   const handleReveal = () => {

@@ -23,6 +23,7 @@
   - `X` then `S` → Extra Small
   - `X` then `L` → Extra Large
   - `?` → Unknown
+  - `Escape` or `Backspace` → Deselect vote
 
 **Vote Display:**
 

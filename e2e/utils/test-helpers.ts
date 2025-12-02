@@ -64,6 +64,13 @@ export async function pressVoteKey(page: Page, size: string) {
   }
 }
 
+export async function pressDeselectKey(
+  page: Page,
+  key: 'Escape' | 'Backspace'
+) {
+  await page.keyboard.press(key);
+}
+
 export async function clickRevealVotes(page: Page) {
   await page.getByRole('button', { name: /reveal/i }).click();
 }
