@@ -72,6 +72,9 @@ export default function VotingCards({
 }: VotingCardsProps) {
   return (
     <div className="voting-section-bottom">
+      <p className="voting-hint">
+        Press a key to vote: XS, S, M, L, XL, or ? for unknown
+      </p>
       <div className="voting-cards-bottom">
         {CARD_VALUES.map((card) => {
           const stats = calculateCardStats(card.value, votes, revealed);

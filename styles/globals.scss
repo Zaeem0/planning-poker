@@ -27,3 +27,28 @@ button,
 input {
   font-family: inherit;
 }
+
+.git-info {
+  position: fixed;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+  font-family: $font-mono;
+  color: $text-muted;
+  text-decoration: none;
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  z-index: 200;
+
+  &:hover {
+    opacity: 1;
+    color: $text-secondary;
+  }
+}
