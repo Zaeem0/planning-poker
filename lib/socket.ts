@@ -70,13 +70,6 @@ export function useSocket(
     newSocket.on(
       'user-joined',
       ({ userId: joinedUserId, username, users, votes, revealed }) => {
-        console.log('user-joined event received:', {
-          joinedUserId,
-          username,
-          usersCount: users.length,
-          votesCount: votes.length,
-          revealed,
-        });
         setUserId(joinedUserId);
         setUsername(username);
         setUsers(users);
@@ -87,7 +80,6 @@ export function useSocket(
     );
 
     newSocket.on('connect', () => {
-      console.log('Socket connected, joining game:', gameId);
       newSocket.emit('join-game', {
         gameId,
         userId,

@@ -1,4 +1,5 @@
-import { CARD_VALUES } from '@/lib/constants';
+import { useMemo } from 'react';
+import { CARD_VALUES, VoteSize } from '@/lib/constants';
 import { Vote } from '@/lib/store';
 
 interface VotingCardsProps {
@@ -15,29 +16,39 @@ interface CardStats {
   hasVotes: boolean;
 }
 
-function calculateCardStats(
-  cardValue: string,
-  votes: Vote[],
-  revealed: boolean
-): CardStats {
+type AllCardStats = Record<string, CardStats>;
+
+function calculateAllCardStats(votes: Vote[], revealed: boolean): AllCardStats {
   if (!revealed) {
-    return {
+    const emptyStats: CardStats = {
       voteCount: 0,
       percentage: 0,
       isMostCommon: false,
       hasVotes: false,
     };
+    return Object.fromEntries(CARD_VALUES.map((c) => [c.value, emptyStats]));
   }
 
-  const voteCount = votes.filter((v) => v.vote === cardValue).length;
-  const percentage =
-    votes.length > 0 ? Math.round((voteCount / votes.length) * 100) : 0;
-  const maxVotes = Math.max(
-    ...CARD_VALUES.map((c) => votes.filter((v) => v.vote === c.value).length)
-  );
-  const isMostCommon = voteCount > 0 && voteCount === maxVotes;
+  const voteCounts = new Map<string, number>();
+  for (const vote of votes) {
+    voteCounts.set(vote.vote, (voteCounts.get(vote.vote) || 0) + 1);
+  }
 
-  return { voteCount, percentage, isMostCommon, hasVotes: voteCount > 0 };
+  const maxVotes = Math.max(0, ...voteCounts.values());
+
+  return Object.fromEntries(
+    CARD_VALUES.map((card) => {
+      const voteCount = voteCounts.get(card.value) || 0;
+      const percentage =
+        votes.length > 0 ? Math.round((voteCount / votes.length) * 100) : 0;
+      const isMostCommon = voteCount > 0 && voteCount === maxVotes;
+
+      return [
+        card.value,
+        { voteCount, percentage, isMostCommon, hasVotes: voteCount > 0 },
+      ];
+    })
+  );
 }
 
 function getCardClassName(
@@ -70,6 +81,11 @@ export function VotingCards({
   selectedVote,
   onVote,
 }: VotingCardsProps) {
+  const allStats = useMemo(
+    () => calculateAllCardStats(votes, revealed),
+    [votes, revealed]
+  );
+
   return (
     <div className="voting-section-bottom">
       <p className="voting-hint">
@@ -77,7 +93,7 @@ export function VotingCards({
       </p>
       <div className="voting-cards-bottom">
         {CARD_VALUES.map((card) => {
-          const stats = calculateCardStats(card.value, votes, revealed);
+          const stats = allStats[card.value];
           const className = getCardClassName(
             card.value,
             selectedVote,
@@ -91,7 +107,7 @@ export function VotingCards({
               : undefined;
 
           const showPercentage = revealed && stats.hasVotes;
-          const showTitle = !showPercentage && card.value !== 'unknown';
+          const showTitle = !showPercentage && card.value !== VoteSize.UNKNOWN;
 
           return (
             <button

@@ -4,12 +4,14 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '@/lib/store';
 import { useSocket, emitVote, emitReveal, emitReset } from '@/lib/socket';
+import { useKeyboardVoting } from '@/lib/hooks/useKeyboardVoting';
 import { PokerTable } from '@/components/PokerTable';
 import { JoinGameForm } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
 import { VotingCards } from '@/components/VotingCards';
 import { Toast } from '@/components/Toast';
 import { Loader } from '@/components/Loader';
+import { copyToClipboard } from '@/lib/clipboard';
 import '@/styles/game.scss';
 import '@/styles/poker-table.scss';
 
@@ -55,42 +57,10 @@ export default function GamePage() {
     [socket, userId, gameId, setSelectedVote]
   );
 
-  useEffect(() => {
-    if (!username || revealed) return;
-
-    const isTypingInFormField = (target: HTMLElement) =>
-      target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
-
-    const handleTwoCharacterVote = (firstKey: string) => {
-      if (firstKey !== 'x') return;
-
-      const waitForSecondKey = (e2: KeyboardEvent) => {
-        const secondKey = e2.key.toLowerCase();
-        if (secondKey === 's') handleVote('xs');
-        else if (secondKey === 'l') handleVote('xl');
-        window.removeEventListener('keydown', waitForSecondKey);
-      };
-
-      window.addEventListener('keydown', waitForSecondKey);
-      setTimeout(
-        () => window.removeEventListener('keydown', waitForSecondKey),
-        1000
-      );
-    };
-
-    const handleKeyboardVote = (e: KeyboardEvent) => {
-      const key = e.key.toLowerCase();
-      const singleCharVotes = ['xs', 's', 'm', 'l', 'xl'];
-
-      if (isTypingInFormField(e.target as HTMLElement)) return;
-      if (e.key === '?') return handleVote('unknown');
-      if (singleCharVotes.includes(key)) return handleVote(key);
-      handleTwoCharacterVote(key);
-    };
-
-    window.addEventListener('keydown', handleKeyboardVote);
-    return () => window.removeEventListener('keydown', handleKeyboardVote);
-  }, [username, revealed, handleVote]);
+  useKeyboardVoting({
+    enabled: !!username && !revealed,
+    onVote: handleVote,
+  });
 
   const handleReveal = () => {
     if (socket) emitReveal(socket, gameId);
@@ -101,34 +71,10 @@ export default function GamePage() {
   };
 
   const handleCopyLink = async () => {
-    const copyWithClipboardAPI = async () => {
-      await navigator.clipboard.writeText(window.location.href);
-    };
-
-    const copyWithFallbackTextArea = () => {
-      const textArea = document.createElement('textarea');
-      textArea.value = window.location.href;
-      textArea.style.position = 'fixed';
-      textArea.style.left = '-999999px';
-      textArea.style.top = '-999999px';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      document.execCommand('copy');
-      textArea.remove();
-    };
-
-    try {
-      const canUseClipboardAPI = navigator.clipboard && window.isSecureContext;
-      if (canUseClipboardAPI) {
-        await copyWithClipboardAPI();
-      } else {
-        copyWithFallbackTextArea();
-      }
+    const success = await copyToClipboard(window.location.href);
+    if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
     }
   };
 

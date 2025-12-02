@@ -1,23 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { User, Vote } from '@/lib/store';
-import { CARD_VALUES } from '@/lib/constants';
+import { CARD_VALUES, THROW_EMOJIS, VoteSize } from '@/lib/constants';
 import { Socket } from 'socket.io-client';
 import { emitThrowEmoji } from '@/lib/socket';
+import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
 import '@/styles/poker-table.scss';
-
-const THROW_EMOJIS = ['🪃', '🏒', '🥢', '✈️'];
-
-interface EmojiAnimation {
-  id: number;
-  emoji: string;
-  targetUserId: string;
-  delay: number;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  rotation: number;
-}
 
 interface PokerTableProps {
   users: User[];
@@ -37,58 +24,15 @@ export function PokerTable({
   gameId,
 }: PokerTableProps) {
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
-  const [emojiAnimations, setEmojiAnimations] = useState<EmojiAnimation[]>([]);
+  const { getAnimationsForUser } = useEmojiAnimations(socket);
 
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleEmojiThrown = ({
-      targetUserId,
-      emoji,
-    }: {
-      targetUserId: string;
-      emoji: string;
-    }) => {
-      const baseId = Date.now();
-      const projectileCount = 8;
-      const newAnimations: EmojiAnimation[] = [];
-
-      for (let i = 0; i < projectileCount; i++) {
-        newAnimations.push({
-          id: baseId + i + Math.random(),
-          emoji,
-          targetUserId,
-          delay: i * 0.08,
-          startX: Math.random() * 500 - 250,
-          startY: Math.random() * 300 - 150,
-          endX: Math.random() * 120 - 60,
-          endY: Math.random() * 80 - 40,
-          rotation: Math.random() * 720 - 360,
-        });
-      }
-
-      setEmojiAnimations((prev) => [...prev, ...newAnimations]);
-
-      setTimeout(() => {
-        setEmojiAnimations((prev) =>
-          prev.filter((a) => !newAnimations.find((n) => n.id === a.id))
-        );
-      }, 1500);
-    };
-
-    socket.on('emoji-thrown', handleEmojiThrown);
-    return () => {
-      socket.off('emoji-thrown', handleEmojiThrown);
-    };
-  }, [socket]);
-
-  const handleThrowEmoji = (targetUserId: string, emoji: string) => {
-    emitThrowEmoji(socket, gameId, targetUserId, emoji);
-    setHoveredUserId(null);
-  };
-
-  const getAnimationsForUser = (userId: string) =>
-    emojiAnimations.filter((a) => a.targetUserId === userId);
+  const handleThrowEmoji = useCallback(
+    (targetUserId: string, emoji: string) => {
+      emitThrowEmoji(socket, gameId, targetUserId, emoji);
+      setHoveredUserId(null);
+    },
+    [socket, gameId]
+  );
 
   const getVoteForUser = (userId: string) =>
     votes.find((v) => v.userId === userId)?.vote;
@@ -128,7 +72,7 @@ export function PokerTable({
           ) : revealed && vote ? (
             <div className="player-card-content">
               <span className="player-card-emoji">{getVoteLabel(vote)}</span>
-              {vote !== 'unknown' && (
+              {vote !== VoteSize.UNKNOWN && (
                 <span className="player-card-size">{vote.toUpperCase()}</span>
               )}
             </div>

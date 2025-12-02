@@ -140,23 +140,18 @@ app.prepare().then(() => {
   });
 
   io.on('connection', (socket: Socket) => {
-    console.log('User connected:', socket.id);
-
     socket.on(
       'join-game',
       ({ gameId, userId: clientUserId, username }: JoinGamePayload) => {
         let userId = clientUserId;
         let finalUsername: string | null = null;
-        let isReconnection = false;
 
         if (!userId) {
           userId = generateUserId();
         }
 
         if (userProfiles.has(userId)) {
-          const profile = userProfiles.get(userId)!;
-          finalUsername = profile.username;
-          isReconnection = true;
+          finalUsername = userProfiles.get(userId)!.username;
         } else if (username) {
           finalUsername = username;
           userProfiles.set(userId, { username: finalUsername });
@@ -193,25 +188,8 @@ app.prepare().then(() => {
 
         users.set(socket.id, { userId, gameId });
 
-        console.log(
-          `User ${
-            isReconnection ? 'reconnected' : 'joined'
-          }: ${finalUsername} (${userId})`
-        );
-
         const votesData = getVotesForUser(game, userId);
         const sortedUsers = getSortedUsersByJoinOrder(game);
-
-        console.log('Sending user-joined event:', {
-          userId,
-          username: finalUsername,
-          usersCount: game.users.size,
-          votesCount: votesData.length,
-          revealed: game.revealed,
-          totalVotesInGame: game.votes.size,
-        });
-
-        // Notify the joining user of game state
         socket.emit('user-joined', {
           userId,
           username: finalUsername,
@@ -281,10 +259,7 @@ app.prepare().then(() => {
       }
     );
 
-    // Handle user disconnect (mark as disconnected, keep votes for reconnection)
     socket.on('disconnect', () => {
-      console.log('User disconnected:', socket.id);
-
       const userData = users.get(socket.id);
       if (userData) {
         const { userId, gameId } = userData;
