@@ -2,7 +2,7 @@
 
 const GITHUB_REPO_URL = 'https://github.com/Zaeem0/planning-poker';
 
-export default function GitInfo() {
+export function GitInfo() {
   const commitHash = process.env.NEXT_PUBLIC_COMMIT_HASH || 'dev';
   const commitUrl = `${GITHUB_REPO_URL}/commit/${commitHash}`;
 

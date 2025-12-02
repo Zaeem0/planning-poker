@@ -4,12 +4,12 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '@/lib/store';
 import { useSocket, emitVote, emitReveal, emitReset } from '@/lib/socket';
-import PokerTable from '@/components/PokerTable';
-import JoinGameForm from '@/components/JoinGameForm';
-import GameHeader from '@/components/GameHeader';
-import VotingCards from '@/components/VotingCards';
-import Toast from '@/components/Toast';
-import Loader from '@/components/Loader';
+import { PokerTable } from '@/components/PokerTable';
+import { JoinGameForm } from '@/components/JoinGameForm';
+import { GameHeader } from '@/components/GameHeader';
+import { VotingCards } from '@/components/VotingCards';
+import { Toast } from '@/components/Toast';
+import { Loader } from '@/components/Loader';
 import '@/styles/game.scss';
 import '@/styles/poker-table.scss';
 
@@ -58,51 +58,38 @@ export default function GamePage() {
   useEffect(() => {
     if (!username || revealed) return;
 
-    const handleKeyPress = (e: KeyboardEvent) => {
+    const isTypingInFormField = (target: HTMLElement) =>
+      target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+
+    const handleTwoCharacterVote = (firstKey: string) => {
+      if (firstKey !== 'x') return;
+
+      const waitForSecondKey = (e2: KeyboardEvent) => {
+        const secondKey = e2.key.toLowerCase();
+        if (secondKey === 's') handleVote('xs');
+        else if (secondKey === 'l') handleVote('xl');
+        window.removeEventListener('keydown', waitForSecondKey);
+      };
+
+      window.addEventListener('keydown', waitForSecondKey);
+      setTimeout(
+        () => window.removeEventListener('keydown', waitForSecondKey),
+        1000
+      );
+    };
+
+    const handleKeyboardVote = (e: KeyboardEvent) => {
       const key = e.key.toLowerCase();
-      const validVotes = ['xs', 's', 'm', 'l', 'xl'];
+      const singleCharVotes = ['xs', 's', 'm', 'l', 'xl'];
 
-      // Check if user is typing in an input field
-      const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        return;
-      }
-
-      // Handle unknown vote with ?
-      if (e.key === '?') {
-        handleVote('unknown');
-        return;
-      }
-
-      // Handle single character votes
-      if (validVotes.includes(key)) {
-        handleVote(key);
-        return;
-      }
-
-      // Handle two-character votes (xs, xl)
-      if (key === 'x') {
-        const handleSecondKey = (e2: KeyboardEvent) => {
-          const secondKey = e2.key.toLowerCase();
-          if (secondKey === 's') {
-            handleVote('xs');
-          } else if (secondKey === 'l') {
-            handleVote('xl');
-          }
-          window.removeEventListener('keydown', handleSecondKey);
-        };
-
-        window.addEventListener('keydown', handleSecondKey);
-        setTimeout(() => {
-          window.removeEventListener('keydown', handleSecondKey);
-        }, 1000);
-      }
+      if (isTypingInFormField(e.target as HTMLElement)) return;
+      if (e.key === '?') return handleVote('unknown');
+      if (singleCharVotes.includes(key)) return handleVote(key);
+      handleTwoCharacterVote(key);
     };
 
-    window.addEventListener('keydown', handleKeyPress);
-    return () => {
-      window.removeEventListener('keydown', handleKeyPress);
-    };
+    window.addEventListener('keydown', handleKeyboardVote);
+    return () => window.removeEventListener('keydown', handleKeyboardVote);
   }, [username, revealed, handleVote]);
 
   const handleReveal = () => {
@@ -114,22 +101,29 @@ export default function GamePage() {
   };
 
   const handleCopyLink = async () => {
+    const copyWithClipboardAPI = async () => {
+      await navigator.clipboard.writeText(window.location.href);
+    };
+
+    const copyWithFallbackTextArea = () => {
+      const textArea = document.createElement('textarea');
+      textArea.value = window.location.href;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      textArea.remove();
+    };
+
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(window.location.href);
+      const canUseClipboardAPI = navigator.clipboard && window.isSecureContext;
+      if (canUseClipboardAPI) {
+        await copyWithClipboardAPI();
       } else {
-        // Fallback for localhost
-        const textArea = document.createElement('textarea');
-        textArea.value = window.location.href;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        // Expected only used in insecure contexts (e.g. http://)
-        document.execCommand('copy');
-        textArea.remove();
+        copyWithFallbackTextArea();
       }
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);

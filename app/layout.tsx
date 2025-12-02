@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import GitInfo from '@/components/GitInfo';
+import { GitInfo } from '@/components/GitInfo';
 import '@/styles/globals.scss';
 
 export const metadata: Metadata = {

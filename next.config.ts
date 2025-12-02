@@ -22,7 +22,6 @@ const nextConfig: NextConfig = {
     remotePatterns: [],
   },
   env: {
-    NEXT_PUBLIC_SOCKET_URL: process.env.NEXT_PUBLIC_SOCKET_URL || '',
     NEXT_PUBLIC_COMMIT_HASH: getGitCommitHash(),
   },
 };

@@ -59,34 +59,33 @@ export function useSocket(
 
     const userId = getUserId();
 
-    // Listen for user joined event
+    const restoreUserVoteSelection = (
+      votes: { userId: string; vote: string }[],
+      joinedUserId: string
+    ) => {
+      const userVote = votes.find((v) => v.userId === joinedUserId);
+      if (userVote) setSelectedVote(userVote.vote);
+    };
+
     newSocket.on(
       'user-joined',
-      ({ userId, username, users, votes, revealed }) => {
+      ({ userId: joinedUserId, username, users, votes, revealed }) => {
         console.log('user-joined event received:', {
-          userId,
+          joinedUserId,
           username,
           usersCount: users.length,
           votesCount: votes.length,
           revealed,
         });
-        setUserId(userId);
+        setUserId(joinedUserId);
         setUsername(username);
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
-
-        // Restore selectedVote if user has voted
-        const userVote = votes.find(
-          (v: { userId: string; vote: string }) => v.userId === userId
-        );
-        if (userVote) {
-          setSelectedVote(userVote.vote);
-        }
+        restoreUserVoteSelection(votes, joinedUserId);
       }
     );
 
-    // Wait for socket to connect before joining game
     newSocket.on('connect', () => {
       console.log('Socket connected, joining game:', gameId);
       newSocket.emit('join-game', {
@@ -96,18 +95,15 @@ export function useSocket(
       });
     });
 
-    // Listen for user list updates
     newSocket.on('user-list-updated', ({ users }) => {
       setUsers(users);
     });
 
-    // Listen for votes revealed
     newSocket.on('votes-revealed', ({ votes, revealed }) => {
       setVotes(votes);
       setRevealed(revealed);
     });
 
-    // Listen for votes reset
     newSocket.on('votes-reset', ({ users }) => {
       reset();
       setUsers(users);

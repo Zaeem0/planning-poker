@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import CreateGameButton from '@/components/CreateGameButton';
+import { CreateGameButton } from '@/components/CreateGameButton';
 import '@/styles/home.scss';
 
 export default function Home() {

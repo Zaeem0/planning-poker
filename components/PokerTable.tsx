@@ -28,7 +28,7 @@ interface PokerTableProps {
   gameId: string;
 }
 
-export default function PokerTable({
+export function PokerTable({
   users,
   votes,
   revealed,

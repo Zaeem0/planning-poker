@@ -1,7 +1,7 @@
-import GameControls from '@/components/GameControls';
-import CreateGameButton from '@/components/CreateGameButton';
-import CopyIcon from '@/components/icons/CopyIcon';
-import CheckIcon from '@/components/icons/CheckIcon';
+import { GameControls } from '@/components/GameControls';
+import { CreateGameButton } from '@/components/CreateGameButton';
+import { CopyIcon } from '@/components/icons/CopyIcon';
+import { CheckIcon } from '@/components/icons/CheckIcon';
 
 interface GameHeaderProps {
   gameId: string;
@@ -13,7 +13,7 @@ interface GameHeaderProps {
   onCopyLink: () => void;
 }
 
-export default function GameHeader({
+export function GameHeader({
   gameId,
   revealed,
   hasVotes,

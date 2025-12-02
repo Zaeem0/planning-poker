@@ -118,7 +118,7 @@
 - **Real-time**: Socket.io 4.8
 - **State**: Zustand 5
 - **Server**: Custom Node.js server with Socket.io
-- **Runtime**: Node.js 18+
+- **Runtime**: Node.js 22+ (LTS)
 
 ### Communication Flow
 

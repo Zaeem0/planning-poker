@@ -1,10 +1,10 @@
-import CheckIcon from '@/components/icons/CheckIcon';
+import { CheckIcon } from '@/components/icons/CheckIcon';
 
 interface ToastProps {
   message: string;
 }
 
-export default function Toast({ message }: ToastProps) {
+export function Toast({ message }: ToastProps) {
   return (
     <div className="toast">
       <CheckIcon />

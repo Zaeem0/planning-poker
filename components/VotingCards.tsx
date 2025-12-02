@@ -64,7 +64,7 @@ function getCardClassName(
   return classes.join(' ');
 }
 
-export default function VotingCards({
+export function VotingCards({
   votes,
   revealed,
   selectedVote,

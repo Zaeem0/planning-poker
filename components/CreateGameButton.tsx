@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
-export default function CreateGameButton() {
+export function CreateGameButton() {
   const router = useRouter();
 
   const handleClick = () => {

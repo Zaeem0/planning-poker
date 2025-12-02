@@ -1,4 +1,4 @@
-export default function CopyIcon() {
+export function CopyIcon() {
   return (
     <svg
       className="game-id-icon"

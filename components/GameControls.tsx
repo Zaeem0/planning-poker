@@ -7,7 +7,7 @@ interface GameControlsProps {
   hasVotes: boolean;
 }
 
-export default function GameControls({
+export function GameControls({
   revealed,
   onReveal,
   onReset,

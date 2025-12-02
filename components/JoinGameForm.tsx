@@ -5,7 +5,7 @@ interface JoinGameFormProps {
   onSubmit: () => void;
 }
 
-export default function JoinGameForm({
+export function JoinGameForm({
   gameId,
   name,
   onNameChange,
