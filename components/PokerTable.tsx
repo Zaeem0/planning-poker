@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { User, Vote } from '@/lib/store';
-import { CARD_VALUES, THROW_EMOJIS, VoteSize } from '@/lib/constants';
+import { THROW_EMOJIS, VoteSize, getVoteLabel } from '@/lib/constants';
 import { Socket } from 'socket.io-client';
 import { emitThrowEmoji } from '@/lib/socket';
 import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
@@ -40,11 +40,6 @@ export function PokerTable({
 
   const getVoteForUser = (userId: string) =>
     votes.find((v) => v.userId === userId)?.vote;
-
-  const getVoteLabel = (voteValue: string) => {
-    const card = CARD_VALUES.find((c) => c.value === voteValue);
-    return card ? card.label : voteValue;
-  };
 
   const renderUserCard = (user: User) => {
     const vote = getVoteForUser(user.id);

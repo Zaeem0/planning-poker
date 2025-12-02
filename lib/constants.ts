@@ -25,3 +25,8 @@ export const CARD_VALUES: ReadonlyArray<{
 export const SINGLE_KEY_VOTES = [VoteSize.S, VoteSize.M, VoteSize.L] as const;
 
 export const THROW_EMOJIS = ['🥊', '🪃', '🪨', '✈️'];
+
+export function getVoteLabel(voteValue: string): string {
+  const card = CARD_VALUES.find((c) => c.value === voteValue);
+  return card ? card.label : voteValue;
+}
