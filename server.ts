@@ -1,11 +1,11 @@
-import { createServer } from "http";
-import { parse } from "url";
-import next from "next";
-import { Server, Socket } from "socket.io";
+import { createServer } from 'http';
+import { parse } from 'url';
+import next from 'next';
+import { Server, Socket } from 'socket.io';
 
-const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.HOSTNAME || "0.0.0.0";
-const port = parseInt(process.env.PORT || "3000", 10);
+const dev = process.env.NODE_ENV !== 'production';
+const hostname = process.env.HOSTNAME || '0.0.0.0';
+const port = parseInt(process.env.PORT || '3000', 10);
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
@@ -77,24 +77,24 @@ app.prepare().then(() => {
       const parsedUrl = parse(req.url!, true);
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error("Error occurred handling", req.url, err);
+      console.error('Error occurred handling', req.url, err);
       res.statusCode = 500;
-      res.end("internal server error");
+      res.end('internal server error');
     }
   });
 
   const io = new Server(httpServer, {
     cors: {
-      origin: process.env.CORS_ORIGIN || "*",
-      methods: ["GET", "POST"],
+      origin: process.env.CORS_ORIGIN || '*',
+      methods: ['GET', 'POST'],
     },
   });
 
-  io.on("connection", (socket: Socket) => {
-    console.log("User connected:", socket.id);
+  io.on('connection', (socket: Socket) => {
+    console.log('User connected:', socket.id);
 
     socket.on(
-      "join-game",
+      'join-game',
       ({ gameId, userId: clientUserId, username }: JoinGamePayload) => {
         let userId = clientUserId;
         let finalUsername: string | null = null;
@@ -112,7 +112,7 @@ app.prepare().then(() => {
           finalUsername = username;
           userProfiles.set(userId, { username: finalUsername });
         } else {
-          socket.emit("user-joined", {
+          socket.emit('user-joined', {
             userId,
             username: null,
             users: [],
@@ -158,7 +158,7 @@ app.prepare().then(() => {
 
         console.log(
           `User ${
-            isReconnection ? "reconnected" : "joined"
+            isReconnection ? 'reconnected' : 'joined'
           }: ${finalUsername} (${userId})`
         );
 
@@ -169,7 +169,7 @@ app.prepare().then(() => {
             }))
           : [];
 
-        console.log("Sending user-joined event:", {
+        console.log('Sending user-joined event:', {
           userId,
           username: finalUsername,
           usersCount: game.users.size,
@@ -184,7 +184,7 @@ app.prepare().then(() => {
           (a, b) => a.joinOrder - b.joinOrder
         );
 
-        socket.emit("user-joined", {
+        socket.emit('user-joined', {
           userId,
           username: finalUsername,
           users: sortedUsers,
@@ -192,13 +192,13 @@ app.prepare().then(() => {
           revealed: game.revealed,
         });
 
-        socket.to(gameId).emit("user-list-updated", {
+        socket.to(gameId).emit('user-list-updated', {
           users: sortedUsers,
         });
       }
     );
 
-    socket.on("vote", ({ gameId, userId, vote }: VotePayload) => {
+    socket.on('vote', ({ gameId, userId, vote }: VotePayload) => {
       const game = games.get(gameId);
       if (!game) return;
 
@@ -212,18 +212,18 @@ app.prepare().then(() => {
       const sortedUsers = Array.from(game.users.values()).sort(
         (a, b) => a.joinOrder - b.joinOrder
       );
-      io.to(gameId).emit("user-list-updated", {
+      io.to(gameId).emit('user-list-updated', {
         users: sortedUsers,
       });
     });
 
-    socket.on("reveal-votes", ({ gameId }: RevealVotesPayload) => {
+    socket.on('reveal-votes', ({ gameId }: RevealVotesPayload) => {
       const game = games.get(gameId);
       if (!game) return;
 
       game.revealed = true;
 
-      io.to(gameId).emit("votes-revealed", {
+      io.to(gameId).emit('votes-revealed', {
         votes: Array.from(game.votes.entries()).map(([userId, vote]) => ({
           userId,
           vote,
@@ -232,7 +232,7 @@ app.prepare().then(() => {
       });
     });
 
-    socket.on("reset-votes", ({ gameId }: ResetVotesPayload) => {
+    socket.on('reset-votes', ({ gameId }: ResetVotesPayload) => {
       const game = games.get(gameId);
       if (!game) return;
 
@@ -246,20 +246,20 @@ app.prepare().then(() => {
       const sortedUsers = Array.from(game.users.values()).sort(
         (a, b) => a.joinOrder - b.joinOrder
       );
-      io.to(gameId).emit("votes-reset", {
+      io.to(gameId).emit('votes-reset', {
         users: sortedUsers,
       });
     });
 
     socket.on(
-      "throw-emoji",
+      'throw-emoji',
       ({ gameId, targetUserId, emoji }: ThrowEmojiPayload) => {
-        io.to(gameId).emit("emoji-thrown", { targetUserId, emoji });
+        io.to(gameId).emit('emoji-thrown', { targetUserId, emoji });
       }
     );
 
-    socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
+    socket.on('disconnect', () => {
+      console.log('User disconnected:', socket.id);
 
       const userData = users.get(socket.id);
       if (userData) {
@@ -281,7 +281,7 @@ app.prepare().then(() => {
             (a, b) => a.joinOrder - b.joinOrder
           );
 
-          io.to(gameId).emit("user-list-updated", {
+          io.to(gameId).emit('user-list-updated', {
             users: sortedUsers,
           });
         }
@@ -292,7 +292,7 @@ app.prepare().then(() => {
   });
 
   httpServer
-    .once("error", (err) => {
+    .once('error', (err) => {
       console.error(err);
       process.exit(1);
     })

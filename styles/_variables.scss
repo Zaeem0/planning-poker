@@ -8,17 +8,17 @@ $success-hover: #34d399;
 $success-light: #059669;
 
 // Dark Blue Background Palette
-$dark-bg: #0f172a;        // Main background (slate-900)
+$dark-bg: #0f172a; // Main background (slate-900)
 $dark-bg-elevated: #1e293b; // Cards/elevated surfaces (slate-800)
-$dark-bg-hover: #334155;   // Hover states (slate-700)
-$dark-border: #334155;     // Borders (slate-700)
+$dark-bg-hover: #334155; // Hover states (slate-700)
+$dark-border: #334155; // Borders (slate-700)
 $dark-border-light: #475569; // Light borders (slate-600)
 
 // Text Colors for Dark Theme
-$text-primary: #f1f5f9;    // Primary text (slate-100)
-$text-secondary: #cbd5e1;  // Secondary text (slate-300)
-$text-muted: #94a3b8;      // Muted text (slate-400)
-$text-disabled: #64748b;   // Disabled text (slate-500)
+$text-primary: #f1f5f9; // Primary text (slate-100)
+$text-secondary: #cbd5e1; // Secondary text (slate-300)
+$text-muted: #94a3b8; // Muted text (slate-400)
+$text-disabled: #64748b; // Disabled text (slate-500)
 
 // Legacy slate colors (for compatibility)
 $slate-50: #f8fafc;
@@ -41,4 +41,3 @@ $shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
 
 $font-mono: ui-monospace, SFMono-Regular, monospace;
-

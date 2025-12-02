@@ -76,7 +76,9 @@
   font-size: 1rem;
   color: $text-primary;
   outline: none;
-  transition: border-color 150ms, box-shadow 150ms;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
 
   &:focus {
     border-color: $primary;
@@ -87,4 +89,3 @@
     color: $text-muted;
   }
 }
-

@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { User, Vote } from "@/lib/store";
-import { CARD_VALUES } from "@/lib/constants";
-import { Socket } from "socket.io-client";
-import { emitThrowEmoji } from "@/lib/socket";
-import "@/styles/poker-table.scss";
+import { useState, useEffect } from 'react';
+import { User, Vote } from '@/lib/store';
+import { CARD_VALUES } from '@/lib/constants';
+import { Socket } from 'socket.io-client';
+import { emitThrowEmoji } from '@/lib/socket';
+import '@/styles/poker-table.scss';
 
-const THROW_EMOJIS = ["🪃", "🏒", "🥢", "✈️"];
+const THROW_EMOJIS = ['🪃', '🏒', '🥢', '✈️'];
 
 interface EmojiAnimation {
   id: number;
@@ -76,9 +76,9 @@ export default function PokerTable({
       }, 1500);
     };
 
-    socket.on("emoji-thrown", handleEmojiThrown);
+    socket.on('emoji-thrown', handleEmojiThrown);
     return () => {
-      socket.off("emoji-thrown", handleEmojiThrown);
+      socket.off('emoji-thrown', handleEmojiThrown);
     };
   }, [socket]);
 
@@ -117,9 +117,9 @@ export default function PokerTable({
         onMouseLeave={() => setHoveredUserId(null)}
       >
         <div
-          className={`player-card ${hasVoted ? "player-card-voted" : ""} ${
-            revealed && vote ? "player-card-revealed" : ""
-          } ${isDisconnected ? "player-card-disconnected" : ""}`}
+          className={`player-card ${hasVoted ? 'player-card-voted' : ''} ${
+            revealed && vote ? 'player-card-revealed' : ''
+          } ${isDisconnected ? 'player-card-disconnected' : ''}`}
         >
           {isDisconnected ? (
             <div className="player-card-content">
@@ -128,7 +128,7 @@ export default function PokerTable({
           ) : revealed && vote ? (
             <div className="player-card-content">
               <span className="player-card-emoji">{getVoteLabel(vote)}</span>
-              {vote !== "unknown" && (
+              {vote !== 'unknown' && (
                 <span className="player-card-size">{vote.toUpperCase()}</span>
               )}
             </div>
@@ -142,11 +142,11 @@ export default function PokerTable({
               style={
                 {
                   animationDelay: `${anim.delay}s`,
-                  "--start-x": `${anim.startX}px`,
-                  "--start-y": `${anim.startY}px`,
-                  "--end-x": `${anim.endX}px`,
-                  "--end-y": `${anim.endY}px`,
-                  "--rotation": `${anim.rotation}deg`,
+                  '--start-x': `${anim.startX}px`,
+                  '--start-y': `${anim.startY}px`,
+                  '--end-x': `${anim.endX}px`,
+                  '--end-y': `${anim.endY}px`,
+                  '--rotation': `${anim.rotation}deg`,
                 } as React.CSSProperties
               }
             >
@@ -178,9 +178,9 @@ export default function PokerTable({
 
   const getTableMessage = () => {
     const votedCount = users.filter((u) => u.hasVoted).length;
-    if (revealed) return "Votes revealed!";
-    if (votedCount === 0) return "Pick your cards!";
-    if (votedCount === users.length) return "All voted! Ready to reveal";
+    if (revealed) return 'Votes revealed!';
+    if (votedCount === 0) return 'Pick your cards!';
+    if (votedCount === users.length) return 'All voted! Ready to reveal';
     return `${votedCount} of ${users.length} voted`;
   };
 

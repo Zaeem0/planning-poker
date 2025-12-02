@@ -1,5 +1,5 @@
-import { CARD_VALUES } from "@/lib/constants";
-import { Vote } from "@/lib/store";
+import { CARD_VALUES } from '@/lib/constants';
+import { Vote } from '@/lib/store';
 
 interface VotingCardsProps {
   votes: Vote[];
@@ -46,22 +46,22 @@ function getCardClassName(
   revealed: boolean,
   stats: CardStats
 ): string {
-  const classes = ["voting-card-small"];
+  const classes = ['voting-card-small'];
 
   if (!revealed && selectedVote === cardValue) {
-    classes.push("selected");
+    classes.push('selected');
   }
   if (revealed && stats.isMostCommon) {
-    classes.push("most-common");
+    classes.push('most-common');
   }
   if (revealed && stats.hasVotes && !stats.isMostCommon) {
-    classes.push("has-votes");
+    classes.push('has-votes');
   }
   if (revealed && !stats.hasVotes) {
-    classes.push("no-votes");
+    classes.push('no-votes');
   }
 
-  return classes.join(" ");
+  return classes.join(' ');
 }
 
 export default function VotingCards({
@@ -84,11 +84,11 @@ export default function VotingCards({
           const opacity = Math.min(stats.percentage, 99) / 100;
           const style =
             revealed && stats.hasVotes
-              ? ({ "--vote-opacity": opacity } as React.CSSProperties)
+              ? ({ '--vote-opacity': opacity } as React.CSSProperties)
               : undefined;
 
           const showPercentage = revealed && stats.hasVotes;
-          const showTitle = !showPercentage && card.value !== "unknown";
+          const showTitle = !showPercentage && card.value !== 'unknown';
 
           return (
             <button

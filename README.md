@@ -17,7 +17,7 @@ A real-time Planning Poker application built with Next.js, Socket.io, and TypeSc
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+ (LTS)
 - Yarn 1.22.0+
 
 ### Local Development
@@ -59,7 +59,7 @@ git push origin main
 - **Real-time**: Socket.io 4.8
 - **State Management**: Zustand 5
 - **Server**: Custom Node.js server with Socket.io
-- **Runtime**: Node.js 18+, Yarn 1.22+
+- **Runtime**: Node.js 22+ (LTS), Yarn 1.22+
 
 ## 📁 Project Structure
 

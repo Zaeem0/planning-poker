@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import CreateGameButton from "@/components/CreateGameButton";
-import "@/styles/home.scss";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import CreateGameButton from '@/components/CreateGameButton';
+import '@/styles/home.scss';
 
 export default function Home() {
   const router = useRouter();
-  const [gameId, setGameId] = useState("");
+  const [gameId, setGameId] = useState('');
 
   const joinGame = (e: React.FormEvent) => {
     e.preventDefault();

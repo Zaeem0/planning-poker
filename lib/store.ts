@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 export interface User {
   id: string;
@@ -32,9 +32,9 @@ interface GameState {
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  gameId: "",
-  userId: "",
-  username: "",
+  gameId: '',
+  userId: '',
+  username: '',
   users: [],
   votes: [],
   revealed: false,

@@ -1,4 +1,4 @@
-import CheckIcon from "@/components/icons/CheckIcon";
+import CheckIcon from '@/components/icons/CheckIcon';
 
 interface ToastProps {
   message: string;

@@ -1,4 +1,4 @@
-@use "variables" as *;
+@use 'variables' as *;
 
 .loader-container {
   display: flex;
@@ -21,4 +21,3 @@
     transform: rotate(360deg);
   }
 }
-

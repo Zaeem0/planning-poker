@@ -36,14 +36,13 @@
 }
 
 .player-card-voted {
-  background:
-    repeating-linear-gradient(
-      45deg,
-      $primary 0px,
-      $primary 2px,
-      $primary-light 2px,
-      $primary-light 8px
-    );
+  background: repeating-linear-gradient(
+    45deg,
+    $primary 0px,
+    $primary 2px,
+    $primary-light 2px,
+    $primary-light 8px
+  );
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
   border-color: $primary;
 }
@@ -120,7 +119,11 @@
 }
 
 .table-surface {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15) 0%,
+    rgba(79, 70, 229, 0.1) 100%
+  );
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: 16px;
   padding: 3rem;
@@ -135,7 +138,7 @@
 }
 
 .table-message {
-  font-size: .875rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: $text-secondary;
 }
@@ -213,11 +216,11 @@
   font-size: 1.5rem;
 }
 
-.voting-card-small[data-card-size="l"] .voting-card-emoji {
+.voting-card-small[data-card-size='l'] .voting-card-emoji {
   font-size: 1.8rem;
 }
 
-.voting-card-small[data-card-size="xl"] .voting-card-emoji {
+.voting-card-small[data-card-size='xl'] .voting-card-emoji {
   font-size: 1.6rem;
 }
 
@@ -271,7 +274,8 @@
 @keyframes projectile-fly {
   0% {
     opacity: 1;
-    transform: translate(var(--start-x, -200px), var(--start-y, -100px)) rotate(var(--rotation, -180deg));
+    transform: translate(var(--start-x, -200px), var(--start-y, -100px))
+      rotate(var(--rotation, -180deg));
   }
   50% {
     opacity: 1;

@@ -4,7 +4,7 @@ services:
     name: planning-poker
     runtime: node
     plan: free
-    buildCommand: yarn install --frozen-lockfile && yarn build
+    buildCommand: yarn install && yarn build
     startCommand: yarn start
     envVars:
       - key: NODE_ENV
@@ -12,7 +12,7 @@ services:
       - key: HOSTNAME
         value: 0.0.0.0
       - key: CORS_ORIGIN
-        value: "*"
+        value: '*'
       # NEXT_PUBLIC_SOCKET_URL will be auto-set to the Render service URL
       # You can also set it manually in the Render dashboard if needed
       - key: NEXT_PUBLIC_SOCKET_URL

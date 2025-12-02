@@ -177,21 +177,18 @@ Game State (In-Memory)
 ### How It Works
 
 1. **First Visit:**
-
    - User provides username
    - Assigned unique user ID (stored in localStorage)
    - Username stored on server
    - Assigned join order position
 
 2. **Subsequent Visits:**
-
    - User ID retrieved from localStorage
    - Username retrieved from server
    - Join order preserved
    - Vote restored if exists
 
 3. **During Disconnect:**
-
    - User marked as `connected: false`
    - User kept in game state
    - Vote preserved

@@ -47,13 +47,11 @@ git push origin main
 If you prefer to configure manually:
 
 1. **Create New Web Service**
-
    - Go to Render Dashboard
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
 
 2. **Configure the Service**
-
    - **Name**: `planning-poker` (or your preferred name)
    - **Runtime**: `Node`
    - **Build Command**: `yarn install --frozen-lockfile && yarn build`
@@ -61,7 +59,6 @@ If you prefer to configure manually:
    - **Plan**: `Free`
 
 3. **Set Environment Variables**
-
    - Click "Advanced" → "Add Environment Variable"
    - Add the following:
      ```

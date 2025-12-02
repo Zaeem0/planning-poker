@@ -1,4 +1,4 @@
-import "@/styles/game-controls.scss";
+import '@/styles/game-controls.scss';
 
 interface GameControlsProps {
   revealed: boolean;

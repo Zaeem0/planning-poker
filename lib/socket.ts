@@ -1,11 +1,11 @@
-import { useEffect, useRef, useSyncExternalStore } from "react";
-import { io, Socket } from "socket.io-client";
-import { useGameStore } from "./store";
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { useGameStore } from './store';
 
-const USER_ID_KEY = "planning-poker-user-id";
+const USER_ID_KEY = 'planning-poker-user-id';
 
 function getUserId(): string {
-  if (typeof window === "undefined") return "";
+  if (typeof window === 'undefined') return '';
 
   let userId = localStorage.getItem(USER_ID_KEY);
   if (!userId) {
@@ -48,9 +48,9 @@ export function useSocket(
   useEffect(() => {
     if (!gameId || !shouldConnect) return;
 
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "";
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
     const newSocket = io(socketUrl, {
-      path: "/socket.io",
+      path: '/socket.io',
     });
 
     socketRef.current = newSocket;
@@ -61,9 +61,9 @@ export function useSocket(
 
     // Listen for user joined event
     newSocket.on(
-      "user-joined",
+      'user-joined',
       ({ userId, username, users, votes, revealed }) => {
-        console.log("user-joined event received:", {
+        console.log('user-joined event received:', {
           userId,
           username,
           usersCount: users.length,
@@ -87,9 +87,9 @@ export function useSocket(
     );
 
     // Wait for socket to connect before joining game
-    newSocket.on("connect", () => {
-      console.log("Socket connected, joining game:", gameId);
-      newSocket.emit("join-game", {
+    newSocket.on('connect', () => {
+      console.log('Socket connected, joining game:', gameId);
+      newSocket.emit('join-game', {
         gameId,
         userId,
         username: customUsername,
@@ -97,18 +97,18 @@ export function useSocket(
     });
 
     // Listen for user list updates
-    newSocket.on("user-list-updated", ({ users }) => {
+    newSocket.on('user-list-updated', ({ users }) => {
       setUsers(users);
     });
 
     // Listen for votes revealed
-    newSocket.on("votes-revealed", ({ votes, revealed }) => {
+    newSocket.on('votes-revealed', ({ votes, revealed }) => {
       setVotes(votes);
       setRevealed(revealed);
     });
 
     // Listen for votes reset
-    newSocket.on("votes-reset", ({ users }) => {
+    newSocket.on('votes-reset', ({ users }) => {
       reset();
       setUsers(users);
     });
@@ -141,19 +141,19 @@ export function emitVote(
   vote: string
 ) {
   if (socket) {
-    socket.emit("vote", { gameId, userId, vote });
+    socket.emit('vote', { gameId, userId, vote });
   }
 }
 
 export function emitReveal(socket: Socket | null, gameId: string) {
   if (socket) {
-    socket.emit("reveal-votes", { gameId });
+    socket.emit('reveal-votes', { gameId });
   }
 }
 
 export function emitReset(socket: Socket | null, gameId: string) {
   if (socket) {
-    socket.emit("reset-votes", { gameId });
+    socket.emit('reset-votes', { gameId });
   }
 }
 
@@ -164,6 +164,6 @@ export function emitThrowEmoji(
   emoji: string
 ) {
   if (socket) {
-    socket.emit("throw-emoji", { gameId, targetUserId, emoji });
+    socket.emit('throw-emoji', { gameId, targetUserId, emoji });
   }
 }

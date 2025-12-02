@@ -1,4 +1,4 @@
-import "@/styles/loader.scss";
+import '@/styles/loader.scss';
 
 export default function Loader() {
   return (
@@ -7,4 +7,3 @@ export default function Loader() {
     </div>
   );
 }
-

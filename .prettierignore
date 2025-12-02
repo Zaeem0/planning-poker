@@ -1,0 +1,19 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+dist
+build
+
+# Logs
+*.log
+
+# Package manager files
+yarn.lock
+package-lock.json
+
+# Don't format package.json to preserve key order
+package.json
+
