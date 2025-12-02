@@ -12,7 +12,6 @@ interface PokerTableProps {
   votes: Vote[];
   revealed: boolean;
   currentUserId: string;
-  gameCreatorUserId: string | null;
   socket: Socket | null;
   gameId: string;
   selectedVote: string | null;
@@ -24,7 +23,6 @@ export function PokerTable({
   votes,
   revealed,
   currentUserId,
-  gameCreatorUserId,
   socket,
   gameId,
   selectedVote,
@@ -51,7 +49,6 @@ export function PokerTable({
   const renderUserCard = (user: User) => {
     const vote = getVoteForUser(user.id);
     const isCurrentUser = user.id === currentUserId;
-    const isGameCreator = user.id === gameCreatorUserId;
     const hasVoted = user.hasVoted;
     const isHovered = hoveredUserId === user.id;
     const userAnimations = getAnimationsForUser(user.id);
@@ -127,7 +124,6 @@ export function PokerTable({
         <span
           className={`player-name ${isDisconnected ? 'player-name-disconnected' : ''}`}
         >
-          {isGameCreator && <span className="player-game-creator">👑</span>}
           {user.username}
           {isCurrentUser && <span className="player-you">(you)</span>}
           {isSpectator && <span className="player-spectator">(spectator)</span>}

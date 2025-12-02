@@ -39,12 +39,6 @@
 - Automatic reconnection with stored username
 - No random username generation
 
-**Game Creator:**
-
-- First non-spectator player to join becomes the game creator
-- Game creator indicated with 👑 crown icon next to their name
-- Visual indicator only (all players can reveal votes and start new rounds)
-
 **Spectator Mode:**
 
 - Toggle option on join form to join as spectator
@@ -53,12 +47,10 @@
 - Spectators excluded from vote count (e.g., "2 of 3 voted" won't count spectators)
 - Keyboard voting disabled for spectators
 - "(spectator)" label shown under spectator names
-- Spectators can be game creator (first user to join becomes game creator)
 
 **User Display:**
 
 - Visual distinction for current user
-- Game creator shown with 👑 crown icon
 - Player cards arranged around poker table
 - Emoji throwing between players for fun interactions
 - Disconnected users shown with 🔌 plug icon

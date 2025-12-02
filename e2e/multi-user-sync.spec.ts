@@ -7,6 +7,7 @@ import {
   clickRevealVotes,
   clickNewRound,
   waitForPlayerCount,
+  waitForRevealedCards,
   getPlayerCard,
   getVoteCard,
   closeContexts,
@@ -116,13 +117,16 @@ test.describe('Multi-User-Sync', () => {
       await joinGameAsUser(alicePage, gameId, 'Alice');
       await joinGameAsUser(bobPage, gameId, 'Bob');
 
+      await waitForPlayerCount(alicePage, 2);
+      await waitForPlayerCount(bobPage, 2);
+
       await selectVoteCard(alicePage, 's');
       await selectVoteCard(bobPage, 'l');
 
       await clickRevealVotes(alicePage);
 
-      await expect(bobPage.locator('.player-card-revealed')).toHaveCount(2);
-      await expect(alicePage.locator('.player-card-revealed')).toHaveCount(2);
+      await waitForRevealedCards(bobPage, 2);
+      await waitForRevealedCards(alicePage, 2);
 
       await closeContexts(aliceContext, bobContext);
     });

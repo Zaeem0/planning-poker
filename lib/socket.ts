@@ -38,7 +38,6 @@ export function useSocket(
     setVotes,
     setRevealed,
     setSelectedVote,
-    setGameCreatorUserId,
     reset,
   } = useGameStore();
 
@@ -80,20 +79,12 @@ export function useSocket(
 
     newSocket.on(
       'user-joined',
-      ({
-        userId: joinedUserId,
-        username,
-        users,
-        votes,
-        revealed,
-        gameCreatorUserId,
-      }) => {
+      ({ userId: joinedUserId, username, users, votes, revealed }) => {
         setUserId(joinedUserId);
         setUsername(username);
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
-        setGameCreatorUserId(gameCreatorUserId);
         restoreUserVoteSelection(votes, joinedUserId);
       }
     );
@@ -107,11 +98,8 @@ export function useSocket(
       });
     });
 
-    newSocket.on('user-list-updated', ({ users, gameCreatorUserId }) => {
+    newSocket.on('user-list-updated', ({ users }) => {
       setUsers(users);
-      if (gameCreatorUserId !== undefined) {
-        setGameCreatorUserId(gameCreatorUserId);
-      }
     });
 
     newSocket.on('votes-revealed', ({ votes, revealed }) => {
@@ -143,7 +131,6 @@ export function useSocket(
     setVotes,
     setRevealed,
     setSelectedVote,
-    setGameCreatorUserId,
     reset,
   ]);
 

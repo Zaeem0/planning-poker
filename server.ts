@@ -25,7 +25,6 @@ interface Game {
   votes: Map<string, string>;
   revealed: boolean;
   nextJoinOrder: number;
-  gameCreatorUserId: string | null;
 }
 
 interface UserProfile {
@@ -82,7 +81,6 @@ function getOrCreateGame(gameId: string): Game {
       votes: new Map(),
       revealed: false,
       nextJoinOrder: 0,
-      gameCreatorUserId: null,
     });
   }
   return games.get(gameId)!;
@@ -182,15 +180,9 @@ app.prepare().then(() => {
         // Preserve join order for reconnecting users, assign new order for first-time joiners
         const hasVoted = game.votes.has(userId);
         const existingUser = game.users.get(userId);
-        const isNewUser = !existingUser;
         const joinOrder = existingUser
           ? existingUser.joinOrder
           : game.nextJoinOrder++;
-
-        // First user to join becomes the game creator
-        if (isNewUser && game.gameCreatorUserId === null) {
-          game.gameCreatorUserId = userId;
-        }
 
         const userIsSpectator =
           existingUser?.isSpectator ?? isSpectator ?? false;
@@ -214,13 +206,11 @@ app.prepare().then(() => {
           users: sortedUsers,
           votes: votesData,
           revealed: game.revealed,
-          gameCreatorUserId: game.gameCreatorUserId,
         });
 
         // Notify other users in the game
         socket.to(gameId).emit('user-list-updated', {
           users: sortedUsers,
-          gameCreatorUserId: game.gameCreatorUserId,
         });
       }
     );

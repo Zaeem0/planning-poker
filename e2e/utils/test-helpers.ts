@@ -82,6 +82,12 @@ export async function waitForPlayerCount(page: Page, expectedCount: number) {
   await expect(page.locator('.table-player')).toHaveCount(expectedCount);
 }
 
+export async function waitForRevealedCards(page: Page, expectedCount: number) {
+  await expect(page.locator('.player-card-revealed')).toHaveCount(
+    expectedCount
+  );
+}
+
 export async function waitForDisconnectedPlayers(
   page: Page,
   expectedCount: number

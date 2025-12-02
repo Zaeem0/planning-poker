@@ -34,7 +34,6 @@ export default function GamePage() {
     votes,
     revealed,
     selectedVote,
-    gameCreatorUserId,
     setGameId,
     setSelectedVote,
   } = useGameStore();
@@ -135,7 +134,6 @@ export default function GamePage() {
             votes={votes}
             revealed={revealed}
             currentUserId={userId}
-            gameCreatorUserId={gameCreatorUserId}
             socket={socket}
             gameId={gameId}
             selectedVote={selectedVote}
