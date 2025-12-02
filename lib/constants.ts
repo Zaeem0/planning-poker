@@ -24,4 +24,4 @@ export const CARD_VALUES: ReadonlyArray<{
 
 export const SINGLE_KEY_VOTES = [VoteSize.S, VoteSize.M, VoteSize.L] as const;
 
-export const THROW_EMOJIS = ['🪃', '🏒', '🥢', '✈️'];
+export const THROW_EMOJIS = ['🥊', '🪃', '🪨', '✈️'];

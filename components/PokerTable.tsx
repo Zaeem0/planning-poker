@@ -36,7 +36,6 @@ export function PokerTable({
   const handleThrowEmoji = useCallback(
     (targetUserId: string, emoji: string) => {
       emitThrowEmoji(socket, gameId, targetUserId, emoji);
-      setHoveredUserId(null);
     },
     [socket, gameId]
   );
@@ -100,8 +99,10 @@ export function PokerTable({
                   animationDelay: `${anim.delay}s`,
                   '--start-x': `${anim.startX}px`,
                   '--start-y': `${anim.startY}px`,
-                  '--end-x': `${anim.endX}px`,
-                  '--end-y': `${anim.endY}px`,
+                  '--impact-x': `${anim.impactX}px`,
+                  '--impact-y': `${anim.impactY}px`,
+                  '--bounce-x': `${anim.bounceX}px`,
+                  '--bounce-y': `${anim.bounceY}px`,
                   '--rotation': `${anim.rotation}deg`,
                 } as React.CSSProperties
               }
@@ -123,7 +124,9 @@ export function PokerTable({
             ))}
           </div>
         )}
-        <span className="player-name">
+        <span
+          className={`player-name ${isDisconnected ? 'player-name-disconnected' : ''}`}
+        >
           {isGameCreator && <span className="player-game-creator">👑</span>}
           {user.username}
           {isCurrentUser && <span className="player-you">(you)</span>}
