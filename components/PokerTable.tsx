@@ -4,6 +4,7 @@ import { CARD_VALUES, THROW_EMOJIS, VoteSize } from '@/lib/constants';
 import { Socket } from 'socket.io-client';
 import { emitThrowEmoji } from '@/lib/socket';
 import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
+import { VotingCards } from '@/components/VotingCards';
 import '@/styles/poker-table.scss';
 
 interface PokerTableProps {
@@ -13,6 +14,8 @@ interface PokerTableProps {
   currentUserId: string;
   socket: Socket | null;
   gameId: string;
+  selectedVote: string | null;
+  onVote: (value: string) => void;
 }
 
 export function PokerTable({
@@ -22,6 +25,8 @@ export function PokerTable({
   currentUserId,
   socket,
   gameId,
+  selectedVote,
+  onVote,
 }: PokerTableProps) {
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
   const { getAnimationsForUser } = useEmojiAnimations(socket);
@@ -41,9 +46,6 @@ export function PokerTable({
     const card = CARD_VALUES.find((c) => c.value === voteValue);
     return card ? card.label : voteValue;
   };
-
-  const topUsers = users.filter((_, i) => i % 2 === 0);
-  const bottomUsers = users.filter((_, i) => i % 2 === 1);
 
   const renderUserCard = (user: User) => {
     const vote = getVoteForUser(user.id);
@@ -98,7 +100,7 @@ export function PokerTable({
             </span>
           ))}
         </div>
-        {isHovered && !isCurrentUser ? (
+        {isHovered && !isCurrentUser && (
           <div className="emoji-picker">
             {THROW_EMOJIS.map((emoji) => (
               <button
@@ -110,12 +112,11 @@ export function PokerTable({
               </button>
             ))}
           </div>
-        ) : (
-          <span className="player-name">
-            {user.username}
-            {isCurrentUser && <span className="player-you">(you)</span>}
-          </span>
         )}
+        <span className="player-name">
+          {user.username}
+          {isCurrentUser && <span className="player-you">(you)</span>}
+        </span>
       </div>
     );
   };
@@ -130,19 +131,16 @@ export function PokerTable({
 
   return (
     <div className="poker-table-container">
-      <div className="table-players table-players-top">
-        {topUsers.map(renderUserCard)}
-      </div>
+      <div className="table-players">{users.map(renderUserCard)}</div>
 
-      <div className="poker-table">
-        <div className="table-surface">
-          <span className="table-message">{getTableMessage()}</span>
-        </div>
-      </div>
+      <span className="table-message">{getTableMessage()}</span>
 
-      <div className="table-players table-players-bottom">
-        {bottomUsers.map(renderUserCard)}
-      </div>
+      <VotingCards
+        votes={votes}
+        revealed={revealed}
+        selectedVote={selectedVote}
+        onVote={onVote}
+      />
     </div>
   );
 }

@@ -17,18 +17,21 @@
 }
 
 .table-player {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  padding: 40px;
+  margin: -40px;
 }
 
 .player-card {
-  width: 48px;
-  height: 72px;
+  width: 60px;
+  height: 90px;
   background: $dark-bg-elevated;
   border: 1px solid $dark-border;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,12 +71,12 @@
 }
 
 .player-card-emoji {
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   line-height: 1;
 }
 
 .player-card-size {
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: $slate-500;
   text-transform: uppercase;
@@ -113,31 +116,6 @@
   font-weight: 400;
 }
 
-.poker-table {
-  width: 100%;
-  max-width: 500px;
-  margin: 1rem 0;
-}
-
-.table-surface {
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.15) 0%,
-    rgba(79, 70, 229, 0.1) 100%
-  );
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  border-radius: 16px;
-  padding: 3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 120px;
-
-  &.table-surface-revealed {
-    padding: 3rem;
-  }
-}
-
 .table-message {
   font-size: 0.875rem;
   font-weight: 500;
@@ -145,16 +123,10 @@
 }
 
 .voting-section-bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  z-index: 100;
 }
 
 .voting-hint {
@@ -225,14 +197,6 @@
   font-size: 1.5rem;
 }
 
-.voting-card-small[data-card-size='l'] .voting-card-emoji {
-  font-size: 1.8rem;
-}
-
-.voting-card-small[data-card-size='xl'] .voting-card-emoji {
-  font-size: 1.6rem;
-}
-
 .voting-card-title {
   font-size: 0.625rem;
   font-weight: 600;
@@ -243,31 +207,39 @@
 .voting-card-percentage {
   font-size: 0.75rem;
   font-weight: 700;
-  color: color.scale($success, $lightness: -75%);
-  text-shadow: 0 0 1px rgba($white, 0.3);
+  color: color.scale($success, $lightness: 55%);
+  text-shadow: 0 0 30px $dark-bg;
 }
 
 .emoji-picker {
+  position: absolute;
+  top: 0px;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  min-height: 2.5rem;
+  z-index: 100;
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
+  border-radius: $radius;
+  overflow: hidden;
+
+
 }
 
 .emoji-picker-button {
   width: 28px;
   height: 28px;
-  border: 1px solid $dark-border;
-  background: $dark-bg-elevated;
-  border-radius: $radius;
+  border: none;
+  background: transparent;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: all 0.15s ease;
+  transition: background 0.15s ease;
 
   &:hover {
     background: $dark-bg-hover;
-    border-color: $primary;
-    transform: scale(1.15);
+  }
+
+  &:not(:last-child) {
+    border-right: 1px solid $dark-border;
   }
 }
 

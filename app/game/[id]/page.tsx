@@ -8,7 +8,6 @@ import { useKeyboardVoting } from '@/lib/hooks/useKeyboardVoting';
 import { PokerTable } from '@/components/PokerTable';
 import { JoinGameForm } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
-import { VotingCards } from '@/components/VotingCards';
 import { Toast } from '@/components/Toast';
 import { Loader } from '@/components/Loader';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -116,16 +115,11 @@ export default function GamePage() {
             currentUserId={userId}
             socket={socket}
             gameId={gameId}
+            selectedVote={selectedVote}
+            onVote={handleVote}
           />
         </div>
       </div>
-
-      <VotingCards
-        votes={votes}
-        revealed={revealed}
-        selectedVote={selectedVote}
-        onVote={handleVote}
-      />
 
       {copied && <Toast message="Link copied to clipboard" />}
     </div>

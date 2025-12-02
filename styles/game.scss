@@ -6,8 +6,11 @@
 }
 
 .game-wrapper {
+  height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .join-page {
@@ -72,8 +75,7 @@
 
 .game-header {
   position: relative;
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 2rem;
+  padding: 1.5rem 1.25rem 0 1.25rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -176,10 +178,11 @@
 }
 
 .game-main-table {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-bottom: 100px;
+  justify-content: center;
 }
 
 .game-content {
