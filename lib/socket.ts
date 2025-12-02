@@ -2,6 +2,12 @@ import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useGameStore } from './store';
 
+declare global {
+  interface Window {
+    __TEST_SOCKET__?: Socket | null;
+  }
+}
+
 const USER_ID_KEY = 'planning-poker-user-id';
 
 function getUserId(): string {
@@ -32,6 +38,7 @@ export function useSocket(
     setVotes,
     setRevealed,
     setSelectedVote,
+    setGameCreatorUserId,
     reset,
   } = useGameStore();
 
@@ -55,6 +62,9 @@ export function useSocket(
     });
 
     socketRef.current = newSocket;
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
+      window.__TEST_SOCKET__ = newSocket;
+    }
     const listeners = listenersRef.current;
     listeners.forEach((listener) => listener());
 
@@ -70,12 +80,20 @@ export function useSocket(
 
     newSocket.on(
       'user-joined',
-      ({ userId: joinedUserId, username, users, votes, revealed }) => {
+      ({
+        userId: joinedUserId,
+        username,
+        users,
+        votes,
+        revealed,
+        gameCreatorUserId,
+      }) => {
         setUserId(joinedUserId);
         setUsername(username);
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
+        setGameCreatorUserId(gameCreatorUserId);
         restoreUserVoteSelection(votes, joinedUserId);
       }
     );
@@ -89,8 +107,11 @@ export function useSocket(
       });
     });
 
-    newSocket.on('user-list-updated', ({ users }) => {
+    newSocket.on('user-list-updated', ({ users, gameCreatorUserId }) => {
       setUsers(users);
+      if (gameCreatorUserId !== undefined) {
+        setGameCreatorUserId(gameCreatorUserId);
+      }
     });
 
     newSocket.on('votes-revealed', ({ votes, revealed }) => {
@@ -106,6 +127,9 @@ export function useSocket(
     return () => {
       newSocket.disconnect();
       socketRef.current = null;
+      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
+        window.__TEST_SOCKET__ = null;
+      }
       listeners.forEach((listener) => listener());
     };
   }, [
@@ -119,6 +143,7 @@ export function useSocket(
     setVotes,
     setRevealed,
     setSelectedVote,
+    setGameCreatorUserId,
     reset,
   ]);
 

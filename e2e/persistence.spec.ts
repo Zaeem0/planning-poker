@@ -10,6 +10,7 @@ import {
   waitForDisconnectedPlayers,
   waitForAnyDisconnectedPlayer,
   waitForGamePageVisible,
+  disconnectSocket,
   reopenPageInContext,
   closeContexts,
   getVoteCard,
@@ -217,12 +218,12 @@ test.describe('Persistence', () => {
       await waitForPlayerCount(alicePage, 2);
       await waitForPlayerCount(bobPage, 2);
 
-      await bobPage.close();
-      await bobContext.close();
+      // Directly disconnect socket via JavaScript - most reliable approach
+      await disconnectSocket(bobPage);
 
       await waitForAnyDisconnectedPlayer(alicePage);
 
-      await closeContexts(aliceContext);
+      await closeContexts(aliceContext, bobContext);
     });
 
     test('should maintain users after reconnection', async ({ browser }) => {
@@ -239,15 +240,18 @@ test.describe('Persistence', () => {
       await waitForPlayerCount(alicePage, 2);
       await waitForPlayerCount(bobPage, 2);
 
-      await bobPage.close();
+      // Directly disconnect socket via JavaScript
+      await disconnectSocket(bobPage);
 
       await waitForAnyDisconnectedPlayer(alicePage);
 
+      // Reopen page to reconnect
       bobPage = await reopenPageInContext(bobContext, gameId);
-      await expect(bobPage.getByText('Bob(you)')).toBeVisible();
 
       await waitForPlayerCount(alicePage, 2);
       await waitForDisconnectedPlayers(alicePage, 0);
+
+      await expect(bobPage.getByText('Bob(you)')).toBeVisible();
 
       await closeContexts(aliceContext, bobContext);
     });

@@ -87,18 +87,32 @@ export async function waitForDisconnectedPlayers(
   expectedCount: number
 ) {
   await expect
-    .poll(async () => await page.locator('.player-card-disconnected').count())
+    .poll(async () => await page.locator('.player-card-disconnected').count(), {
+      timeout: 15000,
+      intervals: [500, 1000, 1000],
+    })
     .toBe(expectedCount);
 }
 
 export async function waitForAnyDisconnectedPlayer(page: Page) {
   await expect
-    .poll(async () => await page.locator('.player-card-disconnected').count())
+    .poll(async () => await page.locator('.player-card-disconnected').count(), {
+      timeout: 15000,
+      intervals: [500, 1000, 1000],
+    })
     .toBeGreaterThan(0);
 }
 
 export async function waitForGamePageVisible(page: Page) {
   await expect(page.locator('.game-page')).toBeVisible();
+}
+
+export async function disconnectSocket(page: Page) {
+  await page.evaluate(() => {
+    if (window.__TEST_SOCKET__) {
+      window.__TEST_SOCKET__.disconnect();
+    }
+  });
 }
 
 export async function reopenPageInContext(

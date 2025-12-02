@@ -2,12 +2,14 @@ import { test, expect } from '@playwright/test';
 import {
   generateUniqueGameId,
   joinGameAsUser,
+  joinGameAsSpectator,
   selectVoteCard,
   pressVoteKey,
   clickRevealVotes,
   clickNewRound,
   navigateToGame,
   waitForJoinFormVisible,
+  waitForPlayerCount,
   getVoteCard,
   getRevealButton,
   getPlayerCard,
@@ -318,6 +320,64 @@ test.describe('Voting', () => {
       await expect(page.locator('.table-message')).toContainText(
         'Votes revealed!'
       );
+    });
+  });
+
+  test.describe('Game Creator', () => {
+    test('should show crown icon for game creator', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'Creator');
+
+      await expect(page.locator('.player-game-creator')).toBeVisible();
+      await expect(page.locator('.player-game-creator')).toContainText('👑');
+    });
+
+    test('should make first player the game creator', async ({ browser }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+
+      await waitForPlayerCount(alicePage, 2);
+
+      const alicePlayer = getPlayerCard(alicePage, 'Alice');
+      await expect(alicePlayer.locator('.player-game-creator')).toBeVisible();
+
+      const bobPlayer = getPlayerCard(alicePage, 'Bob');
+      await expect(bobPlayer.locator('.player-game-creator')).not.toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
+    });
+
+    test('should allow spectator to be game creator', async ({ browser }) => {
+      const gameId = generateUniqueGameId();
+
+      const spectatorContext = await browser.newContext();
+      const voterContext = await browser.newContext();
+      const spectatorPage = await spectatorContext.newPage();
+      const voterPage = await voterContext.newPage();
+
+      await joinGameAsSpectator(spectatorPage, gameId, 'Spectator');
+      await joinGameAsUser(voterPage, gameId, 'Voter');
+
+      await waitForPlayerCount(spectatorPage, 2);
+
+      const spectatorPlayer = getPlayerCard(spectatorPage, 'Spectator');
+      await expect(
+        spectatorPlayer.locator('.player-game-creator')
+      ).toBeVisible();
+
+      const voterPlayer = getPlayerCard(spectatorPage, 'Voter');
+      await expect(
+        voterPlayer.locator('.player-game-creator')
+      ).not.toBeVisible();
+
+      await closeContexts(spectatorContext, voterContext);
     });
   });
 });

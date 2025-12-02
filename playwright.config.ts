@@ -1,17 +1,20 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const isCI = !!process.env.CI;
+const isDebug = process.env.DEBUG === 'true';
+
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: false,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: 1,
-  reporter: 'html',
-  timeout: 60000,
+  fullyParallel: true,
+  forbidOnly: isCI,
+  retries: isCI ? 2 : isDebug ? 2 : 0,
+  workers: isCI ? 1 : 8,
+  reporter: isDebug ? 'html' : 'line',
+  timeout: isDebug ? 60000 : 30000,
   use: {
     baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    video: 'retain-on-failure',
+    trace: isDebug ? 'on-first-retry' : 'off',
+    video: isDebug ? 'retain-on-failure' : 'off',
   },
   projects: [
     {
@@ -22,7 +25,10 @@ export default defineConfig({
   webServer: {
     command: 'yarn dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !isCI,
     timeout: 120000,
+    env: {
+      NEXT_PUBLIC_TEST_MODE: 'true',
+    },
   },
 });
