@@ -62,6 +62,11 @@
   opacity: 0.6;
 }
 
+.player-card-spectator {
+  background: $dark-bg-elevated;
+  border-color: $slate-600;
+}
+
 .player-card-content {
   display: flex;
   flex-direction: column;
@@ -113,6 +118,13 @@
   display: block;
   font-size: 0.75rem;
   color: $primary-hover;
+  font-weight: 400;
+}
+
+.player-spectator {
+  display: block;
+  font-size: 0.75rem;
+  color: $text-secondary;
   font-weight: 400;
 }
 

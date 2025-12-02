@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   generateUniqueGameId,
   joinGameAsUser,
+  joinGameAsSpectator,
   navigateToGame,
   waitForJoinFormVisible,
   closeContexts,
@@ -148,5 +149,57 @@ test.describe('Joining a Game', () => {
       await closeContexts(context);
     });
   });
-});
 
+  test.describe('Spectator Mode', () => {
+    test('should show spectator toggle on join form', async ({ browser }) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+
+      const gameId = generateUniqueGameId();
+      await navigateToGame(page, gameId);
+      await waitForJoinFormVisible(page);
+
+      await expect(page.getByText('Join as spectator')).toBeVisible();
+
+      await closeContexts(context);
+    });
+
+    test('should join as spectator when toggle is enabled', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsSpectator(page, gameId, 'SpectatorUser');
+
+      await expect(page.getByText('SpectatorUser(you)')).toBeVisible();
+      await expect(page.getByText('(spectator)')).toBeVisible();
+    });
+
+    test('should show spectator emoji on player card', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsSpectator(page, gameId, 'SpectatorUser');
+
+      await expect(page.locator('.player-card-spectator')).toBeVisible();
+      await expect(page.locator('.player-card-spectator')).toContainText('👁️');
+    });
+
+    test('should not show voting cards for spectators', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsSpectator(page, gameId, 'SpectatorUser');
+
+      await expect(page.locator('.voting-section-bottom')).not.toBeVisible();
+    });
+
+    test('should not allow keyboard voting for spectators', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsSpectator(page, gameId, 'SpectatorUser');
+
+      await page.keyboard.press('m');
+
+      await expect(
+        page.locator('.player-card-spectator.player-card-voted')
+      ).not.toBeVisible();
+    });
+  });
+});

@@ -54,6 +54,7 @@ export function PokerTable({
     const isHovered = hoveredUserId === user.id;
     const userAnimations = getAnimationsForUser(user.id);
     const isDisconnected = !user.connected;
+    const isSpectator = user.isSpectator;
 
     return (
       <div
@@ -65,11 +66,17 @@ export function PokerTable({
         <div
           className={`player-card ${hasVoted ? 'player-card-voted' : ''} ${
             revealed && vote ? 'player-card-revealed' : ''
-          } ${isDisconnected ? 'player-card-disconnected' : ''}`}
+          } ${isDisconnected ? 'player-card-disconnected' : ''} ${
+            isSpectator ? 'player-card-spectator' : ''
+          }`}
         >
           {isDisconnected ? (
             <div className="player-card-content">
               <span className="player-card-emoji">🔌</span>
+            </div>
+          ) : isSpectator ? (
+            <div className="player-card-content">
+              <span className="player-card-emoji">👁️</span>
             </div>
           ) : revealed && vote ? (
             <div className="player-card-content">
@@ -116,17 +123,22 @@ export function PokerTable({
         <span className="player-name">
           {user.username}
           {isCurrentUser && <span className="player-you">(you)</span>}
+          {isSpectator && <span className="player-spectator">(spectator)</span>}
         </span>
       </div>
     );
   };
 
+  const voters = users.filter((u) => !u.isSpectator);
+  const currentUser = users.find((u) => u.id === currentUserId);
+  const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
+
   const getTableMessage = () => {
-    const votedCount = users.filter((u) => u.hasVoted).length;
+    const votedCount = voters.filter((u) => u.hasVoted).length;
     if (revealed) return 'Votes revealed!';
     if (votedCount === 0) return 'Pick your cards!';
-    if (votedCount === users.length) return 'All voted! Ready to reveal';
-    return `${votedCount} of ${users.length} voted`;
+    if (votedCount === voters.length) return 'All voted! Ready to reveal';
+    return `${votedCount} of ${voters.length} voted`;
   };
 
   return (
@@ -135,12 +147,14 @@ export function PokerTable({
 
       <span className="table-message">{getTableMessage()}</span>
 
-      <VotingCards
-        votes={votes}
-        revealed={revealed}
-        selectedVote={selectedVote}
-        onVote={onVote}
-      />
+      {!isCurrentUserSpectator && (
+        <VotingCards
+          votes={votes}
+          revealed={revealed}
+          selectedVote={selectedVote}
+          onVote={onVote}
+        />
+      )}
     </div>
   );
 }

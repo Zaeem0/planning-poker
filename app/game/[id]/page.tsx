@@ -19,9 +19,13 @@ export default function GamePage() {
   const gameId = params.id as string;
   const [copied, setCopied] = useState(false);
   const [name, setName] = useState('');
+  const [isSpectator, setIsSpectator] = useState(false);
   const [submittedName, setSubmittedName] = useState<string | undefined>(
     undefined
   );
+  const [submittedIsSpectator, setSubmittedIsSpectator] = useState<
+    boolean | undefined
+  >(undefined);
 
   const {
     userId,
@@ -34,7 +38,7 @@ export default function GamePage() {
     setSelectedVote,
   } = useGameStore();
 
-  const socket = useSocket(gameId, submittedName, true);
+  const socket = useSocket(gameId, submittedName, submittedIsSpectator, true);
 
   useEffect(() => {
     setGameId(gameId);
@@ -44,6 +48,7 @@ export default function GamePage() {
     const trimmedName = name.trim();
     if (!trimmedName) return;
     setSubmittedName(trimmedName);
+    setSubmittedIsSpectator(isSpectator);
   };
 
   const handleCardClick = useCallback(
@@ -67,8 +72,11 @@ export default function GamePage() {
     [socket, userId, gameId, setSelectedVote]
   );
 
+  const currentUser = users.find((u) => u.id === userId);
+  const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
+
   useKeyboardVoting({
-    enabled: !!username && !revealed,
+    enabled: !!username && !revealed && !isCurrentUserSpectator,
     onVote: handleKeyboardVote,
   });
 
@@ -97,7 +105,9 @@ export default function GamePage() {
       <JoinGameForm
         gameId={gameId}
         name={name}
+        isSpectator={isSpectator}
         onNameChange={setName}
+        onSpectatorChange={setIsSpectator}
         onSubmit={handleJoin}
       />
     );

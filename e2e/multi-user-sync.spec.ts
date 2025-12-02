@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   generateUniqueGameId,
   joinGameAsUser,
+  joinGameAsSpectator,
   selectVoteCard,
   clickRevealVotes,
   clickNewRound,
@@ -327,6 +328,80 @@ test.describe('Multi-User-Sync', () => {
       await expect(bobPage.locator('.player-card-revealed')).toBeVisible();
 
       await closeContexts(aliceContext, bobContext);
+    });
+  });
+
+  test.describe('Spectator Mode', () => {
+    test('should not count spectators in vote total', async ({ browser }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const spectatorContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+      const spectatorPage = await spectatorContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await joinGameAsSpectator(spectatorPage, gameId, 'Spectator');
+
+      await waitForPlayerCount(alicePage, 3);
+
+      await selectVoteCard(alicePage, 'm');
+
+      await expect(alicePage.locator('.table-message')).toContainText(
+        '1 of 2 voted'
+      );
+
+      await closeContexts(aliceContext, bobContext, spectatorContext);
+    });
+
+    test('should show all voted when only voters have voted', async ({
+      browser,
+    }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const spectatorContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+      const spectatorPage = await spectatorContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await joinGameAsSpectator(spectatorPage, gameId, 'Spectator');
+
+      await waitForPlayerCount(alicePage, 3);
+
+      await selectVoteCard(alicePage, 'm');
+      await selectVoteCard(bobPage, 's');
+
+      await expect(alicePage.locator('.table-message')).toContainText(
+        'All voted! Ready to reveal'
+      );
+
+      await closeContexts(aliceContext, bobContext, spectatorContext);
+    });
+
+    test('should show spectator to other users', async ({ browser }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const spectatorContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const spectatorPage = await spectatorContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsSpectator(spectatorPage, gameId, 'Spectator');
+
+      await waitForPlayerCount(alicePage, 2);
+
+      await expect(alicePage.locator('.player-card-spectator')).toBeVisible();
+      await expect(alicePage.getByText('(spectator)')).toBeVisible();
+
+      await closeContexts(aliceContext, spectatorContext);
     });
   });
 });

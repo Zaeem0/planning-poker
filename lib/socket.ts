@@ -20,6 +20,7 @@ function getUserId(): string {
 export function useSocket(
   gameId: string,
   customUsername?: string,
+  isSpectator?: boolean,
   shouldConnect: boolean = true
 ) {
   const socketRef = useRef<Socket | null>(null);
@@ -84,6 +85,7 @@ export function useSocket(
         gameId,
         userId,
         username: customUsername,
+        isSpectator,
       });
     });
 
@@ -109,6 +111,7 @@ export function useSocket(
   }, [
     gameId,
     customUsername,
+    isSpectator,
     shouldConnect,
     setUserId,
     setUsername,

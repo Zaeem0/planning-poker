@@ -1,14 +1,18 @@
 interface JoinGameFormProps {
   gameId: string;
   name: string;
+  isSpectator: boolean;
   onNameChange: (name: string) => void;
+  onSpectatorChange: (isSpectator: boolean) => void;
   onSubmit: () => void;
 }
 
 export function JoinGameForm({
   gameId,
   name,
+  isSpectator,
   onNameChange,
+  onSpectatorChange,
   onSubmit,
 }: JoinGameFormProps) {
   return (
@@ -40,6 +44,18 @@ export function JoinGameForm({
               autoFocus
               required
             />
+          </div>
+          <div className="join-form-group">
+            <label className="join-toggle">
+              <input
+                type="checkbox"
+                checked={isSpectator}
+                onChange={(e) => onSpectatorChange(e.target.checked)}
+                className="join-toggle-input"
+              />
+              <span className="join-toggle-slider"></span>
+              <span className="join-toggle-label">Join as spectator</span>
+            </label>
           </div>
           <button type="submit" disabled={!name.trim()} className="join-button">
             Join Game

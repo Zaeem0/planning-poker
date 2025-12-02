@@ -17,6 +17,7 @@ interface User {
   hasVoted: boolean;
   joinOrder: number;
   connected: boolean;
+  isSpectator: boolean;
 }
 
 interface Game {
@@ -39,6 +40,7 @@ interface JoinGamePayload {
   gameId: string;
   userId?: string;
   username?: string;
+  isSpectator?: boolean;
 }
 
 interface VotePayload {
@@ -142,7 +144,12 @@ app.prepare().then(() => {
   io.on('connection', (socket: Socket) => {
     socket.on(
       'join-game',
-      ({ gameId, userId: clientUserId, username }: JoinGamePayload) => {
+      ({
+        gameId,
+        userId: clientUserId,
+        username,
+        isSpectator,
+      }: JoinGamePayload) => {
         let userId = clientUserId;
         let finalUsername: string | null = null;
 
@@ -184,6 +191,7 @@ app.prepare().then(() => {
           hasVoted,
           joinOrder,
           connected: true,
+          isSpectator: existingUser?.isSpectator ?? isSpectator ?? false,
         });
 
         users.set(socket.id, { userId, gameId });

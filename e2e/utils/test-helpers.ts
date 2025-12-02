@@ -28,6 +28,20 @@ export async function joinGameAsUser(
   await expect(page.getByText(`${username}(you)`)).toBeVisible();
 }
 
+export async function joinGameAsSpectator(
+  page: Page,
+  gameId: string,
+  username: string
+) {
+  await navigateToGame(page, gameId);
+  await page.getByPlaceholder('Enter your name').fill(username);
+  await page.getByText('Join as spectator').click();
+  await page.getByRole('button', { name: 'Join Game' }).click();
+  await waitForGamePageVisible(page);
+  await expect(page.getByText(`${username}(you)`)).toBeVisible();
+  await expect(page.getByText('(spectator)')).toBeVisible();
+}
+
 export async function selectVoteCard(page: Page, size: string) {
   await page.locator(`[data-card-size="${size}"]`).click();
 }

@@ -39,12 +39,22 @@
 - Automatic reconnection with stored username
 - No random username generation
 
+**Spectator Mode:**
+
+- Toggle option on join form to join as spectator
+- Spectators shown with 👁️ eye icon on their card
+- Spectators cannot vote (no voting cards shown)
+- Spectators excluded from vote count (e.g., "2 of 3 voted" won't count spectators)
+- Keyboard voting disabled for spectators
+- "(spectator)" label shown under spectator names
+
 **User Display:**
 
 - Visual distinction for current user
 - Player cards arranged around poker table
 - Emoji throwing between players for fun interactions
 - Disconnected users shown with 🔌 plug icon
+- Spectators shown with 👁️ eye icon
 
 ### Session Persistence
 
@@ -147,7 +157,7 @@ Game State (In-Memory)
 **Server-side (In-Memory Maps):**
 
 - `games` - Game state by game ID
-- `users` - Socket ID to user data mapping
+- `users` - Socket ID to user data mapping (includes isSpectator flag)
 - `userProfiles` - User ID to username mapping
 
 ### Data Persistence
@@ -212,10 +222,11 @@ Game State (In-Memory)
 
 1. **Landing Page** → Create or join game
 2. **Enter Username** → Required on first visit
-3. **Vote** → Click card or use keyboard
-4. **Wait** → See who has voted (striped cards)
-5. **Reveal** → View all votes and statistics
-6. **New Round** → Reset and start over
+3. **Choose Role** → Toggle spectator mode if observing only
+4. **Vote** → Click card or use keyboard (voters only)
+5. **Wait** → See who has voted (striped cards)
+6. **Reveal** → View all votes and statistics
+7. **New Round** → Reset and start over
 
 ## 🎯 Design Principles
 

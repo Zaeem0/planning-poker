@@ -6,6 +6,7 @@ export interface User {
   hasVoted: boolean;
   joinOrder: number;
   connected: boolean;
+  isSpectator: boolean;
 }
 
 export interface Vote {
