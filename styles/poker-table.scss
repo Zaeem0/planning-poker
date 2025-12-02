@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'variables' as *;
 
 .poker-table-container {
@@ -234,7 +235,7 @@
 .voting-card-percentage {
   font-size: 0.75rem;
   font-weight: 700;
-  color: darken($success, 75%);
+  color: color.scale($success, $lightness: -75%);
   text-shadow: 0 0 1px rgba($white, 0.3);
 }
 
