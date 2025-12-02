@@ -44,7 +44,7 @@ interface JoinGamePayload {
 interface VotePayload {
   gameId: string;
   userId: string;
-  vote: string;
+  vote: string | null;
 }
 
 interface RevealVotesPayload {
@@ -210,10 +210,17 @@ app.prepare().then(() => {
       const game = games.get(gameId);
       if (!game) return;
 
-      game.votes.set(userId, vote);
       const user = game.users.get(userId);
-      if (user) {
-        user.hasVoted = true;
+      if (vote === null) {
+        game.votes.delete(userId);
+        if (user) {
+          user.hasVoted = false;
+        }
+      } else {
+        game.votes.set(userId, vote);
+        if (user) {
+          user.hasVoted = true;
+        }
       }
 
       // Broadcast updated user list (shows who has voted)

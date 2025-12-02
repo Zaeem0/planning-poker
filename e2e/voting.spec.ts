@@ -65,6 +65,25 @@ test.describe('Voting', () => {
       await expect(getVoteCard(page, 'xl')).toHaveClass(/selected/);
       await expect(getVoteCard(page, 'xs')).not.toHaveClass(/selected/);
     });
+
+    test('should allow unselecting a card by clicking it again', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'UnselectUser');
+
+      const playerCard = getPlayerCard(page, 'UnselectUser').locator(
+        '.player-card'
+      );
+
+      await selectVoteCard(page, 'm');
+      await expect(getVoteCard(page, 'm')).toHaveClass(/selected/);
+      await expect(playerCard).toHaveClass(/player-card-voted/);
+
+      await selectVoteCard(page, 'm');
+      await expect(getVoteCard(page, 'm')).not.toHaveClass(/selected/);
+      await expect(playerCard).not.toHaveClass(/player-card-voted/);
+    });
   });
 
   test.describe('Keyboard Voting', () => {

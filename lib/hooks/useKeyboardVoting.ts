@@ -26,7 +26,9 @@ export function useKeyboardVoting({
       timeoutRef.current = null;
     }
     if (secondKeyListenerRef.current) {
-      window.removeEventListener('keydown', secondKeyListenerRef.current);
+      window.removeEventListener('keydown', secondKeyListenerRef.current, {
+        capture: true,
+      });
       secondKeyListenerRef.current = null;
     }
   }, []);
@@ -43,6 +45,7 @@ export function useKeyboardVoting({
       clearPendingTimeout();
 
       const waitForSecondKey = (e: KeyboardEvent) => {
+        e.stopImmediatePropagation();
         const secondKey = e.key.toLowerCase();
         if (secondKey === 's') onVote(VoteSize.XS);
         else if (secondKey === 'l') onVote(VoteSize.XL);
@@ -50,7 +53,7 @@ export function useKeyboardVoting({
       };
 
       secondKeyListenerRef.current = waitForSecondKey;
-      window.addEventListener('keydown', waitForSecondKey);
+      window.addEventListener('keydown', waitForSecondKey, { capture: true });
 
       timeoutRef.current = setTimeout(clearPendingTimeout, TWO_CHAR_TIMEOUT_MS);
     };

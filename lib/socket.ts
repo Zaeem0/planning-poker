@@ -126,7 +126,7 @@ export function emitVote(
   socket: Socket | null,
   gameId: string,
   userId: string,
-  vote: string
+  vote: string | null
 ) {
   if (socket) {
     socket.emit('vote', { gameId, userId, vote });

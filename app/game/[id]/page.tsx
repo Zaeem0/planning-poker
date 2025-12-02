@@ -46,7 +46,18 @@ export default function GamePage() {
     setSubmittedName(trimmedName);
   };
 
-  const handleVote = useCallback(
+  const handleCardClick = useCallback(
+    (value: string) => {
+      const newVote = selectedVote === value ? null : value;
+      setSelectedVote(newVote);
+      if (socket && userId) {
+        emitVote(socket, gameId, userId, newVote);
+      }
+    },
+    [socket, userId, gameId, selectedVote, setSelectedVote]
+  );
+
+  const handleKeyboardVote = useCallback(
     (value: string) => {
       setSelectedVote(value);
       if (socket && userId) {
@@ -58,7 +69,7 @@ export default function GamePage() {
 
   useKeyboardVoting({
     enabled: !!username && !revealed,
-    onVote: handleVote,
+    onVote: handleKeyboardVote,
   });
 
   const handleReveal = () => {
@@ -116,7 +127,7 @@ export default function GamePage() {
             socket={socket}
             gameId={gameId}
             selectedVote={selectedVote}
-            onVote={handleVote}
+            onVote={handleCardClick}
           />
         </div>
       </div>
