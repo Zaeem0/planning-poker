@@ -10,6 +10,7 @@ import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard';
 import { useConfetti } from '@/lib/hooks/useConfetti';
 import { useConfettiOrigin } from '@/lib/hooks/useConfettiOrigin';
 import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
+import { useUnanimousChime } from '@/lib/hooks/useUnanimousChime';
 import { PokerTable } from '@/components/PokerTable';
 import { JoinGameForm, JoinFormData } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
@@ -31,8 +32,10 @@ export default function GamePage() {
     votes,
     revealed,
     selectedVote,
+    isMuted,
     setGameId,
     setSelectedVote,
+    setIsMuted,
   } = useGameStore();
 
   const socket = useSocket(
@@ -60,6 +63,7 @@ export default function GamePage() {
   const confettiOrigin = useConfettiOrigin(votes, revealed);
   const { particles } = useConfetti(votes, revealed, confettiOrigin);
   const { getAnimationsForUser } = useEmojiAnimations(socket);
+  useUnanimousChime(votes, revealed);
 
   useEffect(() => {
     setGameId(gameId);
@@ -84,6 +88,10 @@ export default function GamePage() {
 
   const hasAnyVotes = users.some((u) => u.hasVoted);
 
+  const handleToggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
   return (
     <div className="game-page">
       <div className="game-wrapper">
@@ -92,9 +100,11 @@ export default function GamePage() {
           revealed={revealed}
           hasVotes={hasAnyVotes}
           copied={copied}
+          isMuted={isMuted}
           onReveal={handleReveal}
           onReset={handleReset}
           onCopyLink={handleCopyLink}
+          onToggleMute={handleToggleMute}
         />
 
         <div className="game-main-table">

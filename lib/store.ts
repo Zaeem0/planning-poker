@@ -24,6 +24,7 @@ interface GameState {
   votes: Vote[];
   revealed: boolean;
   selectedVote: string | null;
+  isMuted: boolean;
   setGameId: (gameId: string) => void;
   setCurrentUserId: (userId: string) => void;
   setCurrentUserName: (userName: string) => void;
@@ -31,6 +32,7 @@ interface GameState {
   setVotes: (votes: Vote[]) => void;
   setRevealed: (revealed: boolean) => void;
   setSelectedVote: (vote: string | null) => void;
+  setIsMuted: (isMuted: boolean) => void;
   reset: () => void;
 }
 
@@ -42,6 +44,7 @@ export const useGameStore = create<GameState>((set) => ({
   votes: [],
   revealed: false,
   selectedVote: null,
+  isMuted: false,
   setGameId: (gameId) => set({ gameId }),
   setCurrentUserId: (currentUserId) => set({ currentUserId }),
   setCurrentUserName: (currentUserName) => set({ currentUserName }),
@@ -49,5 +52,6 @@ export const useGameStore = create<GameState>((set) => ({
   setVotes: (votes) => set({ votes }),
   setRevealed: (revealed) => set({ revealed }),
   setSelectedVote: (vote) => set({ selectedVote: vote }),
+  setIsMuted: (isMuted) => set({ isMuted }),
   reset: () => set({ selectedVote: null, votes: [], revealed: false }),
 }));

@@ -215,6 +215,30 @@
   color: $success;
 }
 
+.mute-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $dark-bg-elevated;
+  padding: 0.5rem;
+  border-radius: $radius;
+  border: 1px solid $dark-border;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: $text-muted;
+
+  &:hover {
+    background: $dark-bg-hover;
+    border-color: $dark-border-light;
+    color: $text-secondary;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 .game-main {
   display: grid;
   grid-template-columns: 1fr;

@@ -1,15 +1,22 @@
 import { GameControls } from '@/components/GameControls';
 import { CreateGameButton } from '@/components/CreateGameButton';
-import { CopyIcon, CheckIcon } from '@/components/icons';
+import {
+  CopyIcon,
+  CheckIcon,
+  VolumeIcon,
+  VolumeMuteIcon,
+} from '@/components/icons';
 
 interface GameHeaderProps {
   gameId: string;
   revealed: boolean;
   hasVotes: boolean;
   copied: boolean;
+  isMuted: boolean;
   onReveal: () => void;
   onReset: () => void;
   onCopyLink: () => void;
+  onToggleMute: () => void;
 }
 
 export function GameHeader({
@@ -17,9 +24,11 @@ export function GameHeader({
   revealed,
   hasVotes,
   copied,
+  isMuted,
   onReveal,
   onReset,
   onCopyLink,
+  onToggleMute,
 }: GameHeaderProps) {
   return (
     <header className="game-header">
@@ -34,6 +43,14 @@ export function GameHeader({
           onReset={onReset}
           hasVotes={hasVotes}
         />
+        <button
+          onClick={onToggleMute}
+          className="mute-button"
+          aria-label={isMuted ? 'Unmute' : 'Mute'}
+          title={isMuted ? 'Unmute' : 'Mute'}
+        >
+          {isMuted ? <VolumeMuteIcon /> : <VolumeIcon />}
+        </button>
         <button onClick={onCopyLink} className="game-id-badge">
           <span className="game-id-label">Game:</span>
           <span className="game-id-value">{gameId}</span>
