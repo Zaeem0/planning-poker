@@ -16,6 +16,13 @@ export interface VoteAnalysis {
   totalVotes: number;
 }
 
+export function getVoteForUser(
+  votes: Vote[],
+  userId: string
+): string | undefined {
+  return votes.find((v) => v.userId === userId)?.vote;
+}
+
 export function hasUnanimousVote(votes: Vote[]): boolean {
   if (votes.length === 0) return false;
 
@@ -77,4 +84,3 @@ export function calculateAllCardStats(
     })
   );
 }
-

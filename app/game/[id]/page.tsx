@@ -7,9 +7,13 @@ import { useSocket } from '@/lib/socket';
 import { useKeyboardVoting } from '@/lib/hooks/useKeyboardVoting';
 import { useGameActions } from '@/lib/hooks/useGameActions';
 import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard';
+import { useConfetti } from '@/lib/hooks/useConfetti';
+import { useConfettiOrigin } from '@/lib/hooks/useConfettiOrigin';
+import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
 import { PokerTable } from '@/components/PokerTable';
-import { JoinGameForm } from '@/components/JoinGameForm';
+import { JoinGameForm, JoinFormData } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
+import { ConfettiContainer } from '@/components/ConfettiContainer';
 import { Toast } from '@/components/Toast';
 import { Loader } from '@/components/Loader';
 import '@/styles/game.scss';
@@ -18,18 +22,11 @@ import '@/styles/poker-table.scss';
 export default function GamePage() {
   const params = useParams();
   const gameId = params.id as string;
-  const [name, setName] = useState('');
-  const [isSpectator, setIsSpectator] = useState(false);
-  const [submittedName, setSubmittedName] = useState<string | undefined>(
-    undefined
-  );
-  const [submittedIsSpectator, setSubmittedIsSpectator] = useState<
-    boolean | undefined
-  >(undefined);
+  const [joinFormData, setJoinFormData] = useState<JoinFormData | null>(null);
 
   const {
-    userId,
-    username,
+    currentUserId,
+    currentUserName,
     users,
     votes,
     revealed,
@@ -38,7 +35,12 @@ export default function GamePage() {
     setSelectedVote,
   } = useGameStore();
 
-  const socket = useSocket(gameId, submittedName, submittedIsSpectator, true);
+  const socket = useSocket(
+    gameId,
+    joinFormData?.displayName,
+    joinFormData?.isSpectator,
+    true
+  );
   const { copied, handleCopyLink } = useCopyToClipboard();
 
   const {
@@ -50,46 +52,34 @@ export default function GamePage() {
   } = useGameActions({
     socket,
     gameId,
-    userId,
+    userId: currentUserId,
     selectedVote,
     setSelectedVote,
   });
+
+  const confettiOrigin = useConfettiOrigin(votes, revealed);
+  const { particles } = useConfetti(votes, revealed, confettiOrigin);
+  const { getAnimationsForUser } = useEmojiAnimations(socket);
 
   useEffect(() => {
     setGameId(gameId);
   }, [gameId, setGameId]);
 
-  const handleJoin = () => {
-    const trimmedName = name.trim();
-    if (!trimmedName) return;
-    setSubmittedName(trimmedName);
-    setSubmittedIsSpectator(isSpectator);
-  };
-
-  const currentUser = users.find((u) => u.id === userId);
-  const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
+  const currentUser = users.find((u) => u.id === currentUserId);
+  const isCurrentUserSpectator = currentUser?.role === 'spectator';
 
   useKeyboardVoting({
-    enabled: !!username && !revealed && !isCurrentUserSpectator,
+    enabled: !!currentUserName && !revealed && !isCurrentUserSpectator,
     onVote: handleKeyboardVote,
     onDeselect: handleKeyboardDeselect,
   });
 
-  if (!userId) {
+  if (!currentUserId) {
     return <Loader />;
   }
 
-  if (!username) {
-    return (
-      <JoinGameForm
-        gameId={gameId}
-        name={name}
-        isSpectator={isSpectator}
-        onNameChange={setName}
-        onSpectatorChange={setIsSpectator}
-        onSubmit={handleJoin}
-      />
-    );
+  if (!currentUserName) {
+    return <JoinGameForm gameId={gameId} onSubmit={setJoinFormData} />;
   }
 
   const hasAnyVotes = users.some((u) => u.hasVoted);
@@ -112,15 +102,17 @@ export default function GamePage() {
             users={users}
             votes={votes}
             revealed={revealed}
-            currentUserId={userId}
+            currentUserId={currentUserId}
             socket={socket}
             gameId={gameId}
             selectedVote={selectedVote}
             onVote={handleCardClick}
+            getAnimationsForUser={getAnimationsForUser}
           />
         </div>
       </div>
 
+      <ConfettiContainer particles={particles} />
       {copied && <Toast message="Link copied to clipboard" />}
     </div>
   );

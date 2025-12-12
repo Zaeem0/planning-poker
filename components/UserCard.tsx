@@ -4,7 +4,7 @@ import { EmojiAnimation } from '@/lib/hooks/useEmojiAnimations';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { EmojiProjectile } from '@/components/EmojiProjectile';
 
-interface PlayerCardProps {
+interface UserCardProps {
   user: User;
   vote: string | undefined;
   revealed: boolean;
@@ -41,7 +41,7 @@ function getPlayerNameClassName(isDisconnected: boolean): string {
   return classes.filter(Boolean).join(' ');
 }
 
-export function PlayerCard({
+export function UserCard({
   user,
   vote,
   revealed,
@@ -51,9 +51,10 @@ export function PlayerCard({
   onMouseEnter,
   onMouseLeave,
   onThrowEmoji,
-}: PlayerCardProps) {
-  const { hasVoted, connected: isConnected, isSpectator, username } = user;
+}: UserCardProps) {
+  const { hasVoted, connected: isConnected, role, displayName } = user;
   const isDisconnected = !isConnected;
+  const isSpectator = role === 'spectator';
 
   const cardClassName = getCardClassName(
     hasVoted,
@@ -115,7 +116,7 @@ export function PlayerCard({
       )}
 
       <span className={playerNameClassName}>
-        {username}
+        {displayName}
         {isCurrentUser && <span className="player-you">(you)</span>}
         {isSpectator && <span className="player-spectator">(spectator)</span>}
       </span>

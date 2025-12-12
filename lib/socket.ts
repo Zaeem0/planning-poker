@@ -1,6 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useGameStore } from './store';
+import { getVoteForUser } from './vote-utils';
 
 declare global {
   interface Window {
@@ -25,15 +26,15 @@ function getUserId(): string {
 
 export function useSocket(
   gameId: string,
-  customUsername?: string,
+  displayName?: string,
   isSpectator?: boolean,
   shouldConnect: boolean = true
 ) {
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Set<() => void>>(new Set());
   const {
-    setUserId,
-    setUsername,
+    setCurrentUserId,
+    setCurrentUserName,
     setUsers,
     setVotes,
     setRevealed,
@@ -73,15 +74,15 @@ export function useSocket(
       votes: { userId: string; vote: string }[],
       joinedUserId: string
     ) => {
-      const userVote = votes.find((v) => v.userId === joinedUserId);
-      if (userVote) setSelectedVote(userVote.vote);
+      const userVote = getVoteForUser(votes, joinedUserId);
+      if (userVote) setSelectedVote(userVote);
     };
 
     newSocket.on(
       'user-joined',
       ({ userId: joinedUserId, username, users, votes, revealed }) => {
-        setUserId(joinedUserId);
-        setUsername(username);
+        setCurrentUserId(joinedUserId);
+        setCurrentUserName(username);
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
@@ -93,7 +94,7 @@ export function useSocket(
       newSocket.emit('join-game', {
         gameId,
         userId,
-        username: customUsername,
+        username: displayName,
         isSpectator,
       });
     });
@@ -122,11 +123,11 @@ export function useSocket(
     };
   }, [
     gameId,
-    customUsername,
+    displayName,
     isSpectator,
     shouldConnect,
-    setUserId,
-    setUsername,
+    setCurrentUserId,
+    setCurrentUserName,
     setUsers,
     setVotes,
     setRevealed,

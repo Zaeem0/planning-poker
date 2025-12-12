@@ -1,20 +1,32 @@
-interface JoinGameFormProps {
-  gameId: string;
-  name: string;
+import { useState } from 'react';
+
+export interface JoinFormData {
+  displayName: string;
   isSpectator: boolean;
-  onNameChange: (name: string) => void;
-  onSpectatorChange: (isSpectator: boolean) => void;
-  onSubmit: () => void;
 }
 
-export function JoinGameForm({
-  gameId,
-  name,
-  isSpectator,
-  onNameChange,
-  onSpectatorChange,
-  onSubmit,
-}: JoinGameFormProps) {
+interface JoinGameFormProps {
+  gameId: string;
+  onSubmit: (formData: JoinFormData) => void;
+}
+
+export function JoinGameForm({ gameId, onSubmit }: JoinGameFormProps) {
+  const [formState, setFormState] = useState({
+    displayName: '',
+    isSpectator: false,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedName = formState.displayName.trim();
+    if (!trimmedName) return;
+
+    onSubmit({
+      displayName: trimmedName,
+      isSpectator: formState.isSpectator,
+    });
+  };
+
   return (
     <div className="join-page">
       <div className="join-card">
@@ -23,13 +35,7 @@ export function JoinGameForm({
           Game ID: <span className="join-game-id">{gameId}</span>
         </p>
 
-        <form
-          className="join-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
-          }}
-        >
+        <form className="join-form" onSubmit={handleSubmit}>
           <div className="join-form-group">
             <label htmlFor="username" className="join-label">
               Your name
@@ -37,8 +43,13 @@ export function JoinGameForm({
             <input
               id="username"
               type="text"
-              value={name}
-              onChange={(e) => onNameChange(e.target.value)}
+              value={formState.displayName}
+              onChange={(e) =>
+                setFormState((prev) => ({
+                  ...prev,
+                  displayName: e.target.value,
+                }))
+              }
               placeholder="Enter your name"
               className="join-input"
               autoFocus
@@ -49,15 +60,24 @@ export function JoinGameForm({
             <label className="join-toggle">
               <input
                 type="checkbox"
-                checked={isSpectator}
-                onChange={(e) => onSpectatorChange(e.target.checked)}
+                checked={formState.isSpectator}
+                onChange={(e) =>
+                  setFormState((prev) => ({
+                    ...prev,
+                    isSpectator: e.target.checked,
+                  }))
+                }
                 className="join-toggle-input"
               />
               <span className="join-toggle-slider"></span>
               <span className="join-toggle-label">Join as spectator</span>
             </label>
           </div>
-          <button type="submit" disabled={!name.trim()} className="join-button">
+          <button
+            type="submit"
+            disabled={!formState.displayName.trim()}
+            className="join-button"
+          >
             Join Game
           </button>
         </form>

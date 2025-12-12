@@ -10,14 +10,16 @@ const port = parseInt(process.env.PORT || '3000', 10);
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
+type UserRole = 'player' | 'spectator';
+
 interface User {
   id: string;
   socketId: string;
-  username: string;
+  displayName: string;
+  role: UserRole;
   hasVoted: boolean;
   joinOrder: number;
   connected: boolean;
-  isSpectator: boolean;
 }
 
 interface Game {
@@ -28,7 +30,7 @@ interface Game {
 }
 
 interface UserProfile {
-  username: string;
+  displayName: string;
 }
 
 interface UserData {
@@ -158,10 +160,10 @@ app.prepare().then(() => {
         }
 
         if (userProfiles.has(userId)) {
-          finalUsername = userProfiles.get(userId)!.username;
+          finalUsername = userProfiles.get(userId)!.displayName;
         } else if (username) {
           finalUsername = username;
-          userProfiles.set(userId, { username: finalUsername });
+          userProfiles.set(userId, { displayName: finalUsername });
         } else {
           socket.emit('user-joined', {
             userId,
@@ -184,16 +186,16 @@ app.prepare().then(() => {
           ? existingUser.joinOrder
           : game.nextJoinOrder++;
 
-        const userIsSpectator =
-          existingUser?.isSpectator ?? isSpectator ?? false;
+        const userRole: UserRole =
+          existingUser?.role ?? (isSpectator ? 'spectator' : 'player');
         game.users.set(userId, {
           id: userId,
           socketId: socket.id,
-          username: finalUsername,
+          displayName: finalUsername,
+          role: userRole,
           hasVoted,
           joinOrder,
           connected: true,
-          isSpectator: userIsSpectator,
         });
 
         users.set(socket.id, { userId, gameId });

@@ -2,12 +2,10 @@ import { useState, useCallback } from 'react';
 import { User, Vote } from '@/lib/store';
 import { Socket } from 'socket.io-client';
 import { emitThrowEmoji } from '@/lib/socket';
-import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
-import { useConfetti } from '@/lib/hooks/useConfetti';
-import { useConfettiOrigin } from '@/lib/hooks/useConfettiOrigin';
+import { getVoteForUser } from '@/lib/vote-utils';
+import { EmojiAnimation } from '@/lib/hooks/useEmojiAnimations';
 import { VotingCards } from '@/components/VotingCards';
-import { ConfettiContainer } from '@/components/ConfettiContainer';
-import { PlayerCard } from '@/components/PlayerCard';
+import { UserCard } from '@/components/UserCard';
 import '@/styles/poker-table.scss';
 
 interface PokerTableProps {
@@ -19,6 +17,7 @@ interface PokerTableProps {
   gameId: string;
   selectedVote: string | null;
   onVote: (value: string) => void;
+  getAnimationsForUser: (userId: string) => EmojiAnimation[];
 }
 
 export function PokerTable({
@@ -30,12 +29,9 @@ export function PokerTable({
   gameId,
   selectedVote,
   onVote,
+  getAnimationsForUser,
 }: PokerTableProps) {
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
-  const { getAnimationsForUser } = useEmojiAnimations(socket);
-
-  const confettiOrigin = useConfettiOrigin(votes, revealed);
-  const { particles } = useConfetti(votes, revealed, confettiOrigin);
 
   const handleThrowEmoji = useCallback(
     (targetUserId: string, emoji: string) => {
@@ -44,17 +40,14 @@ export function PokerTable({
     [socket, gameId]
   );
 
-  const getVoteForUser = (userId: string) =>
-    votes.find((v) => v.userId === userId)?.vote;
-
   const renderUserCard = (user: User) => {
-    const vote = getVoteForUser(user.id);
+    const vote = getVoteForUser(votes, user.id);
     const isCurrentUser = user.id === currentUserId;
     const isHovered = hoveredUserId === user.id;
     const userAnimations = getAnimationsForUser(user.id);
 
     return (
-      <PlayerCard
+      <UserCard
         key={user.id}
         user={user}
         vote={vote}
@@ -69,35 +62,31 @@ export function PokerTable({
     );
   };
 
-  const voters = users.filter((u) => !u.isSpectator);
+  const players = users.filter((u) => u.role === 'player');
   const currentUser = users.find((u) => u.id === currentUserId);
-  const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
+  const isCurrentUserSpectator = currentUser?.role === 'spectator';
 
   const getTableMessage = () => {
-    const votedCount = voters.filter((u) => u.hasVoted).length;
+    const votedCount = players.filter((u) => u.hasVoted).length;
     if (revealed) return 'Votes revealed!';
     if (votedCount === 0) return 'Pick your cards!';
-    if (votedCount === voters.length) return 'All voted! Ready to reveal';
-    return `${votedCount} of ${voters.length} voted`;
+    if (votedCount === players.length) return 'All voted! Ready to reveal';
+    return `${votedCount} of ${players.length} voted`;
   };
 
   return (
-    <>
-      <div className="poker-table-container">
-        <div className="table-players">{users.map(renderUserCard)}</div>
+    <div className="poker-table-container">
+      <div className="table-players">{users.map(renderUserCard)}</div>
 
-        <span className="table-message">{getTableMessage()}</span>
+      <span className="table-message">{getTableMessage()}</span>
 
-        <VotingCards
-          votes={votes}
-          revealed={revealed}
-          selectedVote={selectedVote}
-          onVote={onVote}
-          isSpectator={isCurrentUserSpectator}
-        />
-      </div>
-
-      <ConfettiContainer particles={particles} />
-    </>
+      <VotingCards
+        votes={votes}
+        revealed={revealed}
+        selectedVote={selectedVote}
+        onVote={onVote}
+        isSpectator={isCurrentUserSpectator}
+      />
+    </div>
   );
 }
