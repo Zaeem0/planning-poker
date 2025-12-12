@@ -4,7 +4,8 @@ export function getVotingCardClassName(
   cardValue: string,
   selectedVote: string | null,
   revealed: boolean,
-  stats: CardStats
+  stats: CardStats,
+  isUnanimous = false
 ): string {
   const classes = ['voting-card-small'];
 
@@ -20,7 +21,9 @@ export function getVotingCardClassName(
   if (revealed && !stats.hasVotes) {
     classes.push('no-votes');
   }
+  if (revealed && isUnanimous && stats.percentage === 100) {
+    classes.push('unanimous');
+  }
 
   return classes.join(' ');
 }
-

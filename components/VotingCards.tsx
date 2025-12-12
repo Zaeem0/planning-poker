@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { CARD_VALUES, VoteSize } from '@/lib/constants';
 import { Vote } from '@/lib/store';
-import { calculateAllCardStats } from '@/lib/vote-utils';
+import { calculateAllCardStats, hasUnanimousVote } from '@/lib/vote-utils';
 import { getVotingCardClassName } from '@/lib/card-utils';
 
 interface VotingCardsProps {
@@ -24,6 +24,11 @@ export function VotingCards({
     [votes, revealed]
   );
 
+  const isUnanimous = useMemo(
+    () => revealed && hasUnanimousVote(votes),
+    [revealed, votes]
+  );
+
   const canVote = !revealed && !isSpectator;
 
   return (
@@ -40,7 +45,8 @@ export function VotingCards({
             card.value,
             selectedVote,
             revealed,
-            stats
+            stats,
+            isUnanimous
           );
           const opacity = Math.min(stats.percentage, 99) / 100;
           const style =

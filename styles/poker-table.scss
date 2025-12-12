@@ -208,10 +208,81 @@
   &.no-votes {
     opacity: 0.3;
   }
+
+  &.unanimous {
+    .voting-card-emoji {
+      font-size: 5rem;
+      animation: wiggle-celebrate 10s ease-in-out;
+    }
+  }
+}
+
+@keyframes wiggle-celebrate {
+  0% {
+    transform: rotate(0deg);
+  }
+  3% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  6% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  9% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  12% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  15% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  18% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  21% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  24% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  27% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  30% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  33% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  36% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  39% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  42% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  45% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  48% {
+    transform: rotate(8deg) scale(1.05);
+  }
+  51% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  54% {
+    transform: rotate(0deg) scale(1);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
 }
 
 .voting-card-emoji {
   font-size: 1.5rem;
+  transition: font-size 0.3s ease;
 }
 
 .voting-card-title {
