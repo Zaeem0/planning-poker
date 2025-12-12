@@ -7,6 +7,7 @@ interface VotingCardsProps {
   revealed: boolean;
   selectedVote: string | null;
   onVote: (value: string) => void;
+  isSpectator?: boolean;
 }
 
 interface CardStats {
@@ -80,17 +81,22 @@ export function VotingCards({
   revealed,
   selectedVote,
   onVote,
+  isSpectator = false,
 }: VotingCardsProps) {
   const allStats = useMemo(
     () => calculateAllCardStats(votes, revealed),
     [votes, revealed]
   );
 
+  const canVote = !revealed && !isSpectator;
+
   return (
     <div className="voting-section-bottom">
-      <p className="voting-hint">
-        Press a key to vote: XS, S, M, L, XL, or ? for unknown
-      </p>
+      {!isSpectator && (
+        <p className="voting-hint">
+          Press a key to vote: XS, S, M, L, XL, or ? for unknown
+        </p>
+      )}
       <div className="voting-cards-bottom">
         {CARD_VALUES.map((card) => {
           const stats = allStats[card.value];
@@ -113,7 +119,7 @@ export function VotingCards({
             <button
               key={card.value}
               className={className}
-              onClick={() => !revealed && onVote(card.value)}
+              onClick={() => canVote && onVote(card.value)}
               style={style}
               data-card-size={card.value}
             >

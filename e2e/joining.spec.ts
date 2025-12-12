@@ -182,11 +182,14 @@ test.describe('Joining a Game', () => {
       await expect(page.locator('.player-card-spectator')).toContainText('👁️');
     });
 
-    test('should not show voting cards for spectators', async ({ page }) => {
+    test('should show voting cards for spectators without hint', async ({
+      page,
+    }) => {
       const gameId = generateUniqueGameId();
       await joinGameAsSpectator(page, gameId, 'SpectatorUser');
 
-      await expect(page.locator('.voting-section-bottom')).not.toBeVisible();
+      await expect(page.locator('.voting-section-bottom')).toBeVisible();
+      await expect(page.locator('.voting-hint')).not.toBeVisible();
     });
 
     test('should not allow keyboard voting for spectators', async ({
@@ -199,6 +202,20 @@ test.describe('Joining a Game', () => {
 
       await expect(
         page.locator('.player-card-spectator.player-card-voted')
+      ).not.toBeVisible();
+    });
+
+    test('should not allow clicking cards for spectators', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsSpectator(page, gameId, 'SpectatorUser');
+
+      await page.click('[data-card-size="m"]');
+
+      await expect(
+        page.locator('.player-card-spectator.player-card-voted')
+      ).not.toBeVisible();
+      await expect(
+        page.locator('.voting-card-small.selected')
       ).not.toBeVisible();
     });
   });

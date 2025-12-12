@@ -145,14 +145,13 @@ export function PokerTable({
 
       <span className="table-message">{getTableMessage()}</span>
 
-      {!isCurrentUserSpectator && (
-        <VotingCards
-          votes={votes}
-          revealed={revealed}
-          selectedVote={selectedVote}
-          onVote={onVote}
-        />
-      )}
+      <VotingCards
+        votes={votes}
+        revealed={revealed}
+        selectedVote={selectedVote}
+        onVote={onVote}
+        isSpectator={isCurrentUserSpectator}
+      />
     </div>
   );
 }
