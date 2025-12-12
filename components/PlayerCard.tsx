@@ -16,6 +16,31 @@ interface PlayerCardProps {
   onThrowEmoji: (emoji: string) => void;
 }
 
+function getCardClassName(
+  hasVoted: boolean,
+  revealed: boolean,
+  vote: string | undefined,
+  isDisconnected: boolean,
+  isSpectator: boolean
+): string {
+  const classes = ['player-card'];
+
+  if (hasVoted) classes.push('player-card-voted');
+  if (revealed && vote) classes.push('player-card-revealed');
+  if (isDisconnected) classes.push('player-card-disconnected');
+  if (isSpectator) classes.push('player-card-spectator');
+
+  return classes.filter(Boolean).join(' ');
+}
+
+function getPlayerNameClassName(isDisconnected: boolean): string {
+  const classes = ['player-name'];
+
+  if (isDisconnected) classes.push('player-name-disconnected');
+
+  return classes.filter(Boolean).join(' ');
+}
+
 export function PlayerCard({
   user,
   vote,
@@ -30,15 +55,13 @@ export function PlayerCard({
   const { hasVoted, connected: isConnected, isSpectator, username } = user;
   const isDisconnected = !isConnected;
 
-  const cardClassName = [
-    'player-card',
-    hasVoted && 'player-card-voted',
-    revealed && vote && 'player-card-revealed',
-    isDisconnected && 'player-card-disconnected',
-    isSpectator && 'player-card-spectator',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const cardClassName = getCardClassName(
+    hasVoted,
+    revealed,
+    vote,
+    isDisconnected,
+    isSpectator
+  );
 
   const renderCardContent = () => {
     if (isDisconnected) {
@@ -71,12 +94,7 @@ export function PlayerCard({
     return <span className="player-card-back"></span>;
   };
 
-  const playerNameClassName = [
-    'player-name',
-    isDisconnected && 'player-name-disconnected',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  const playerNameClassName = getPlayerNameClassName(isDisconnected);
 
   return (
     <div

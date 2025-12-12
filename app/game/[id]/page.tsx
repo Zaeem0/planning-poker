@@ -1,23 +1,23 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameStore } from '@/lib/store';
-import { useSocket, emitVote, emitReveal, emitReset } from '@/lib/socket';
+import { useSocket } from '@/lib/socket';
 import { useKeyboardVoting } from '@/lib/hooks/useKeyboardVoting';
+import { useGameActions } from '@/lib/hooks/useGameActions';
+import { useCopyToClipboard } from '@/lib/hooks/useCopyToClipboard';
 import { PokerTable } from '@/components/PokerTable';
 import { JoinGameForm } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
 import { Toast } from '@/components/Toast';
 import { Loader } from '@/components/Loader';
-import { copyToClipboard } from '@/lib/clipboard';
 import '@/styles/game.scss';
 import '@/styles/poker-table.scss';
 
 export default function GamePage() {
   const params = useParams();
   const gameId = params.id as string;
-  const [copied, setCopied] = useState(false);
   const [name, setName] = useState('');
   const [isSpectator, setIsSpectator] = useState(false);
   const [submittedName, setSubmittedName] = useState<string | undefined>(
@@ -39,6 +39,21 @@ export default function GamePage() {
   } = useGameStore();
 
   const socket = useSocket(gameId, submittedName, submittedIsSpectator, true);
+  const { copied, handleCopyLink } = useCopyToClipboard();
+
+  const {
+    handleCardClick,
+    handleKeyboardVote,
+    handleKeyboardDeselect,
+    handleReveal,
+    handleReset,
+  } = useGameActions({
+    socket,
+    gameId,
+    userId,
+    selectedVote,
+    setSelectedVote,
+  });
 
   useEffect(() => {
     setGameId(gameId);
@@ -51,34 +66,6 @@ export default function GamePage() {
     setSubmittedIsSpectator(isSpectator);
   };
 
-  const handleCardClick = useCallback(
-    (value: string) => {
-      const newVote = selectedVote === value ? null : value;
-      setSelectedVote(newVote);
-      if (socket && userId) {
-        emitVote(socket, gameId, userId, newVote);
-      }
-    },
-    [socket, userId, gameId, selectedVote, setSelectedVote]
-  );
-
-  const handleKeyboardVote = useCallback(
-    (value: string) => {
-      setSelectedVote(value);
-      if (socket && userId) {
-        emitVote(socket, gameId, userId, value);
-      }
-    },
-    [socket, userId, gameId, setSelectedVote]
-  );
-
-  const handleKeyboardDeselect = useCallback(() => {
-    setSelectedVote(null);
-    if (socket && userId) {
-      emitVote(socket, gameId, userId, null);
-    }
-  }, [socket, userId, gameId, setSelectedVote]);
-
   const currentUser = users.find((u) => u.id === userId);
   const isCurrentUserSpectator = currentUser?.isSpectator ?? false;
 
@@ -87,22 +74,6 @@ export default function GamePage() {
     onVote: handleKeyboardVote,
     onDeselect: handleKeyboardDeselect,
   });
-
-  const handleReveal = () => {
-    if (socket) emitReveal(socket, gameId);
-  };
-
-  const handleReset = () => {
-    if (socket) emitReset(socket, gameId);
-  };
-
-  const handleCopyLink = async () => {
-    const success = await copyToClipboard(window.location.href);
-    if (success) {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
 
   if (!userId) {
     return <Loader />;

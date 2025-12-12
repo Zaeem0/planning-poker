@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { CARD_VALUES, VoteSize } from '@/lib/constants';
 import { Vote } from '@/lib/store';
-import { calculateAllCardStats, CardStats } from '@/lib/vote-utils';
+import { calculateAllCardStats } from '@/lib/vote-utils';
+import { getVotingCardClassName } from '@/lib/card-utils';
 
 interface VotingCardsProps {
   votes: Vote[];
@@ -9,30 +10,6 @@ interface VotingCardsProps {
   selectedVote: string | null;
   onVote: (value: string) => void;
   isSpectator?: boolean;
-}
-
-function getCardClassName(
-  cardValue: string,
-  selectedVote: string | null,
-  revealed: boolean,
-  stats: CardStats
-): string {
-  const classes = ['voting-card-small'];
-
-  if (!revealed && selectedVote === cardValue) {
-    classes.push('selected');
-  }
-  if (revealed && stats.isMostCommon) {
-    classes.push('most-common');
-  }
-  if (revealed && stats.hasVotes && !stats.isMostCommon) {
-    classes.push('has-votes');
-  }
-  if (revealed && !stats.hasVotes) {
-    classes.push('no-votes');
-  }
-
-  return classes.join(' ');
 }
 
 export function VotingCards({
@@ -59,7 +36,7 @@ export function VotingCards({
       <div className="voting-cards-bottom">
         {CARD_VALUES.map((card) => {
           const stats = allStats[card.value];
-          const className = getCardClassName(
+          const className = getVotingCardClassName(
             card.value,
             selectedVote,
             revealed,

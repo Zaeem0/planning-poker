@@ -88,7 +88,6 @@ export function useConfetti(
     prevRevealedRef.current = revealed;
 
     if (!wasRevealed && revealed && isUnanimous) {
-      console.log('🎉 Confetti triggered! Unanimous vote detected');
       counterRef.current += 1;
       setTriggerId(counterRef.current);
     } else if (!revealed && triggerId !== 0) {
@@ -99,9 +98,7 @@ export function useConfetti(
 
   const particles = useMemo(() => {
     if (triggerId === 0) return [];
-    const newParticles = createConfettiParticles(origin);
-    console.log('🎊 Generated confetti particles:', newParticles.length);
-    return newParticles;
+    return createConfettiParticles(origin);
   }, [triggerId, origin]);
 
   return {

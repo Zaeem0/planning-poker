@@ -1,12 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { generateGameId } from '@/lib/game-utils';
 
 export function CreateGameButton() {
   const router = useRouter();
 
   const handleClick = () => {
-    const newGameId = Math.random().toString(36).substring(2, 10);
+    const newGameId = generateGameId();
     router.push(`/game/${newGameId}`);
   };
 

@@ -1,10 +1,10 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { User, Vote } from '@/lib/store';
 import { Socket } from 'socket.io-client';
 import { emitThrowEmoji } from '@/lib/socket';
 import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
 import { useConfetti } from '@/lib/hooks/useConfetti';
-import { getVoteAnalysis } from '@/lib/vote-utils';
+import { useConfettiOrigin } from '@/lib/hooks/useConfettiOrigin';
 import { VotingCards } from '@/components/VotingCards';
 import { ConfettiContainer } from '@/components/ConfettiContainer';
 import { PlayerCard } from '@/components/PlayerCard';
@@ -34,26 +34,7 @@ export function PokerTable({
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
   const { getAnimationsForUser } = useEmojiAnimations(socket);
 
-  const confettiOrigin = useMemo(() => {
-    if (!revealed || votes.length === 0) return { x: 50, y: 50 };
-
-    const { isUnanimous, unanimousVote } = getVoteAnalysis(votes);
-
-    if (isUnanimous && unanimousVote) {
-      const cardElement = document.querySelector(
-        `[data-card-size="${unanimousVote}"]`
-      );
-      if (cardElement) {
-        const rect = cardElement.getBoundingClientRect();
-        const x = ((rect.left + rect.width / 2) / window.innerWidth) * 100;
-        const y = ((rect.top + rect.height / 2) / window.innerHeight) * 100;
-        return { x, y };
-      }
-    }
-
-    return { x: 50, y: 50 };
-  }, [revealed, votes]);
-
+  const confettiOrigin = useConfettiOrigin(votes, revealed);
   const { particles } = useConfetti(votes, revealed, confettiOrigin);
 
   const handleThrowEmoji = useCallback(

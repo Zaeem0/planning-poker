@@ -111,6 +111,8 @@
 - Percentage overlays on voting cards
 - Toast notifications for actions
 - Smooth transitions and animations
+- **Celebration confetti** - Animated confetti burst when 100% unanimous vote is revealed
+- **Emoji throwing** - Interactive emoji animations between players
 
 ### Modern Styling
 
@@ -119,6 +121,28 @@
 - Shadow effects and hover states
 - SCSS with design system variables
 - Consistent spacing and typography
+- Animated confetti particles with physics-based movement
+- Smooth emoji projectile animations with bounce effects
+
+### Interactive Features
+
+**Celebration Confetti:**
+
+- Triggers automatically on 100% unanimous vote reveal
+- Bursts from the center of the winning vote card
+- 150 particles with varied sizes, colors, and emojis (🥳🎉🎈🎊)
+- Chaotic spread pattern with random velocities and rotations
+- Staggered fade-in for dynamic visual effect
+- Pure CSS animations for optimal performance
+
+**Emoji Throwing:**
+
+- Hover over any player card to reveal emoji picker
+- Choose from 🥊, 🪃, 🪨, ✈️ to throw at other players
+- Physics-based projectile animation with bounce
+- Random projectile count (1-3) for variety
+- Synchronized across all connected users
+- Fun way to celebrate or react during voting
 
 ## 🔧 Technical Architecture
 
@@ -130,6 +154,7 @@
 - **State**: Zustand 5
 - **Server**: Custom Node.js server with Socket.io
 - **Runtime**: Node.js 22+ (LTS)
+- **Testing**: Playwright (E2E)
 
 ### Communication Flow
 

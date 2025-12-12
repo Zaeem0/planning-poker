@@ -10,6 +10,9 @@ A real-time Planning Poker application built with Next.js, Socket.io, and TypeSc
 - **Keyboard Shortcuts** - Quick voting with S, M, L, XS, XL, ? keys
 - **Vote Statistics** - View distribution and most common estimate
 - **Disconnection Handling** - See who's offline with visual indicators
+- **Spectator Mode** - Join as observer without voting ability
+- **Celebration Confetti** - Animated confetti burst for 100% unanimous votes
+- **Emoji Throwing** - Fun interactions between players
 
 📖 **[View Complete Feature List →](./FEATURES.md)**
 
@@ -72,21 +75,43 @@ planning-poker/
 ├── components/
 │   ├── PokerTable.tsx         # Poker table with player cards
 │   ├── VotingCards.tsx        # Voting card selector with results
+│   ├── PlayerCard.tsx         # Individual player card component
+│   ├── ConfettiContainer.tsx  # Confetti animation container
+│   ├── EmojiPicker.tsx        # Emoji selection for throwing
+│   ├── EmojiProjectile.tsx    # Emoji animation component
 │   ├── GameHeader.tsx         # Header with controls
 │   ├── GameControls.tsx       # Reveal/Reset buttons
 │   ├── CreateGameButton.tsx   # Shared create game button
 │   ├── JoinGameForm.tsx       # Join game form
+│   ├── GitInfo.tsx            # Git commit info display
 │   ├── Loader.tsx             # Loading spinner component
 │   └── Toast.tsx              # Toast notifications
 ├── styles/
 │   ├── _variables.scss        # SCSS variables
 │   ├── globals.scss           # Global styles
 │   ├── game.scss              # Game page styles
-│   └── poker-table.scss       # Table and card styles
+│   ├── poker-table.scss       # Table, card, and confetti styles
+│   └── components.scss        # Shared component styles
 ├── lib/
+│   ├── hooks/
+│   │   ├── useConfetti.ts           # Confetti animation hook
+│   │   ├── useConfettiOrigin.ts     # Confetti origin calculation
+│   │   ├── useEmojiAnimations.ts    # Emoji throwing animations
+│   │   ├── useKeyboardVoting.ts     # Keyboard shortcuts
+│   │   ├── useGameActions.ts        # Game action handlers
+│   │   └── useCopyToClipboard.ts    # Clipboard functionality
 │   ├── store.ts               # Zustand state management
 │   ├── socket.ts              # Socket.io client hooks
-│   └── constants.ts           # Card values
+│   ├── constants.ts           # Card values and emojis
+│   ├── vote-utils.ts          # Vote calculation utilities
+│   ├── card-utils.ts          # Card className utilities
+│   ├── game-utils.ts          # Game ID generation
+│   └── clipboard.ts           # Clipboard helper
+├── e2e/
+│   ├── voting.spec.ts         # Voting E2E tests
+│   ├── multi-user-sync.spec.ts # Multi-user E2E tests
+│   ├── persistence.spec.ts    # Persistence E2E tests
+│   └── joining.spec.ts        # Join flow E2E tests
 └── server.ts                  # Custom Socket.io server (TypeScript)
 ```
 
@@ -96,6 +121,8 @@ planning-poker/
 - `yarn build` - Build for production
 - `yarn start` - Start production server
 - `yarn lint` - Run ESLint
+- `yarn test:e2e` - Run Playwright E2E tests
+- `yarn test:e2e:ui` - Run E2E tests with UI
 
 ## 📚 Documentation
 
