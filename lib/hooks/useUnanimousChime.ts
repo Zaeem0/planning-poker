@@ -9,7 +9,7 @@ function playChimeSound() {
     new // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (window.AudioContext || (window as any).webkitAudioContext)();
 
-  // Realistic crowd celebration sound - 5+ seconds
+  // Realistic crowd celebration sound - 2 seconds
   // Multiple layers for natural, modern sound
 
   // Create realistic clap sound with proper envelope
@@ -76,8 +76,8 @@ function playChimeSound() {
     noise.stop(now + 0.08);
   }
 
-  // Generate natural crowd clapping pattern over 5+ seconds
-  const totalDuration = 5.5;
+  // Generate natural crowd clapping pattern over 2 seconds
+  const totalDuration = 2.0;
   const clapsPerSecond = 12; // Realistic clapping rate
   const totalClaps = Math.floor(totalDuration * clapsPerSecond);
 
@@ -140,7 +140,7 @@ function playChimeSound() {
   // Cleanup after sound finishes
   setTimeout(() => {
     audioContext.close();
-  }, 6000);
+  }, 2500);
 }
 
 export function useUnanimousChime(votes: Vote[], revealed: boolean): void {
