@@ -157,6 +157,19 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: center;
+
+  &.spectator-mode {
+    .voting-card-small {
+      cursor: default;
+      pointer-events: none;
+
+      &:hover {
+        background: $dark-bg-elevated;
+        border-color: $dark-border;
+        transform: none;
+      }
+    }
+  }
 }
 
 .voting-card-small {

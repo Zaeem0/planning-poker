@@ -65,6 +65,11 @@ interface ThrowEmojiPayload {
   emoji: string;
 }
 
+interface ToggleRolePayload {
+  gameId: string;
+  userId: string;
+}
+
 // In-memory state
 const games = new Map<string, Game>();
 const users = new Map<string, UserData>();
@@ -301,6 +306,26 @@ app.prepare().then(() => {
         io.to(gameId).emit('emoji-thrown', { targetUserId, emoji });
       }
     );
+
+    socket.on('toggle-role', ({ gameId, userId }: ToggleRolePayload) => {
+      const game = games.get(gameId);
+      if (!game) return;
+
+      const user = game.users.get(userId);
+      if (!user) return;
+
+      const newRole: UserRole = user.role === 'player' ? 'spectator' : 'player';
+      user.role = newRole;
+
+      if (newRole === 'spectator') {
+        game.votes.delete(userId);
+        user.hasVoted = false;
+      }
+
+      io.to(gameId).emit('user-list-updated', {
+        users: getSortedUsersByJoinOrder(game),
+      });
+    });
 
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected:', socket.id, 'Reason:', reason);

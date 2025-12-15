@@ -72,6 +72,12 @@ export default function GamePage() {
   const currentUser = users.find((u) => u.id === currentUserId);
   const isCurrentUserSpectator = currentUser?.role === 'spectator';
 
+  useEffect(() => {
+    if (isCurrentUserSpectator && selectedVote) {
+      setSelectedVote(null);
+    }
+  }, [isCurrentUserSpectator, selectedVote, setSelectedVote]);
+
   useKeyboardVoting({
     enabled: !!currentUserName && !revealed && !isCurrentUserSpectator,
     onVote: handleKeyboardVote,
@@ -101,6 +107,8 @@ export default function GamePage() {
           hasVotes={hasAnyVotes}
           copied={copied}
           isMuted={isMuted}
+          socket={socket}
+          userId={currentUserId}
           onReveal={handleReveal}
           onReset={handleReset}
           onCopyLink={handleCopyLink}

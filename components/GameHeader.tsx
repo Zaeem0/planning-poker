@@ -1,6 +1,8 @@
+import { Socket } from 'socket.io-client';
 import { GameControls } from '@/components/GameControls';
 import { CreateGameButton } from '@/components/CreateGameButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { RoleToggle } from '@/components/RoleToggle';
 import {
   CopyIcon,
   CheckIcon,
@@ -14,6 +16,8 @@ interface GameHeaderProps {
   hasVotes: boolean;
   copied: boolean;
   isMuted: boolean;
+  socket: Socket | null;
+  userId: string;
   onReveal: () => void;
   onReset: () => void;
   onCopyLink: () => void;
@@ -26,6 +30,8 @@ export function GameHeader({
   hasVotes,
   copied,
   isMuted,
+  socket,
+  userId,
   onReveal,
   onReset,
   onCopyLink,
@@ -44,6 +50,7 @@ export function GameHeader({
           onReset={onReset}
           hasVotes={hasVotes}
         />
+        <RoleToggle socket={socket} gameId={gameId} userId={userId} />
         <ThemeToggle />
         <button
           onClick={onToggleMute}

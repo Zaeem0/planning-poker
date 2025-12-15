@@ -69,8 +69,13 @@ export function PokerTable({
   const getTableMessage = () => {
     const votedCount = players.filter((u) => u.hasVoted).length;
     if (revealed) return 'Votes revealed!';
+    if (votedCount === players.length && players.length > 0)
+      return 'All voted! Ready to reveal';
+    if (isCurrentUserSpectator) {
+      if (votedCount === 0) return 'Watching the game';
+      return `Watching the game - ${votedCount} of ${players.length} voted`;
+    }
     if (votedCount === 0) return 'Pick your cards!';
-    if (votedCount === players.length) return 'All voted! Ready to reveal';
     return `${votedCount} of ${players.length} voted`;
   };
 

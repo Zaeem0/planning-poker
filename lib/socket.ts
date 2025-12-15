@@ -214,3 +214,13 @@ export function emitThrowEmoji(
     socket.emit('throw-emoji', { gameId, targetUserId, emoji });
   }
 }
+
+export function emitToggleRole(
+  socket: Socket | null,
+  gameId: string,
+  userId: string
+) {
+  if (socket) {
+    socket.emit('toggle-role', { gameId, userId });
+  }
+}

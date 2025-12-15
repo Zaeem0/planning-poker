@@ -38,7 +38,9 @@ export function VotingCards({
           Press a key to vote: XS, S, M, L, XL, or ? for unknown
         </p>
       )}
-      <div className="voting-cards-bottom">
+      <div
+        className={`voting-cards-bottom ${isSpectator ? 'spectator-mode' : ''}`}
+      >
         {CARD_VALUES.map((card) => {
           const stats = allStats[card.value];
           const className = getVotingCardClassName(
