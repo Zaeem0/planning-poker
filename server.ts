@@ -141,9 +141,21 @@ app.prepare().then(() => {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
     },
+    pingTimeout: 120000,
+    pingInterval: 25000,
+    connectTimeout: 45000,
+    maxHttpBufferSize: 1e6,
+    transports: ['websocket', 'polling'],
+    allowUpgrades: true,
   });
 
   io.on('connection', (socket: Socket) => {
+    console.log('New connection:', socket.id);
+
+    socket.on('error', (error) => {
+      console.error('Socket error for', socket.id, ':', error);
+    });
+
     socket.on(
       'join-game',
       ({
@@ -202,6 +214,18 @@ app.prepare().then(() => {
 
         const votesData = getVotesForUser(game, userId);
         const sortedUsers = getSortedUsersByJoinOrder(game);
+
+        console.log(
+          'User joined:',
+          finalUsername,
+          'userId:',
+          userId,
+          'gameId:',
+          gameId,
+          'socketId:',
+          socket.id
+        );
+
         socket.emit('user-joined', {
           userId,
           username: finalUsername,
@@ -278,7 +302,8 @@ app.prepare().then(() => {
       }
     );
 
-    socket.on('disconnect', () => {
+    socket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', socket.id, 'Reason:', reason);
       const userData = users.get(socket.id);
       if (userData) {
         const { userId, gameId } = userData;

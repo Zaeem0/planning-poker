@@ -57,65 +57,108 @@ export function useSocket(
     if (!gameId || !shouldConnect) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
-    const newSocket = io(socketUrl, {
-      path: '/socket.io',
-    });
-
-    socketRef.current = newSocket;
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
-      window.__TEST_SOCKET__ = newSocket;
-    }
     const listeners = listenersRef.current;
-    listeners.forEach((listener) => listener());
+    const connectionDelay = Math.random() * 1000;
 
-    const userId = getUserId();
+    const connectTimer = setTimeout(() => {
+      const newSocket = io(socketUrl, {
+        path: '/socket.io',
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 20000,
+        transports: ['websocket', 'polling'],
+      });
 
-    const restoreUserVoteSelection = (
-      votes: { userId: string; vote: string }[],
-      joinedUserId: string
-    ) => {
-      const userVote = getVoteForUser(votes, joinedUserId);
-      if (userVote) setSelectedVote(userVote);
-    };
+      socketRef.current = newSocket;
+      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
+        window.__TEST_SOCKET__ = newSocket;
+      }
+      listeners.forEach((listener) => listener());
 
-    newSocket.on(
-      'user-joined',
-      ({ userId: joinedUserId, username, users, votes, revealed }) => {
-        setCurrentUserId(joinedUserId);
-        setCurrentUserName(username);
+      const userId = getUserId();
+
+      const restoreUserVoteSelection = (
+        votes: { userId: string; vote: string }[],
+        joinedUserId: string
+      ) => {
+        const userVote = getVoteForUser(votes, joinedUserId);
+        if (userVote) setSelectedVote(userVote);
+      };
+
+      const joinGame = () => {
+        newSocket.emit('join-game', {
+          gameId,
+          userId,
+          username: displayName,
+          isSpectator,
+        });
+      };
+
+      newSocket.on(
+        'user-joined',
+        ({ userId: joinedUserId, username, users, votes, revealed }) => {
+          setCurrentUserId(joinedUserId);
+          setCurrentUserName(username);
+          setUsers(users);
+          setVotes(votes);
+          setRevealed(revealed);
+          restoreUserVoteSelection(votes, joinedUserId);
+        }
+      );
+
+      newSocket.on('connect', () => {
+        console.log('Socket connected');
+        joinGame();
+      });
+
+      newSocket.on('reconnect', (attemptNumber) => {
+        console.log('Reconnected after', attemptNumber, 'attempts');
+        joinGame();
+      });
+
+      newSocket.on('disconnect', (reason) => {
+        console.log('Socket disconnected:', reason);
+      });
+
+      newSocket.on('connect_error', (error) => {
+        console.error('Connection error:', error.message);
+      });
+
+      newSocket.on('reconnect_error', (error) => {
+        console.error('Reconnection error:', error.message);
+      });
+
+      newSocket.on('reconnect_failed', () => {
+        console.error('Failed to reconnect after all attempts');
+      });
+
+      newSocket.on('error', (error) => {
+        console.error('Socket error:', error);
+      });
+
+      newSocket.on('user-list-updated', ({ users }) => {
         setUsers(users);
+      });
+
+      newSocket.on('votes-revealed', ({ votes, revealed }) => {
         setVotes(votes);
         setRevealed(revealed);
-        restoreUserVoteSelection(votes, joinedUserId);
-      }
-    );
-
-    newSocket.on('connect', () => {
-      newSocket.emit('join-game', {
-        gameId,
-        userId,
-        username: displayName,
-        isSpectator,
       });
-    });
 
-    newSocket.on('user-list-updated', ({ users }) => {
-      setUsers(users);
-    });
-
-    newSocket.on('votes-revealed', ({ votes, revealed }) => {
-      setVotes(votes);
-      setRevealed(revealed);
-    });
-
-    newSocket.on('votes-reset', ({ users }) => {
-      reset();
-      setUsers(users);
-    });
+      newSocket.on('votes-reset', ({ users }) => {
+        reset();
+        setUsers(users);
+      });
+    }, connectionDelay);
 
     return () => {
-      newSocket.disconnect();
-      socketRef.current = null;
+      clearTimeout(connectTimer);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
       if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
         window.__TEST_SOCKET__ = null;
       }

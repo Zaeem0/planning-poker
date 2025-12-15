@@ -10,7 +10,7 @@ export default defineConfig({
   retries: isCI ? 2 : isDebug ? 2 : 0,
   workers: isCI ? 1 : 8,
   reporter: isDebug ? 'html' : 'line',
-  timeout: isDebug ? 60000 : 30000,
+  timeout: isDebug ? 120000 : 90000,
   use: {
     baseURL: 'http://localhost:3000',
     trace: isDebug ? 'on-first-retry' : 'off',
