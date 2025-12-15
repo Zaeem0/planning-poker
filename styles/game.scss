@@ -130,7 +130,7 @@
   justify-content: center;
   gap: 1rem;
 
-  @media (min-width: 970px) {
+  @media (min-width: 1068px) {
     justify-content: space-between;
   }
 }
@@ -145,7 +145,7 @@
 .game-header-left {
   order: 2;
 
-  @media (min-width: 970px) {
+  @media (min-width: 1068px) {
     order: 0;
   }
 }
@@ -158,7 +158,7 @@
   width: 100%;
   text-align: center;
 
-  @media (min-width: 970px) {
+  @media (min-width: 1068px) {
     width: auto;
     position: absolute;
     left: 50%;
@@ -169,7 +169,7 @@
 .game-header-right {
   order: 3;
 
-  @media (min-width: 970px) {
+  @media (min-width: 1068px) {
     order: 0;
   }
 }

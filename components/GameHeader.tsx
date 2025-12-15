@@ -1,5 +1,6 @@
 import { GameControls } from '@/components/GameControls';
 import { CreateGameButton } from '@/components/CreateGameButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   CopyIcon,
   CheckIcon,
@@ -43,6 +44,7 @@ export function GameHeader({
           onReset={onReset}
           hasVotes={hasVotes}
         />
+        <ThemeToggle />
         <button
           onClick={onToggleMute}
           className="mute-button"

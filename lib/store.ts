@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 export type UserRole = 'player' | 'spectator';
+export type Theme = 'default' | 'christmas';
 
 export interface User {
   id: string;
@@ -16,6 +17,8 @@ export interface Vote {
   vote: string;
 }
 
+export const THEME_STORAGE_KEY = 'planning-poker-theme';
+
 interface GameState {
   gameId: string;
   currentUserId: string;
@@ -25,6 +28,7 @@ interface GameState {
   revealed: boolean;
   selectedVote: string | null;
   isMuted: boolean;
+  theme: Theme;
   setGameId: (gameId: string) => void;
   setCurrentUserId: (userId: string) => void;
   setCurrentUserName: (userName: string) => void;
@@ -33,6 +37,7 @@ interface GameState {
   setRevealed: (revealed: boolean) => void;
   setSelectedVote: (vote: string | null) => void;
   setIsMuted: (isMuted: boolean) => void;
+  setTheme: (theme: Theme) => void;
   reset: () => void;
 }
 
@@ -45,6 +50,7 @@ export const useGameStore = create<GameState>((set) => ({
   revealed: false,
   selectedVote: null,
   isMuted: false,
+  theme: 'default', // Initialize to 'default' to avoid hydration mismatch
   setGameId: (gameId) => set({ gameId }),
   setCurrentUserId: (currentUserId) => set({ currentUserId }),
   setCurrentUserName: (currentUserName) => set({ currentUserName }),
@@ -53,5 +59,11 @@ export const useGameStore = create<GameState>((set) => ({
   setRevealed: (revealed) => set({ revealed }),
   setSelectedVote: (vote) => set({ selectedVote: vote }),
   setIsMuted: (isMuted) => set({ isMuted }),
+  setTheme: (theme) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    }
+    set({ theme });
+  },
   reset: () => set({ selectedVote: null, votes: [], revealed: false }),
 }));

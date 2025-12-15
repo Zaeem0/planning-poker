@@ -1,0 +1,473 @@
+// Christmas Theme Colors - More Festive & Vibrant
+$christmas-red: #dc143c; // Crimson red - more vibrant
+$christmas-red-hover: #ff1744; // Bright red hover
+$christmas-red-light: #b71c1c; // Deep red
+
+$christmas-green: #228b22; // Forest green - more vibrant
+$christmas-green-hover: #32cd32; // Lime green hover
+$christmas-green-light: #1b5e20; // Dark green
+
+$christmas-gold: #ffd700; // Gold - brighter
+$christmas-gold-hover: #ffed4e; // Bright gold hover
+$christmas-gold-light: #f9a825; // Amber gold
+
+// Christmas Background Palette - Richer tones
+$christmas-dark-bg: #0d1f0d; // Deep forest green background
+$christmas-dark-bg-elevated: #1a3a1a; // Elevated forest green
+$christmas-dark-bg-hover: #2d5a2d; // Hover forest green
+$christmas-dark-border: #2d5a2d; // Border forest green
+$christmas-dark-border-light: #3d6a3d; // Light border green
+
+// Christmas Text Colors
+$christmas-text-primary: #ffffff; // Pure white for better contrast
+$christmas-text-secondary: #e8f5e9; // Light mint green
+$christmas-text-muted: #a5d6a7; // Soft green
+$christmas-text-disabled: #81c784; // Muted green
+
+// Christmas specific decorative colors
+$christmas-snow: #ffffff;
+$christmas-ice-blue: #b3e5fc;
+
+body.theme-christmas {
+  // Override color variables to use Christmas colors
+  --primary: #{$christmas-red};
+  --primary-hover: #{$christmas-red-hover};
+  --primary-light: #{$christmas-red-light};
+
+  --success: #{$christmas-gold};
+  --success-hover: #{$christmas-gold-hover};
+  --success-light: #{$christmas-gold-light};
+
+  background: $christmas-dark-bg;
+  color: $christmas-text-primary;
+
+  // Override global styles
+  .card {
+    background: $christmas-dark-bg-elevated;
+    border: 2px solid $christmas-dark-border;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba($christmas-gold, 0.1),
+                inset 0 1px 0 rgba($christmas-gold, 0.1);
+  }
+
+  .button-primary,
+  .create-game-button {
+    background: linear-gradient(135deg, $christmas-red 0%, darken($christmas-red, 5%) 100%) !important;
+    box-shadow: 0 4px 15px rgba($christmas-red, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+    border: 1px solid $christmas-gold !important;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%) !important;
+      box-shadow: 0 6px 25px rgba($christmas-red-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      transform: translateY(-2px) scale(1.02);
+      border-color: $christmas-gold-hover !important;
+    }
+
+    &:disabled {
+      background: linear-gradient(135deg, rgba($christmas-red, 0.25) 0%, rgba($christmas-red, 0.15) 100%) !important;
+      border: 1px solid rgba($christmas-gold, 0.25) !important;
+      box-shadow: none !important;
+      color: rgba($christmas-snow, 0.35) !important;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  .button-secondary,
+  .home-join-button {
+    background: linear-gradient(135deg, $christmas-red 0%, darken($christmas-red, 5%) 100%) !important;
+    border: 1px solid $christmas-gold !important;
+    box-shadow: 0 4px 15px rgba($christmas-red, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%) !important;
+      border-color: $christmas-gold-hover !important;
+      box-shadow: 0 6px 25px rgba($christmas-red-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    &:disabled {
+      background: linear-gradient(135deg, rgba($christmas-red, 0.3) 0%, rgba($christmas-red, 0.2) 100%) !important;
+      border: 1px solid rgba($christmas-gold, 0.3) !important;
+      box-shadow: none !important;
+      color: rgba($christmas-snow, 0.4) !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  // Reveal votes button (button-success, reveal-button, reset-button)
+  .button-success,
+  .reveal-button,
+  .reset-button {
+    background: linear-gradient(135deg, $christmas-green 0%, darken($christmas-green, 5%) 100%) !important;
+    border: 1px solid $christmas-gold !important;
+    box-shadow: 0 4px 15px rgba($christmas-green, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+    color: $christmas-snow !important;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $christmas-green-hover 0%, $christmas-green 100%) !important;
+      border-color: $christmas-gold-hover !important;
+      box-shadow: 0 6px 25px rgba($christmas-green-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    &:disabled {
+      background: linear-gradient(135deg, rgba($christmas-green, 0.25) 0%, rgba($christmas-green, 0.15) 100%) !important;
+      border: 1px solid rgba($christmas-gold, 0.25) !important;
+      box-shadow: none !important;
+      color: rgba($christmas-snow, 0.35) !important;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  // Text colors
+  .home-title,
+  .game-header-title,
+  .join-title {
+    color: $christmas-text-primary;
+  }
+
+  .home-subtitle,
+  .join-subtitle,
+  .game-id-label,
+  .game-id-value,
+  .join-game-id {
+    color: $christmas-text-secondary;
+  }
+
+  .home-label,
+  .join-label,
+  .voting-hint,
+  .table-message {
+    color: $christmas-text-muted;
+  }
+
+  // Backgrounds
+  .home-card,
+  .join-card {
+    background: linear-gradient(135deg, rgba($christmas-red, 0.15) 0%, rgba($christmas-green, 0.2) 100%);
+    border-color: rgba($christmas-gold, 0.3);
+  }
+
+  .game-id-badge,
+  .mute-button,
+  .theme-toggle-button {
+    background: $christmas-dark-bg-elevated;
+    border-color: $christmas-dark-border;
+
+    &:hover {
+      background: $christmas-dark-bg-hover;
+      border-color: $christmas-dark-border-light;
+    }
+  }
+
+  // Player cards
+  .player-card {
+    background: $christmas-dark-bg-elevated;
+    border: 2px solid $christmas-dark-border;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .player-card-voted {
+    background: repeating-linear-gradient(
+      45deg,
+      $christmas-red 0px,
+      $christmas-red 2px,
+      $christmas-red-light 2px,
+      $christmas-red-light 8px
+    );
+    border: 2px solid $christmas-gold;
+    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
+                0 0 30px rgba($christmas-gold, 0.4);
+    animation: card-glow 2s ease-in-out infinite;
+  }
+
+  .player-card-revealed {
+    background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg-hover 100%);
+    border: 2px solid $christmas-gold;
+    box-shadow: 0 6px 20px rgba($christmas-gold, 0.4),
+                0 0 30px rgba($christmas-red, 0.3);
+  }
+
+  // When both voted and revealed, use darker Christmas red
+  .player-card-voted.player-card-revealed {
+    background: linear-gradient(135deg, darken($christmas-red, 10%) 0%, darken($christmas-red, 5%) 100%);
+    border: 2px solid $christmas-gold;
+    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
+                0 0 30px rgba($christmas-gold, 0.4);
+  }
+
+  .player-card-vote {
+    color: $christmas-gold-hover;
+    text-shadow: 0 0 10px rgba($christmas-gold, 0.5);
+    font-weight: 700;
+  }
+
+  .player-you {
+    color: $christmas-gold-hover;
+    text-shadow: 0 0 8px rgba($christmas-gold, 0.6);
+  }
+
+  // Voting cards
+  .voting-card-small {
+    background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg 100%);
+    border: 2px solid $christmas-dark-border;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba($christmas-red, 0.3) 0%, rgba($christmas-red, 0.2) 100%);
+      border: 2px solid $christmas-red;
+      box-shadow: 0 4px 15px rgba($christmas-red, 0.4);
+      transform: translateY(-4px);
+    }
+
+    &.selected {
+      background: linear-gradient(135deg, $christmas-red 0%, $christmas-red-light 100%);
+      border: 2px solid $christmas-gold;
+      box-shadow: 0 8px 25px rgba($christmas-red, 0.6),
+                  0 0 35px rgba($christmas-gold, 0.5);
+
+      // When selected and hovering, keep the red background
+      &:hover {
+        background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%);
+        border-color: $christmas-gold-hover;
+        box-shadow: 0 10px 30px rgba($christmas-red, 0.7),
+                    0 0 45px rgba($christmas-gold, 0.6);
+        transform: translateY(-4px);
+      }
+    }
+
+    &.most-common {
+      background: linear-gradient(135deg,
+                  rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
+                  rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%);
+      border: 2px solid $christmas-gold;
+      box-shadow: 0 8px 30px rgba($christmas-red, 0.6),
+                  0 0 40px rgba($christmas-gold, 0.4);
+      animation: winner-glow 2s ease-in-out infinite;
+
+      // Disable hover effects when revealed
+      &:hover {
+        background: linear-gradient(135deg,
+                    rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
+                    rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%);
+        border: 2px solid $christmas-gold;
+        box-shadow: 0 8px 30px rgba($christmas-red, 0.6),
+                    0 0 40px rgba($christmas-gold, 0.4);
+        transform: none;
+      }
+    }
+
+    &.has-votes {
+      background: linear-gradient(135deg,
+                  rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
+                  rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%);
+      border: 2px solid rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
+      box-shadow: 0 4px 15px rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
+
+      // Disable hover effects when revealed
+      &:hover {
+        background: linear-gradient(135deg,
+                    rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
+                    rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%);
+        border: 2px solid rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
+        box-shadow: 0 4px 15px rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
+        transform: none;
+      }
+    }
+
+    &.no-votes {
+      // Disable hover effects when revealed
+      &:hover {
+        background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg 100%);
+        border: 2px solid $christmas-dark-border;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transform: none;
+      }
+    }
+  }
+
+  .voting-card-percentage {
+    color: $christmas-gold-hover;
+    text-shadow: 0 0 10px rgba($christmas-gold, 0.8);
+    font-weight: 700;
+  }
+
+  // Inputs
+  .home-input,
+  .join-input,
+  .input {
+    background: $christmas-dark-bg;
+    border-color: $christmas-dark-border;
+    color: $christmas-text-primary;
+
+    &:focus {
+      border-color: $christmas-red !important;
+      box-shadow: 0 0 0 3px rgba($christmas-red, 0.2) !important;
+    }
+  }
+
+  // Dividers
+  .home-divider::before,
+  .home-divider::after {
+    background: linear-gradient(90deg,
+                transparent 0%,
+                rgba($christmas-gold, 0.4) 50%,
+                transparent 100%);
+  }
+
+  // Git info
+  .git-info {
+    background: $christmas-dark-bg-elevated;
+    border-color: $christmas-dark-border;
+    color: $christmas-text-muted;
+
+    &:hover {
+      color: $christmas-text-secondary;
+    }
+  }
+
+  // Toast
+  .toast {
+    background: $christmas-dark-bg-elevated;
+    border-color: $christmas-dark-border;
+    color: $christmas-text-primary;
+  }
+
+  // Emoji picker
+  .emoji-picker {
+    background: $christmas-dark-bg-elevated;
+    border-color: $christmas-dark-border;
+  }
+
+  .emoji-picker-button {
+    &:hover {
+      background: $christmas-dark-bg-hover;
+    }
+
+    &:not(:last-child) {
+      border-right-color: $christmas-dark-border;
+    }
+  }
+
+
+
+  // Player name colors
+  .player-name {
+    color: $christmas-text-secondary;
+  }
+
+  .player-name-disconnected {
+    color: $christmas-text-muted;
+  }
+
+  .player-spectator {
+    color: $christmas-text-secondary;
+  }
+
+  // Voting card title
+  .voting-card-title {
+    color: $christmas-text-muted;
+  }
+
+  .voting-card-small.selected .voting-card-title {
+    color: $christmas-snow;
+  }
+
+  // Player card size
+  .player-card-size {
+    color: $christmas-text-muted;
+  }
+
+  // Join toggle
+  .join-toggle-slider {
+    background-color: $christmas-dark-border;
+  }
+
+  .join-toggle-input:checked + .join-toggle-slider {
+    background-color: $christmas-red;
+  }
+
+  .join-toggle-label {
+    color: $christmas-text-secondary;
+  }
+
+  // Home divider text
+  .home-divider-text {
+    color: $christmas-text-muted;
+  }
+
+  // Home footer
+  .home-footer {
+    color: $christmas-text-muted;
+  }
+
+  // Game ID icon
+  .game-id-icon {
+    color: $christmas-text-muted;
+
+    .game-id-badge:hover & {
+      color: $christmas-text-secondary;
+    }
+  }
+
+  .game-id-icon-copied {
+    color: $christmas-gold !important;
+  }
+
+  // Toggle switch
+  .join-toggle-input:checked + .join-toggle-slider {
+    background-color: $christmas-red !important;
+  }
+
+  // Loader spinner
+  .loader-spinner {
+    border-color: $christmas-dark-border;
+    border-top-color: $christmas-red !important;
+  }
+
+  // Toast icon (success color = gold)
+  .toast svg {
+    color: $christmas-gold !important;
+  }
+}
+
+// Christmas animations
+@keyframes card-glow {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
+                0 0 30px rgba($christmas-gold, 0.4);
+  }
+  50% {
+    box-shadow: 0 6px 25px rgba($christmas-red, 0.8),
+                0 0 40px rgba($christmas-gold, 0.6);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 8px 25px rgba($christmas-red, 0.6),
+                0 0 35px rgba($christmas-gold, 0.5);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba($christmas-red, 0.8),
+                0 0 45px rgba($christmas-gold, 0.7);
+  }
+}
+
+@keyframes winner-glow {
+  0%, 100% {
+    box-shadow: 0 8px 30px rgba($christmas-green, 0.6),
+                0 0 40px rgba($christmas-gold, 0.4);
+    transform: translateY(-4px) scale(1);
+  }
+  50% {
+    box-shadow: 0 10px 40px rgba($christmas-green, 0.8),
+                0 0 50px rgba($christmas-gold, 0.6);
+    transform: translateY(-6px) scale(1.02);
+  }
+}
+

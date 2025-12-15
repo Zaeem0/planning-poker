@@ -1,0 +1,156 @@
+@use 'christmas-theme' as *;
+
+.christmas-lights-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+}
+
+.christmas-lights-string {
+  position: absolute;
+}
+
+.lights-wire {
+  position: absolute;
+  background: rgba(50, 50, 50, 0.3);
+  z-index: -1;
+}
+
+.christmas-lights-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+
+  .lights-wire {
+    top: 8px;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+}
+
+.christmas-lights-left {
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 100%;
+
+  .lights-wire {
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+  }
+}
+
+.christmas-lights-right {
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+
+  .lights-wire {
+    right: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+  }
+}
+
+.christmas-light {
+  position: absolute;
+  width: 20px;
+  height: 30px;
+  transform: translate(-50%, 0);
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.christmas-lights-left .christmas-light,
+.christmas-lights-right .christmas-light {
+  transform: translate(0, -50%);
+}
+
+.light-bulb {
+  width: 16px;
+  height: 24px;
+  border-radius: 40% 40% 50% 50%;
+  position: relative;
+  margin: 0 auto;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.light-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  filter: blur(8px);
+  opacity: 0.8;
+  animation: glow 2s ease-in-out infinite;
+}
+
+// Red lights
+.christmas-light-red .light-bulb {
+  background: linear-gradient(135deg, #ff1744 0%, #dc143c 50%, #b71c1c 100%);
+}
+
+.christmas-light-red .light-glow {
+  background: radial-gradient(circle, rgba(255, 23, 68, 0.8) 0%, rgba(220, 20, 60, 0) 70%);
+}
+
+// Gold lights
+.christmas-light-gold .light-bulb {
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 50%, #f9a825 100%);
+}
+
+.christmas-light-gold .light-glow {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8) 0%, rgba(255, 215, 0, 0) 70%);
+}
+
+// Green lights
+.christmas-light-green .light-bulb {
+  background: linear-gradient(135deg, #32cd32 0%, #228b22 50%, #1b5e20 100%);
+}
+
+.christmas-light-green .light-glow {
+  background: radial-gradient(circle, rgba(50, 205, 50, 0.8) 0%, rgba(34, 139, 34, 0) 70%);
+}
+
+// Blue lights
+.christmas-light-blue .light-bulb {
+  background: linear-gradient(135deg, #64b5f6 0%, #2196f3 50%, #1976d2 100%);
+}
+
+.christmas-light-blue .light-glow {
+  background: radial-gradient(circle, rgba(33, 150, 243, 0.8) 0%, rgba(33, 150, 243, 0) 70%);
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0.4;
+  }
+}
+

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CreateGameButton } from '@/components/CreateGameButton';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import '@/styles/home.scss';
 
 export default function Home() {
@@ -19,6 +20,9 @@ export default function Home() {
   return (
     <div className="home-page">
       <div className="home-content">
+        <div className="home-theme-toggle">
+          <ThemeToggle />
+        </div>
         <header className="home-header">
           <h1 className="home-title">Planning Poker</h1>
           <p className="home-subtitle">Estimate together, decide faster</p>
