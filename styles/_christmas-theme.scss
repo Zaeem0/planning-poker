@@ -51,7 +51,8 @@ body.theme-christmas {
   }
 
   .button-primary,
-  .create-game-button {
+  .create-game-button,
+  .join-button {
     background: linear-gradient(135deg, $christmas-red 0%, darken($christmas-red, 5%) 100%) !important;
     box-shadow: 0 4px 15px rgba($christmas-red, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
     border: 1px solid $christmas-gold !important;
