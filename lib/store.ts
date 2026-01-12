@@ -17,8 +17,6 @@ export interface Vote {
   vote: string;
 }
 
-export const THEME_STORAGE_KEY = 'planning-poker-theme';
-
 interface GameState {
   gameId: string;
   currentUserId: string;
@@ -59,11 +57,6 @@ export const useGameStore = create<GameState>((set) => ({
   setRevealed: (revealed) => set({ revealed }),
   setSelectedVote: (vote) => set({ selectedVote: vote }),
   setIsMuted: (isMuted) => set({ isMuted }),
-  setTheme: (theme) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(THEME_STORAGE_KEY, theme);
-    }
-    set({ theme });
-  },
+  setTheme: (theme) => set({ theme }),
   reset: () => set({ selectedVote: null, votes: [], revealed: false }),
 }));
