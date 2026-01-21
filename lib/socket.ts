@@ -224,3 +224,23 @@ export function emitToggleRole(
     socket.emit('toggle-role', { gameId, userId });
   }
 }
+
+export function emitUserActive(
+  socket: Socket | null,
+  gameId: string,
+  userId: string
+) {
+  if (socket) {
+    socket.emit('user-active', { gameId, userId });
+  }
+}
+
+export function emitHeartbeat(
+  socket: Socket | null,
+  gameId: string,
+  userId: string
+) {
+  if (socket) {
+    socket.emit('heartbeat', { gameId, userId });
+  }
+}

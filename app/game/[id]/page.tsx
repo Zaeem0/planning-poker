@@ -11,6 +11,8 @@ import { useConfetti } from '@/lib/hooks/useConfetti';
 import { useConfettiOrigin } from '@/lib/hooks/useConfettiOrigin';
 import { useEmojiAnimations } from '@/lib/hooks/useEmojiAnimations';
 import { useUnanimousChime } from '@/lib/hooks/useUnanimousChime';
+import { usePageVisibility } from '@/lib/hooks/usePageVisibility';
+import { useActivityHeartbeat } from '@/lib/hooks/useActivityHeartbeat';
 import { PokerTable } from '@/components/PokerTable';
 import { JoinGameForm, JoinFormData } from '@/components/JoinGameForm';
 import { GameHeader } from '@/components/GameHeader';
@@ -64,6 +66,22 @@ export default function GamePage() {
   const { particles } = useConfetti(votes, revealed, confettiOrigin);
   const { getAnimationsForUser } = useEmojiAnimations(socket);
   useUnanimousChime(votes, revealed);
+
+  // Connection stability hooks
+  usePageVisibility({
+    socket,
+    gameId,
+    userId: currentUserId,
+    enabled: !!currentUserName,
+  });
+
+  useActivityHeartbeat({
+    socket,
+    gameId,
+    userId: currentUserId,
+    enabled: !!currentUserName,
+    intervalMs: 30000, // Send heartbeat every 30 seconds
+  });
 
   useEffect(() => {
     setGameId(gameId);

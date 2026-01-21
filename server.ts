@@ -146,8 +146,10 @@ app.prepare().then(() => {
       origin: process.env.CORS_ORIGIN || '*',
       methods: ['GET', 'POST'],
     },
-    pingTimeout: 120000,
-    pingInterval: 25000,
+    // Increased timeouts to handle browser tab throttling
+    // When users switch tabs, browsers throttle background tabs
+    pingTimeout: 240000, // 4 minutes - wait longer before considering client disconnected
+    pingInterval: 45000, // 45 seconds - send pings less frequently
     connectTimeout: 45000,
     maxHttpBufferSize: 1e6,
     transports: ['websocket', 'polling'],
@@ -326,6 +328,60 @@ app.prepare().then(() => {
         users: getSortedUsersByJoinOrder(game),
       });
     });
+
+    // Handle user-active event (sent when tab becomes visible)
+    socket.on(
+      'user-active',
+      ({ gameId, userId }: { gameId: string; userId: string }) => {
+        const game = games.get(gameId);
+        if (!game) return;
+
+        const user = game.users.get(userId);
+        if (user) {
+          const wasDisconnected = !user.connected;
+          user.connected = true;
+          user.socketId = socket.id;
+
+          // Update user data mapping
+          users.set(socket.id, { userId, gameId });
+
+          // If user was disconnected, notify others they're back
+          if (wasDisconnected) {
+            console.log('User became active:', userId, 'in game:', gameId);
+            io.to(gameId).emit('user-list-updated', {
+              users: getSortedUsersByJoinOrder(game),
+            });
+          }
+        }
+      }
+    );
+
+    // Handle heartbeat event (sent periodically and on activity)
+    socket.on(
+      'heartbeat',
+      ({ gameId, userId }: { gameId: string; userId: string }) => {
+        const game = games.get(gameId);
+        if (!game) return;
+
+        const user = game.users.get(userId);
+        if (user) {
+          const wasDisconnected = !user.connected;
+          user.connected = true;
+          user.socketId = socket.id;
+
+          // Update user data mapping
+          users.set(socket.id, { userId, gameId });
+
+          // If user was disconnected, notify others they're back
+          if (wasDisconnected) {
+            console.log('User heartbeat restored connection:', userId);
+            io.to(gameId).emit('user-list-updated', {
+              users: getSortedUsersByJoinOrder(game),
+            });
+          }
+        }
+      }
+    );
 
     socket.on('disconnect', (reason) => {
       console.log('Socket disconnected:', socket.id, 'Reason:', reason);
