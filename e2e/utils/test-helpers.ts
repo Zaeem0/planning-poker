@@ -1,7 +1,7 @@
 import { expect, Page, BrowserContext } from '@playwright/test';
 
 export const generateUniqueGameId = () =>
-  `test-game-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+  Math.random().toString(36).substring(2, 8); // 6 random characters
 
 export async function navigateToHomePage(page: Page) {
   await page.goto('/');
@@ -23,7 +23,14 @@ export async function joinGameAsUser(
 ) {
   await navigateToGame(page, gameId);
   await page.getByPlaceholder('Enter your name').fill(username);
-  await page.getByRole('button', { name: 'Join Game' }).click();
+  // Use Create Game for new games, Join Game for existing games
+  const createButton = page.getByRole('button', { name: 'Create Game' });
+  const joinButton = page.getByRole('button', { name: 'Join Game' });
+  if (await createButton.isVisible()) {
+    await createButton.click();
+  } else {
+    await joinButton.click();
+  }
   await waitForGamePageVisible(page);
   await expect(page.getByText(`${username}(you)`)).toBeVisible();
 }
@@ -36,7 +43,14 @@ export async function joinGameAsSpectator(
   await navigateToGame(page, gameId);
   await page.getByPlaceholder('Enter your name').fill(username);
   await page.getByText('Join as spectator').click();
-  await page.getByRole('button', { name: 'Join Game' }).click();
+  // Use Create Game for new games, Join Game for existing games
+  const createButton = page.getByRole('button', { name: 'Create Game' });
+  const joinButton = page.getByRole('button', { name: 'Join Game' });
+  if (await createButton.isVisible()) {
+    await createButton.click();
+  } else {
+    await joinButton.click();
+  }
   await waitForGamePageVisible(page);
   await expect(page.getByText(`${username}(you)`)).toBeVisible();
   await expect(page.getByText('(spectator)')).toBeVisible();
@@ -72,11 +86,13 @@ export async function pressDeselectKey(
 }
 
 export async function clickRevealVotes(page: Page) {
-  await page.getByRole('button', { name: /reveal/i }).click();
+  await page.getByRole('button', { name: 'Reveal Votes', exact: true }).click();
 }
 
 export async function clickNewRound(page: Page) {
-  await page.getByRole('button', { name: /new round/i }).click();
+  await page
+    .getByRole('button', { name: 'Start New Round', exact: true })
+    .click();
 }
 
 export async function getPersistedUserId(page: Page): Promise<string> {
@@ -128,6 +144,19 @@ export async function disconnectSocket(page: Page) {
   });
 }
 
+export async function disconnectAndReconnectSocket(page: Page, delayMs = 1000) {
+  await page.evaluate((delay) => {
+    if (window.__TEST_SOCKET__) {
+      window.__TEST_SOCKET__.disconnect();
+      setTimeout(() => {
+        if (window.__TEST_SOCKET__) {
+          window.__TEST_SOCKET__.connect();
+        }
+      }, delay);
+    }
+  }, delayMs);
+}
+
 export async function reopenPageInContext(
   context: BrowserContext,
   gameId: string
@@ -160,7 +189,7 @@ export function getVoteCard(page: Page, size: string) {
 }
 
 export function getRevealButton(page: Page) {
-  return page.getByRole('button', { name: /reveal/i });
+  return page.getByRole('button', { name: 'Reveal Votes', exact: true });
 }
 
 export function getNewRoundButton(page: Page) {

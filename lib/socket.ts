@@ -2,6 +2,7 @@ import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useGameStore } from './store';
 import { getVoteForUser } from './vote-utils';
+import { CardSet } from './constants';
 
 declare global {
   interface Window {
@@ -28,7 +29,8 @@ export function useSocket(
   gameId: string,
   displayName?: string,
   isSpectator?: boolean,
-  shouldConnect: boolean = true
+  shouldConnect: boolean = true,
+  cardSet?: CardSet
 ) {
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Set<() => void>>(new Set());
@@ -39,6 +41,7 @@ export function useSocket(
     setVotes,
     setRevealed,
     setSelectedVote,
+    setCardSet,
     reset,
   } = useGameStore();
 
@@ -88,22 +91,55 @@ export function useSocket(
       };
 
       const joinGame = () => {
+        // Use provided cardSet or load from localStorage
+        let gameCardSet: CardSet | undefined = cardSet;
+
+        if (!gameCardSet && typeof window !== 'undefined') {
+          const savedCardSet = localStorage.getItem(`game-${gameId}-cardset`);
+          if (savedCardSet) {
+            try {
+              gameCardSet = JSON.parse(savedCardSet);
+            } catch {
+              // Ignore parse errors
+            }
+          }
+        }
+
+        // Save cardSet to localStorage if provided
+        if (gameCardSet && typeof window !== 'undefined') {
+          localStorage.setItem(
+            `game-${gameId}-cardset`,
+            JSON.stringify(gameCardSet)
+          );
+        }
+
         newSocket.emit('join-game', {
           gameId,
           userId,
           username: displayName,
           isSpectator,
+          cardSet: gameCardSet,
         });
       };
 
       newSocket.on(
         'user-joined',
-        ({ userId: joinedUserId, username, users, votes, revealed }) => {
+        ({
+          userId: joinedUserId,
+          username,
+          users,
+          votes,
+          revealed,
+          cardSet,
+        }) => {
           setCurrentUserId(joinedUserId);
           setCurrentUserName(username);
           setUsers(users);
           setVotes(votes);
           setRevealed(revealed);
+          if (cardSet) {
+            setCardSet(cardSet);
+          }
           restoreUserVoteSelection(votes, joinedUserId);
         }
       );
@@ -151,6 +187,33 @@ export function useSocket(
         reset();
         setUsers(users);
       });
+
+      newSocket.on(
+        'card-set-updated',
+        ({
+          cardSet,
+          invalidatedUserIds,
+        }: {
+          cardSet: CardSet;
+          invalidatedUserIds?: string[];
+        }) => {
+          setCardSet(cardSet);
+          // Clear selected vote if current user's vote was invalidated
+          if (invalidatedUserIds?.length) {
+            const currentUserId = useGameStore.getState().currentUserId;
+            if (invalidatedUserIds.includes(currentUserId)) {
+              setSelectedVote(null);
+            }
+          }
+          // Update localStorage
+          if (typeof window !== 'undefined') {
+            localStorage.setItem(
+              `game-${gameId}-cardset`,
+              JSON.stringify(cardSet)
+            );
+          }
+        }
+      );
     }, connectionDelay);
 
     return () => {
@@ -169,12 +232,14 @@ export function useSocket(
     displayName,
     isSpectator,
     shouldConnect,
+    cardSet,
     setCurrentUserId,
     setCurrentUserName,
     setUsers,
     setVotes,
     setRevealed,
     setSelectedVote,
+    setCardSet,
     reset,
   ]);
 

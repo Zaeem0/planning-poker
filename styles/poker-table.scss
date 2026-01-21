@@ -133,10 +133,39 @@
   font-weight: 400;
 }
 
+.table-message-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 10;
+}
+
 .table-message {
   font-size: 0.875rem;
   font-weight: 500;
   color: $text-secondary;
+}
+
+.table-message-reveal-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $success;
+  border: none;
+  border-radius: $radius;
+  padding: 0.375rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: $white;
+
+  svg {
+    display: block;
+  }
+
+  &:hover {
+    background: $success-hover;
+    transform: scale(1.05);
+  }
 }
 
 .voting-section-bottom {
@@ -196,7 +225,8 @@
     background: $primary;
     border-color: $primary-hover;
 
-    .voting-card-title {
+    .voting-card-title,
+    .voting-card-emoji {
       color: $white;
     }
 
@@ -211,15 +241,33 @@
     background: rgba($success, var(--vote-opacity, 0.3));
     border-color: $success;
     transform: translateY(-4px);
+
+    &:hover {
+      background: rgba($success, var(--vote-opacity, 0.3));
+      border-color: $success;
+      transform: translateY(-4px);
+    }
   }
 
   &.has-votes {
     background: rgba($success, var(--vote-opacity, 0.15));
     border-color: rgba($success, calc(var(--vote-opacity, 0.1) + 0.3));
+
+    &:hover {
+      background: rgba($success, var(--vote-opacity, 0.15));
+      border-color: rgba($success, calc(var(--vote-opacity, 0.1) + 0.3));
+      transform: none;
+    }
   }
 
   &.no-votes {
     opacity: 0.3;
+
+    &:hover {
+      background: $dark-bg-elevated;
+      border-color: $dark-border;
+      transform: none;
+    }
   }
 
   &.unanimous {
@@ -295,7 +343,15 @@
 
 .voting-card-emoji {
   font-size: 1.5rem;
-  transition: font-size 0.3s ease;
+  transition:
+    font-size 0.3s ease,
+    color 0.2s ease;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  text-align: center;
+  line-height: 1.2;
+  max-width: 100%;
+  color: $slate-500; // Same default color as voting-card-title
 }
 
 .voting-card-title {
@@ -322,8 +378,6 @@
   border: 1px solid $dark-border;
   border-radius: $radius;
   overflow: hidden;
-
-
 }
 
 .emoji-picker-button {

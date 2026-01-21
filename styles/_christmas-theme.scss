@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 // Christmas Theme Colors - More Festive & Vibrant
 $christmas-red: #dc143c; // Crimson red - more vibrant
 $christmas-red-hover: #ff1744; // Bright red hover
@@ -45,27 +47,44 @@ body.theme-christmas {
   .card {
     background: $christmas-dark-bg-elevated;
     border: 2px solid $christmas-dark-border;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba($christmas-gold, 0.1),
-                inset 0 1px 0 rgba($christmas-gold, 0.1);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba($christmas-gold, 0.1),
+      inset 0 1px 0 rgba($christmas-gold, 0.1);
   }
 
   .button-primary,
   .create-game-button,
   .join-button {
-    background: linear-gradient(135deg, $christmas-red 0%, darken($christmas-red, 5%) 100%) !important;
-    box-shadow: 0 4px 15px rgba($christmas-red, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+    background: linear-gradient(
+      135deg,
+      $christmas-red 0%,
+      color.adjust($christmas-red, $lightness: -5%) 100%
+    ) !important;
+    box-shadow:
+      0 4px 15px rgba($christmas-red, 0.4),
+      0 0 20px rgba($christmas-gold, 0.2) !important;
     border: 1px solid $christmas-gold !important;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%) !important;
-      box-shadow: 0 6px 25px rgba($christmas-red-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      background: linear-gradient(
+        135deg,
+        $christmas-red-hover 0%,
+        $christmas-red 100%
+      ) !important;
+      box-shadow:
+        0 6px 25px rgba($christmas-red-hover, 0.6),
+        0 0 30px rgba($christmas-gold, 0.4) !important;
       transform: translateY(-2px) scale(1.02);
       border-color: $christmas-gold-hover !important;
     }
 
     &:disabled {
-      background: linear-gradient(135deg, rgba($christmas-red, 0.25) 0%, rgba($christmas-red, 0.15) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-red, 0.25) 0%,
+        rgba($christmas-red, 0.15) 100%
+      ) !important;
       border: 1px solid rgba($christmas-gold, 0.25) !important;
       box-shadow: none !important;
       color: rgba($christmas-snow, 0.35) !important;
@@ -76,19 +95,35 @@ body.theme-christmas {
 
   .button-secondary,
   .home-join-button {
-    background: linear-gradient(135deg, $christmas-red 0%, darken($christmas-red, 5%) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      $christmas-red 0%,
+      color.adjust($christmas-red, $lightness: -5%) 100%
+    ) !important;
     border: 1px solid $christmas-gold !important;
-    box-shadow: 0 4px 15px rgba($christmas-red, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+    box-shadow:
+      0 4px 15px rgba($christmas-red, 0.4),
+      0 0 20px rgba($christmas-gold, 0.2) !important;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%) !important;
+      background: linear-gradient(
+        135deg,
+        $christmas-red-hover 0%,
+        $christmas-red 100%
+      ) !important;
       border-color: $christmas-gold-hover !important;
-      box-shadow: 0 6px 25px rgba($christmas-red-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      box-shadow:
+        0 6px 25px rgba($christmas-red-hover, 0.6),
+        0 0 30px rgba($christmas-gold, 0.4) !important;
       transform: translateY(-2px) scale(1.02);
     }
 
     &:disabled {
-      background: linear-gradient(135deg, rgba($christmas-red, 0.3) 0%, rgba($christmas-red, 0.2) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-red, 0.3) 0%,
+        rgba($christmas-red, 0.2) 100%
+      ) !important;
       border: 1px solid rgba($christmas-gold, 0.3) !important;
       box-shadow: none !important;
       color: rgba($christmas-snow, 0.4) !important;
@@ -101,20 +136,36 @@ body.theme-christmas {
   .button-success,
   .reveal-button,
   .reset-button {
-    background: linear-gradient(135deg, $christmas-green 0%, darken($christmas-green, 5%) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      $christmas-green 0%,
+      color.adjust($christmas-green, $lightness: -5%) 100%
+    ) !important;
     border: 1px solid $christmas-gold !important;
-    box-shadow: 0 4px 15px rgba($christmas-green, 0.4), 0 0 20px rgba($christmas-gold, 0.2) !important;
+    box-shadow:
+      0 4px 15px rgba($christmas-green, 0.4),
+      0 0 20px rgba($christmas-gold, 0.2) !important;
     color: $christmas-snow !important;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, $christmas-green-hover 0%, $christmas-green 100%) !important;
+      background: linear-gradient(
+        135deg,
+        $christmas-green-hover 0%,
+        $christmas-green 100%
+      ) !important;
       border-color: $christmas-gold-hover !important;
-      box-shadow: 0 6px 25px rgba($christmas-green-hover, 0.6), 0 0 30px rgba($christmas-gold, 0.4) !important;
+      box-shadow:
+        0 6px 25px rgba($christmas-green-hover, 0.6),
+        0 0 30px rgba($christmas-gold, 0.4) !important;
       transform: translateY(-2px) scale(1.02);
     }
 
     &:disabled {
-      background: linear-gradient(135deg, rgba($christmas-green, 0.25) 0%, rgba($christmas-green, 0.15) 100%) !important;
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-green, 0.25) 0%,
+        rgba($christmas-green, 0.15) 100%
+      ) !important;
       border: 1px solid rgba($christmas-gold, 0.25) !important;
       box-shadow: none !important;
       color: rgba($christmas-snow, 0.35) !important;
@@ -148,7 +199,11 @@ body.theme-christmas {
   // Backgrounds
   .home-card,
   .join-card {
-    background: linear-gradient(135deg, rgba($christmas-red, 0.15) 0%, rgba($christmas-green, 0.2) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($christmas-red, 0.15) 0%,
+      rgba($christmas-green, 0.2) 100%
+    );
     border-color: rgba($christmas-gold, 0.3);
   }
 
@@ -181,24 +236,35 @@ body.theme-christmas {
       $christmas-red-light 8px
     );
     border: 2px solid $christmas-gold;
-    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
-                0 0 30px rgba($christmas-gold, 0.4);
+    box-shadow:
+      0 6px 20px rgba($christmas-red, 0.6),
+      0 0 30px rgba($christmas-gold, 0.4);
     animation: card-glow 2s ease-in-out infinite;
   }
 
   .player-card-revealed {
-    background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg-hover 100%);
+    background: linear-gradient(
+      135deg,
+      $christmas-dark-bg-elevated 0%,
+      $christmas-dark-bg-hover 100%
+    );
     border: 2px solid $christmas-gold;
-    box-shadow: 0 6px 20px rgba($christmas-gold, 0.4),
-                0 0 30px rgba($christmas-red, 0.3);
+    box-shadow:
+      0 6px 20px rgba($christmas-gold, 0.4),
+      0 0 30px rgba($christmas-red, 0.3);
   }
 
   // When both voted and revealed, use darker Christmas red
   .player-card-voted.player-card-revealed {
-    background: linear-gradient(135deg, darken($christmas-red, 10%) 0%, darken($christmas-red, 5%) 100%);
+    background: linear-gradient(
+      135deg,
+      color.adjust($christmas-red, $lightness: -10%) 0%,
+      color.adjust($christmas-red, $lightness: -5%) 100%
+    );
     border: 2px solid $christmas-gold;
-    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
-                0 0 30px rgba($christmas-gold, 0.4);
+    box-shadow:
+      0 6px 20px rgba($christmas-red, 0.6),
+      0 0 30px rgba($christmas-gold, 0.4);
   }
 
   .player-card-vote {
@@ -214,69 +280,101 @@ body.theme-christmas {
 
   // Voting cards
   .voting-card-small {
-    background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg 100%);
+    background: linear-gradient(
+      135deg,
+      $christmas-dark-bg-elevated 0%,
+      $christmas-dark-bg 100%
+    );
     border: 2px solid $christmas-dark-border;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, rgba($christmas-red, 0.3) 0%, rgba($christmas-red, 0.2) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-red, 0.3) 0%,
+        rgba($christmas-red, 0.2) 100%
+      );
       border: 2px solid $christmas-red;
       box-shadow: 0 4px 15px rgba($christmas-red, 0.4);
       transform: translateY(-4px);
     }
 
     &.selected {
-      background: linear-gradient(135deg, $christmas-red 0%, $christmas-red-light 100%);
+      background: linear-gradient(
+        135deg,
+        $christmas-red 0%,
+        $christmas-red-light 100%
+      );
       border: 2px solid $christmas-gold;
-      box-shadow: 0 8px 25px rgba($christmas-red, 0.6),
-                  0 0 35px rgba($christmas-gold, 0.5);
+      box-shadow:
+        0 8px 25px rgba($christmas-red, 0.6),
+        0 0 35px rgba($christmas-gold, 0.5);
 
       // When selected and hovering, keep the red background
       &:hover {
-        background: linear-gradient(135deg, $christmas-red-hover 0%, $christmas-red 100%);
+        background: linear-gradient(
+          135deg,
+          $christmas-red-hover 0%,
+          $christmas-red 100%
+        );
         border-color: $christmas-gold-hover;
-        box-shadow: 0 10px 30px rgba($christmas-red, 0.7),
-                    0 0 45px rgba($christmas-gold, 0.6);
+        box-shadow:
+          0 10px 30px rgba($christmas-red, 0.7),
+          0 0 45px rgba($christmas-gold, 0.6);
         transform: translateY(-4px);
       }
     }
 
     &.most-common {
-      background: linear-gradient(135deg,
-                  rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
-                  rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%);
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
+        rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%
+      );
       border: 2px solid $christmas-gold;
-      box-shadow: 0 8px 30px rgba($christmas-red, 0.6),
-                  0 0 40px rgba($christmas-gold, 0.4);
+      box-shadow:
+        0 8px 30px rgba($christmas-red, 0.6),
+        0 0 40px rgba($christmas-gold, 0.4);
       animation: winner-glow 2s ease-in-out infinite;
 
       // Disable hover effects when revealed
       &:hover {
-        background: linear-gradient(135deg,
-                    rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
-                    rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%);
+        background: linear-gradient(
+          135deg,
+          rgba($christmas-red, var(--vote-opacity, 0.4)) 0%,
+          rgba($christmas-red-light, var(--vote-opacity, 0.3)) 100%
+        );
         border: 2px solid $christmas-gold;
-        box-shadow: 0 8px 30px rgba($christmas-red, 0.6),
-                    0 0 40px rgba($christmas-gold, 0.4);
+        box-shadow:
+          0 8px 30px rgba($christmas-red, 0.6),
+          0 0 40px rgba($christmas-gold, 0.4);
         transform: none;
       }
     }
 
     &.has-votes {
-      background: linear-gradient(135deg,
-                  rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
-                  rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%);
-      border: 2px solid rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
-      box-shadow: 0 4px 15px rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
+        rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%
+      );
+      border: 2px solid
+        rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
+      box-shadow: 0 4px 15px
+        rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
 
       // Disable hover effects when revealed
       &:hover {
-        background: linear-gradient(135deg,
-                    rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
-                    rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%);
-        border: 2px solid rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
-        box-shadow: 0 4px 15px rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
+        background: linear-gradient(
+          135deg,
+          rgba($christmas-red, var(--vote-opacity, 0.2)) 0%,
+          rgba($christmas-red-light, var(--vote-opacity, 0.1)) 100%
+        );
+        border: 2px solid
+          rgba($christmas-red, calc(var(--vote-opacity, 0.3) + 0.4));
+        box-shadow: 0 4px 15px
+          rgba($christmas-red, calc(var(--vote-opacity, 0.2) + 0.2));
         transform: none;
       }
     }
@@ -284,9 +382,39 @@ body.theme-christmas {
     &.no-votes {
       // Disable hover effects when revealed
       &:hover {
-        background: linear-gradient(135deg, $christmas-dark-bg-elevated 0%, $christmas-dark-bg 100%);
+        background: linear-gradient(
+          135deg,
+          $christmas-dark-bg-elevated 0%,
+          $christmas-dark-bg 100%
+        );
         border: 2px solid $christmas-dark-border;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transform: none;
+      }
+    }
+
+    &.unanimous {
+      background: linear-gradient(
+        135deg,
+        rgba($christmas-green, 0.4) 0%,
+        rgba($christmas-green-light, 0.3) 100%
+      );
+      border: 2px solid $christmas-green;
+      box-shadow:
+        0 8px 30px rgba($christmas-green, 0.6),
+        0 0 40px rgba($christmas-green, 0.5);
+      animation: winner-glow-green 2s ease-in-out infinite;
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          rgba($christmas-green, 0.4) 0%,
+          rgba($christmas-green-light, 0.3) 100%
+        );
+        border: 2px solid $christmas-green;
+        box-shadow:
+          0 8px 30px rgba($christmas-green, 0.6),
+          0 0 40px rgba($christmas-green, 0.5);
         transform: none;
       }
     }
@@ -315,10 +443,12 @@ body.theme-christmas {
   // Dividers
   .home-divider::before,
   .home-divider::after {
-    background: linear-gradient(90deg,
-                transparent 0%,
-                rgba($christmas-gold, 0.4) 50%,
-                transparent 100%);
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba($christmas-gold, 0.4) 50%,
+      transparent 100%
+    );
   }
 
   // Git info
@@ -354,8 +484,6 @@ body.theme-christmas {
       border-right-color: $christmas-dark-border;
     }
   }
-
-
 
   // Player name colors
   .player-name {
@@ -439,37 +567,45 @@ body.theme-christmas {
 
 // Christmas animations
 @keyframes card-glow {
-  0%, 100% {
-    box-shadow: 0 6px 20px rgba($christmas-red, 0.6),
-                0 0 30px rgba($christmas-gold, 0.4);
+  0%,
+  100% {
+    box-shadow:
+      0 6px 20px rgba($christmas-red, 0.6),
+      0 0 30px rgba($christmas-gold, 0.4);
   }
   50% {
-    box-shadow: 0 6px 25px rgba($christmas-red, 0.8),
-                0 0 40px rgba($christmas-gold, 0.6);
+    box-shadow:
+      0 6px 25px rgba($christmas-red, 0.8),
+      0 0 40px rgba($christmas-gold, 0.6);
   }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 8px 25px rgba($christmas-red, 0.6),
-                0 0 35px rgba($christmas-gold, 0.5);
+  0%,
+  100% {
+    box-shadow:
+      0 8px 25px rgba($christmas-red, 0.6),
+      0 0 35px rgba($christmas-gold, 0.5);
   }
   50% {
-    box-shadow: 0 8px 30px rgba($christmas-red, 0.8),
-                0 0 45px rgba($christmas-gold, 0.7);
+    box-shadow:
+      0 8px 30px rgba($christmas-red, 0.8),
+      0 0 45px rgba($christmas-gold, 0.7);
   }
 }
 
 @keyframes winner-glow {
-  0%, 100% {
-    box-shadow: 0 8px 30px rgba($christmas-green, 0.6),
-                0 0 40px rgba($christmas-gold, 0.4);
+  0%,
+  100% {
+    box-shadow:
+      0 8px 30px rgba($christmas-green, 0.6),
+      0 0 40px rgba($christmas-gold, 0.4);
     transform: translateY(-4px) scale(1);
   }
   50% {
-    box-shadow: 0 10px 40px rgba($christmas-green, 0.8),
-                0 0 50px rgba($christmas-gold, 0.6);
+    box-shadow:
+      0 10px 40px rgba($christmas-green, 0.8),
+      0 0 50px rgba($christmas-gold, 0.6);
     transform: translateY(-6px) scale(1.02);
   }
 }
-

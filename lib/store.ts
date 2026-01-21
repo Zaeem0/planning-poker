@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { Card, CardSet } from './constants';
 
 export type UserRole = 'player' | 'spectator';
 export type Theme = 'default' | 'christmas';
@@ -27,6 +28,7 @@ interface GameState {
   selectedVote: string | null;
   isMuted: boolean;
   theme: Theme;
+  cardSet: CardSet | null;
   setGameId: (gameId: string) => void;
   setCurrentUserId: (userId: string) => void;
   setCurrentUserName: (userName: string) => void;
@@ -36,6 +38,7 @@ interface GameState {
   setSelectedVote: (vote: string | null) => void;
   setIsMuted: (isMuted: boolean) => void;
   setTheme: (theme: Theme) => void;
+  setCardSet: (cardSet: CardSet | null) => void;
   reset: () => void;
 }
 
@@ -49,6 +52,7 @@ export const useGameStore = create<GameState>((set) => ({
   selectedVote: null,
   isMuted: false,
   theme: 'default', // Initialize to 'default' to avoid hydration mismatch
+  cardSet: null,
   setGameId: (gameId) => set({ gameId }),
   setCurrentUserId: (currentUserId) => set({ currentUserId }),
   setCurrentUserName: (currentUserName) => set({ currentUserName }),
@@ -58,5 +62,6 @@ export const useGameStore = create<GameState>((set) => ({
   setSelectedVote: (vote) => set({ selectedVote: vote }),
   setIsMuted: (isMuted) => set({ isMuted }),
   setTheme: (theme) => set({ theme }),
+  setCardSet: (cardSet) => set({ cardSet }),
   reset: () => set({ selectedVote: null, votes: [], revealed: false }),
 }));

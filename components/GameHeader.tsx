@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io-client';
 import { GameControls } from '@/components/GameControls';
 import { CreateGameButton } from '@/components/CreateGameButton';
+import { GameSettingsButton } from '@/components/GameSettingsButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { RoleToggle } from '@/components/RoleToggle';
 import {
@@ -41,6 +42,7 @@ export function GameHeader({
     <header className="game-header">
       <div className="game-header-left">
         <CreateGameButton />
+        <GameSettingsButton socket={socket} gameId={gameId} />
       </div>
       <h1 className="game-header-title">Planning Poker</h1>
       <div className="game-header-right">

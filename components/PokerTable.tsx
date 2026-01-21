@@ -6,6 +6,7 @@ import { getVoteForUser } from '@/lib/vote-utils';
 import { EmojiAnimation } from '@/lib/hooks/useEmojiAnimations';
 import { VotingCards } from '@/components/VotingCards';
 import { UserCard } from '@/components/UserCard';
+import { RefreshIcon } from '@/components/icons';
 import '@/styles/poker-table.scss';
 
 interface PokerTableProps {
@@ -17,6 +18,8 @@ interface PokerTableProps {
   gameId: string;
   selectedVote: string | null;
   onVote: (value: string) => void;
+  onReveal: () => void;
+  onReset: () => void;
   getAnimationsForUser: (userId: string) => EmojiAnimation[];
 }
 
@@ -29,6 +32,8 @@ export function PokerTable({
   gameId,
   selectedVote,
   onVote,
+  onReveal,
+  onReset,
   getAnimationsForUser,
 }: PokerTableProps) {
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -65,12 +70,12 @@ export function PokerTable({
   const players = users.filter((u) => u.role === 'player');
   const currentUser = users.find((u) => u.id === currentUserId);
   const isCurrentUserSpectator = currentUser?.role === 'spectator';
+  const votedCount = players.filter((u) => u.hasVoted).length;
+  const allVoted = votedCount === players.length && players.length > 0;
+  const showRevealButton = !revealed && allVoted;
 
   const getTableMessage = () => {
-    const votedCount = players.filter((u) => u.hasVoted).length;
     if (revealed) return 'Votes revealed!';
-    if (votedCount === players.length && players.length > 0)
-      return 'All voted! Ready to reveal';
     if (isCurrentUserSpectator) {
       if (votedCount === 0) return 'Watching the game';
       return `Watching the game - ${votedCount} of ${players.length} voted`;
@@ -83,7 +88,31 @@ export function PokerTable({
     <div className="poker-table-container">
       <div className="table-players">{users.map(renderUserCard)}</div>
 
-      <span className="table-message">{getTableMessage()}</span>
+      <div className="table-message-container">
+        <span className="table-message">
+          {showRevealButton ? 'All voted! Ready to reveal' : getTableMessage()}
+        </span>
+        {showRevealButton && (
+          <button
+            className="table-message-reveal-button"
+            onClick={onReveal}
+            title="Reveal votes"
+            aria-label="Reveal votes"
+          >
+            <RefreshIcon />
+          </button>
+        )}
+        {revealed && (
+          <button
+            className="table-message-reveal-button"
+            onClick={onReset}
+            title="Start new round"
+            aria-label="Start new round"
+          >
+            <RefreshIcon />
+          </button>
+        )}
+      </div>
 
       <VotingCards
         votes={votes}

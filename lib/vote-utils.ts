@@ -1,5 +1,5 @@
 import { Vote } from '@/lib/store';
-import { CARD_VALUES } from '@/lib/constants';
+import { CARD_VALUES, Card } from '@/lib/constants';
 
 export interface CardStats {
   voteCount: number;
@@ -51,7 +51,8 @@ export function getVoteAnalysis(votes: Vote[]): VoteAnalysis {
 
 export function calculateAllCardStats(
   votes: Vote[],
-  revealed: boolean
+  revealed: boolean,
+  cards: ReadonlyArray<Card> = CARD_VALUES
 ): AllCardStats {
   if (!revealed) {
     const emptyStats: CardStats = {
@@ -60,7 +61,9 @@ export function calculateAllCardStats(
       isMostCommon: false,
       hasVotes: false,
     };
-    return Object.fromEntries(CARD_VALUES.map((c) => [c.value, emptyStats]));
+    return Object.fromEntries(
+      cards.map((c) => [c.value || c.label, emptyStats])
+    );
   }
 
   const voteCounts = new Map<string, number>();
@@ -71,14 +74,16 @@ export function calculateAllCardStats(
   const maxVotes = Math.max(0, ...voteCounts.values());
 
   return Object.fromEntries(
-    CARD_VALUES.map((card) => {
-      const voteCount = voteCounts.get(card.value) || 0;
+    cards.map((card) => {
+      // Use label as vote value if card.value is empty
+      const voteValue = card.value || card.label;
+      const voteCount = voteCounts.get(voteValue) || 0;
       const percentage =
         votes.length > 0 ? Math.round((voteCount / votes.length) * 100) : 0;
       const isMostCommon = voteCount > 0 && voteCount === maxVotes;
 
       return [
-        card.value,
+        voteValue,
         { voteCount, percentage, isMostCommon, hasVotes: voteCount > 0 },
       ];
     })

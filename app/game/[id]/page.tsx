@@ -22,10 +22,17 @@ import { Loader } from '@/components/Loader';
 import '@/styles/game.scss';
 import '@/styles/poker-table.scss';
 
+const getHasJoinedKey = (gameId: string) => `hasJoined-${gameId}`;
+
 export default function GamePage() {
   const params = useParams();
   const gameId = params.id as string;
   const [joinFormData, setJoinFormData] = useState<JoinFormData | null>(null);
+  const [hasJoinedThisGame, setHasJoinedThisGame] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem(getHasJoinedKey(gameId)) === 'true';
+  });
+  const [isCreatingGame, setIsCreatingGame] = useState<boolean | null>(null);
 
   const {
     currentUserId,
@@ -38,13 +45,15 @@ export default function GamePage() {
     setGameId,
     setSelectedVote,
     setIsMuted,
+    setCardSet,
   } = useGameStore();
 
   const socket = useSocket(
     gameId,
     joinFormData?.displayName,
     joinFormData?.isSpectator,
-    true
+    true,
+    joinFormData?.cardSet
   );
   const { copied, handleCopyLink } = useCopyToClipboard();
 
@@ -87,6 +96,31 @@ export default function GamePage() {
     setGameId(gameId);
   }, [gameId, setGameId]);
 
+  // Check if game exists on mount using HTTP API
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkGameExists = async () => {
+      try {
+        const response = await fetch(`/api/game/${gameId}`);
+        if (!cancelled && response.ok) {
+          const data = await response.json();
+          setIsCreatingGame(!data.exists);
+        }
+      } catch {
+        if (!cancelled) {
+          setIsCreatingGame(true);
+        }
+      }
+    };
+
+    checkGameExists();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [gameId]);
+
   const currentUser = users.find((u) => u.id === currentUserId);
   const isCurrentUserSpectator = currentUser?.role === 'spectator';
 
@@ -106,8 +140,26 @@ export default function GamePage() {
     return <Loader />;
   }
 
-  if (!currentUserName) {
-    return <JoinGameForm gameId={gameId} onSubmit={setJoinFormData} />;
+  // If user hasn't joined this game yet, wait for game check and show form
+  if (!hasJoinedThisGame) {
+    if (isCreatingGame === null) {
+      return <Loader />;
+    }
+    return (
+      <JoinGameForm
+        gameId={gameId}
+        onSubmit={(data) => {
+          if (data.cardSet) {
+            setCardSet(data.cardSet);
+          }
+          setJoinFormData(data);
+          setHasJoinedThisGame(true);
+          localStorage.setItem(getHasJoinedKey(gameId), 'true');
+        }}
+        initialName={currentUserName}
+        isCreating={isCreatingGame}
+      />
+    );
   }
 
   const hasAnyVotes = users.some((u) => u.hasVoted);
@@ -143,6 +195,8 @@ export default function GamePage() {
             gameId={gameId}
             selectedVote={selectedVote}
             onVote={handleCardClick}
+            onReveal={handleReveal}
+            onReset={handleReset}
             getAnimationsForUser={getAnimationsForUser}
           />
         </div>

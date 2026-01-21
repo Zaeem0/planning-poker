@@ -6,13 +6,13 @@ import { generateGameId } from '@/lib/game-utils';
 export function CreateGameButton() {
   const router = useRouter();
 
-  const handleClick = () => {
+  const handleCreateGame = () => {
     const newGameId = generateGameId();
     router.push(`/game/${newGameId}`);
   };
 
   return (
-    <button onClick={handleClick} className="create-game-button">
+    <button onClick={handleCreateGame} className="create-game-button">
       Create New Game
     </button>
   );

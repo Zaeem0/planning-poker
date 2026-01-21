@@ -249,7 +249,7 @@ test.describe('Voting', () => {
       await clickRevealVotes(page);
 
       await expect(
-        page.getByRole('button', { name: /new round/i })
+        page.getByRole('button', { name: 'Start New Round', exact: true })
       ).toBeVisible();
       await expect(getRevealButton(page)).not.toBeVisible();
     });
@@ -349,6 +349,34 @@ test.describe('Voting', () => {
       await expect(page.locator('.table-message')).toContainText(
         'Votes revealed!'
       );
+    });
+
+    test('should show start new round button after reveal and reset when clicked', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'NewRoundUser');
+
+      await selectVoteCard(page, 'm');
+      await clickRevealVotes(page);
+
+      await expect(page.locator('.table-message')).toContainText(
+        'Votes revealed!'
+      );
+
+      const tableResetButton = page.locator(
+        '.table-message-container .table-message-reveal-button'
+      );
+      await expect(tableResetButton).toBeVisible();
+
+      await tableResetButton.click();
+
+      await expect(page.locator('.table-message')).toContainText(
+        'Pick your cards!'
+      );
+      await expect(
+        page.locator('.voting-card-small.selected')
+      ).not.toBeVisible();
     });
   });
 });

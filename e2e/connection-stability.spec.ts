@@ -7,6 +7,7 @@ import {
   waitForDisconnectedPlayers,
   waitForAnyDisconnectedPlayer,
   disconnectSocket,
+  disconnectAndReconnectSocket,
   closeContexts,
 } from './utils/test-helpers';
 
@@ -98,13 +99,13 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(alicePage, 2);
       await waitForPlayerCount(bobPage, 2);
 
-      // Manually disconnect Alice's socket
-      await disconnectSocket(alicePage);
+      // Manually disconnect Alice's socket and trigger reconnection after delay
+      await disconnectAndReconnectSocket(alicePage, 1000);
 
       // Bob should see Alice as disconnected
       await waitForAnyDisconnectedPlayer(bobPage);
 
-      // Wait for automatic reconnection (should happen within a few seconds)
+      // Wait for reconnection to complete
       await waitForDisconnectedPlayers(bobPage, 0);
 
       // Verify Alice reconnected successfully
@@ -123,7 +124,7 @@ test.describe('Connection Stability', () => {
       await joinGameAsUser(page, gameId, 'VoteUser');
       await selectVoteCard(page, 'l');
 
-      const voteCard = page.locator('[data-vote="l"]');
+      const voteCard = page.locator('[data-card-value="l"]');
       await expect(voteCard).toHaveClass(/selected/);
 
       // Disconnect and wait for auto-reconnection
@@ -223,8 +224,8 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(alicePage, 2);
       await waitForPlayerCount(bobPage, 2);
 
-      // Disconnect Alice
-      await disconnectSocket(alicePage);
+      // Disconnect Alice and trigger reconnection after delay
+      await disconnectAndReconnectSocket(alicePage, 2000);
       await waitForAnyDisconnectedPlayer(bobPage);
 
       // Charlie joins while Alice is disconnected
@@ -232,8 +233,8 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(bobPage, 3);
       await waitForPlayerCount(charliePage, 3);
 
-      // Wait for Alice to auto-reconnect
-      await alicePage.waitForTimeout(3000);
+      // Wait for Alice's reconnection to complete
+      await alicePage.waitForTimeout(2000);
 
       // Alice should see all 3 users after reconnection
       await waitForPlayerCount(alicePage, 3);
@@ -305,7 +306,7 @@ test.describe('Connection Stability', () => {
 
       // Should be able to vote after reconnections
       await selectVoteCard(alicePage, 's');
-      const voteCard = alicePage.locator('[data-vote="s"]');
+      const voteCard = alicePage.locator('[data-card-value="s"]');
       await expect(voteCard).toHaveClass(/selected/);
 
       await closeContexts(aliceContext, bobContext);

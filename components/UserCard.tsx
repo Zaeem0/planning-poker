@@ -1,5 +1,5 @@
-import { User } from '@/lib/store';
-import { VoteSize, getVoteLabel } from '@/lib/constants';
+import { User, useGameStore } from '@/lib/store';
+import { getVoteLabel, CARD_VALUES } from '@/lib/constants';
 import { EmojiAnimation } from '@/lib/hooks/useEmojiAnimations';
 import { EmojiPicker } from '@/components/EmojiPicker';
 import { EmojiProjectile } from '@/components/EmojiProjectile';
@@ -53,6 +53,8 @@ export function UserCard({
   onThrowEmoji,
 }: UserCardProps) {
   const { hasVoted, connected: isConnected, role, displayName } = user;
+  const { cardSet } = useGameStore();
+  const cards = cardSet?.cards || CARD_VALUES;
   const isDisconnected = !isConnected;
   const isSpectator = role === 'spectator';
 
@@ -84,8 +86,8 @@ export function UserCard({
     if (revealed && vote) {
       return (
         <div className="player-card-content">
-          <span className="player-card-emoji">{getVoteLabel(vote)}</span>
-          {vote !== VoteSize.UNKNOWN && (
+          <span className="player-card-emoji">{getVoteLabel(vote, cards)}</span>
+          {vote !== 'unknown' && (
             <span className="player-card-size">{vote.toUpperCase()}</span>
           )}
         </div>

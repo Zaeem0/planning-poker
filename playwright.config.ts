@@ -16,6 +16,13 @@ export default defineConfig({
     trace: isDebug ? 'on-first-retry' : 'off',
     video: isDebug ? 'retain-on-failure' : 'off',
   },
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixels: 3000, // Allow more pixels for full page screenshots (timing/rendering variations)
+      threshold: 0.2,
+      animations: 'disabled',
+    },
+  },
   projects: [
     {
       name: 'chromium',

@@ -22,11 +22,23 @@ interface User {
   connected: boolean;
 }
 
+interface Card {
+  value: string;
+  label: string;
+  description: string;
+}
+
+interface CardSet {
+  preset: string;
+  cards: Card[];
+}
+
 interface Game {
   users: Map<string, User>;
   votes: Map<string, string>;
   revealed: boolean;
   nextJoinOrder: number;
+  cardSet?: CardSet;
 }
 
 interface UserProfile {
@@ -43,6 +55,7 @@ interface JoinGamePayload {
   userId?: string;
   username?: string;
   isSpectator?: boolean;
+  cardSet?: CardSet;
 }
 
 interface VotePayload {
@@ -68,6 +81,11 @@ interface ThrowEmojiPayload {
 interface ToggleRolePayload {
   gameId: string;
   userId: string;
+}
+
+interface UpdateCardSetPayload {
+  gameId: string;
+  cardSet: CardSet;
 }
 
 // In-memory state
@@ -133,6 +151,23 @@ app.prepare().then(() => {
   const httpServer = createServer(async (req, res) => {
     try {
       const parsedUrl = parse(req.url!, true);
+
+      // API endpoint to check if game exists
+      if (
+        req.method === 'GET' &&
+        parsedUrl.pathname?.startsWith('/api/game/')
+      ) {
+        const gameId = parsedUrl.pathname.split('/api/game/')[1];
+        if (gameId) {
+          const game = games.get(gameId);
+          const exists = !!game && game.users.size > 0;
+          res.setHeader('Content-Type', 'application/json');
+          res.statusCode = 200;
+          res.end(JSON.stringify({ exists, cardSet: game?.cardSet }));
+          return;
+        }
+      }
+
       await handle(req, res, parsedUrl);
     } catch (err) {
       console.error('Error occurred handling', req.url, err);
@@ -170,6 +205,7 @@ app.prepare().then(() => {
         userId: clientUserId,
         username,
         isSpectator,
+        cardSet,
       }: JoinGamePayload) => {
         let userId = clientUserId;
         let finalUsername: string | null = null;
@@ -178,12 +214,15 @@ app.prepare().then(() => {
           userId = generateUserId();
         }
 
-        if (userProfiles.has(userId)) {
-          finalUsername = userProfiles.get(userId)!.displayName;
-        } else if (username) {
+        // If username is provided, always update the profile (allows name changes)
+        if (username) {
           finalUsername = username;
           userProfiles.set(userId, { displayName: finalUsername });
+        } else if (userProfiles.has(userId)) {
+          // Fall back to existing profile if no username provided
+          finalUsername = userProfiles.get(userId)!.displayName;
         } else {
+          // No username provided and no existing profile
           socket.emit('user-joined', {
             userId,
             username: null,
@@ -197,6 +236,11 @@ app.prepare().then(() => {
         socket.join(gameId);
 
         const game = getOrCreateGame(gameId);
+
+        // Set card set if provided and game doesn't have one yet
+        if (cardSet && !game.cardSet) {
+          game.cardSet = cardSet;
+        }
 
         // Preserve join order for reconnecting users, assign new order for first-time joiners
         const hasVoted = game.votes.has(userId);
@@ -239,6 +283,7 @@ app.prepare().then(() => {
           users: sortedUsers,
           votes: votesData,
           revealed: game.revealed,
+          cardSet: game.cardSet,
         });
 
         // Notify other users in the game
@@ -328,6 +373,46 @@ app.prepare().then(() => {
         users: getSortedUsersByJoinOrder(game),
       });
     });
+
+    // Handle card set update
+    socket.on(
+      'update-card-set',
+      ({ gameId, cardSet }: UpdateCardSetPayload) => {
+        const game = games.get(gameId);
+        if (!game) return;
+
+        // Update the game's card set
+        game.cardSet = cardSet;
+
+        // Get valid card values from the new card set
+        const validValues = new Set(cardSet.cards.map((card) => card.value));
+
+        // Clear votes for cards that no longer exist
+        const invalidatedUserIds: string[] = [];
+        game.votes.forEach((vote, oderId) => {
+          if (!validValues.has(vote)) {
+            game.votes.delete(oderId);
+            const user = game.users.get(oderId);
+            if (user) {
+              user.hasVoted = false;
+            }
+            invalidatedUserIds.push(oderId);
+          }
+        });
+
+        // Broadcast card set update with invalidated user IDs
+        io.to(gameId).emit('card-set-updated', { cardSet, invalidatedUserIds });
+
+        // If any votes were invalidated, also broadcast user list update
+        if (invalidatedUserIds.length > 0) {
+          io.to(gameId).emit('user-list-updated', {
+            users: getSortedUsersByJoinOrder(game),
+          });
+        }
+
+        console.log(`Card set updated for game ${gameId}:`, cardSet.preset);
+      }
+    );
 
     // Handle user-active event (sent when tab becomes visible)
     socket.on(
