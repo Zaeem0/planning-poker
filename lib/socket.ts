@@ -25,6 +25,27 @@ function getUserId(): string {
   return userId;
 }
 
+function resolveCardSet(
+  cardSet: CardSet | undefined,
+  gameId: string
+): CardSet | undefined {
+  let resolved = cardSet;
+  if (!resolved && typeof window !== 'undefined') {
+    const saved = localStorage.getItem(`game-${gameId}-cardset`);
+    if (saved) {
+      try {
+        resolved = JSON.parse(saved);
+      } catch {
+        // Ignore parse errors
+      }
+    }
+  }
+  if (resolved && typeof window !== 'undefined') {
+    localStorage.setItem(`game-${gameId}-cardset`, JSON.stringify(resolved));
+  }
+  return resolved;
+}
+
 export function useSocket(
   gameId: string,
   displayName?: string,
@@ -34,6 +55,17 @@ export function useSocket(
 ) {
   const socketRef = useRef<Socket | null>(null);
   const listenersRef = useRef<Set<() => void>>(new Set());
+  const displayNameRef = useRef(displayName);
+  const isSpectatorRef = useRef(isSpectator);
+  const cardSetRef = useRef(cardSet);
+
+  // Update refs in an effect to avoid mutating during render
+  useEffect(() => {
+    displayNameRef.current = displayName;
+    isSpectatorRef.current = isSpectator;
+    cardSetRef.current = cardSet;
+  }, [displayName, isSpectator, cardSet]);
+
   const {
     setCurrentUserId,
     setCurrentUserName,
@@ -82,42 +114,13 @@ export function useSocket(
 
       const userId = getUserId();
 
-      const restoreUserVoteSelection = (
-        votes: { userId: string; vote: string }[],
-        joinedUserId: string
-      ) => {
-        const userVote = getVoteForUser(votes, joinedUserId);
-        if (userVote) setSelectedVote(userVote);
-      };
-
       const joinGame = () => {
-        // Use provided cardSet or load from localStorage
-        let gameCardSet: CardSet | undefined = cardSet;
-
-        if (!gameCardSet && typeof window !== 'undefined') {
-          const savedCardSet = localStorage.getItem(`game-${gameId}-cardset`);
-          if (savedCardSet) {
-            try {
-              gameCardSet = JSON.parse(savedCardSet);
-            } catch {
-              // Ignore parse errors
-            }
-          }
-        }
-
-        // Save cardSet to localStorage if provided
-        if (gameCardSet && typeof window !== 'undefined') {
-          localStorage.setItem(
-            `game-${gameId}-cardset`,
-            JSON.stringify(gameCardSet)
-          );
-        }
-
+        const gameCardSet = resolveCardSet(cardSetRef.current, gameId);
         newSocket.emit('join-game', {
           gameId,
           userId,
-          username: displayName,
-          isSpectator,
+          username: displayNameRef.current,
+          isSpectator: isSpectatorRef.current,
           cardSet: gameCardSet,
         });
       };
@@ -130,17 +133,18 @@ export function useSocket(
           users,
           votes,
           revealed,
-          cardSet,
+          cardSet: serverCardSet,
         }) => {
           setCurrentUserId(joinedUserId);
           setCurrentUserName(username);
           setUsers(users);
           setVotes(votes);
           setRevealed(revealed);
-          if (cardSet) {
-            setCardSet(cardSet);
+          if (serverCardSet) {
+            setCardSet(serverCardSet);
           }
-          restoreUserVoteSelection(votes, joinedUserId);
+          const userVote = getVoteForUser(votes, joinedUserId);
+          setSelectedVote(userVote ?? null);
         }
       );
 
@@ -191,25 +195,23 @@ export function useSocket(
       newSocket.on(
         'card-set-updated',
         ({
-          cardSet,
+          cardSet: updatedCardSet,
           invalidatedUserIds,
         }: {
           cardSet: CardSet;
           invalidatedUserIds?: string[];
         }) => {
-          setCardSet(cardSet);
-          // Clear selected vote if current user's vote was invalidated
+          setCardSet(updatedCardSet);
           if (invalidatedUserIds?.length) {
             const currentUserId = useGameStore.getState().currentUserId;
             if (invalidatedUserIds.includes(currentUserId)) {
               setSelectedVote(null);
             }
           }
-          // Update localStorage
           if (typeof window !== 'undefined') {
             localStorage.setItem(
               `game-${gameId}-cardset`,
-              JSON.stringify(cardSet)
+              JSON.stringify(updatedCardSet)
             );
           }
         }
@@ -229,10 +231,7 @@ export function useSocket(
     };
   }, [
     gameId,
-    displayName,
-    isSpectator,
     shouldConnect,
-    cardSet,
     setCurrentUserId,
     setCurrentUserName,
     setUsers,
@@ -242,6 +241,19 @@ export function useSocket(
     setCardSet,
     reset,
   ]);
+
+  useEffect(() => {
+    if (!displayName || !socketRef.current?.connected) return;
+    const userId = getUserId();
+    const gameCardSet = resolveCardSet(cardSetRef.current, gameId);
+    socketRef.current.emit('join-game', {
+      gameId,
+      userId,
+      username: displayName,
+      isSpectator: isSpectatorRef.current,
+      cardSet: gameCardSet,
+    });
+  }, [gameId, displayName, isSpectator]);
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }

@@ -92,6 +92,7 @@ interface UpdateCardSetPayload {
 const games = new Map<string, Game>();
 const users = new Map<string, UserData>();
 const userProfiles = new Map<string, UserProfile>();
+const disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
 // Helper functions for game state management
 
@@ -234,6 +235,11 @@ app.prepare().then(() => {
         }
 
         socket.join(gameId);
+
+        if (disconnectTimers.has(userId)) {
+          clearTimeout(disconnectTimers.get(userId)!);
+          disconnectTimers.delete(userId);
+        }
 
         const game = getOrCreateGame(gameId);
 
@@ -477,18 +483,23 @@ app.prepare().then(() => {
       const userData = users.get(socket.id);
       if (userData) {
         const { userId, gameId } = userData;
-        const game = games.get(gameId);
-
-        if (game) {
-          markUserAsDisconnected(game, userId);
-
-          // Broadcast updated user list so others see disconnected state
-          io.to(gameId).emit('user-list-updated', {
-            users: getSortedUsersByJoinOrder(game),
-          });
-        }
-
         users.delete(socket.id);
+
+        const timer = setTimeout(() => {
+          disconnectTimers.delete(userId);
+          const game = games.get(gameId);
+          if (!game) return;
+
+          const user = game.users.get(userId);
+          if (user && user.socketId === socket.id) {
+            markUserAsDisconnected(game, userId);
+            io.to(gameId).emit('user-list-updated', {
+              users: getSortedUsersByJoinOrder(game),
+            });
+          }
+        }, 2000);
+
+        disconnectTimers.set(userId, timer);
       }
     });
   });

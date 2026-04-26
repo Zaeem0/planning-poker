@@ -100,7 +100,7 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(bobPage, 2);
 
       // Manually disconnect Alice's socket and trigger reconnection after delay
-      await disconnectAndReconnectSocket(alicePage, 1000);
+      await disconnectAndReconnectSocket(alicePage, 3000);
 
       // Bob should see Alice as disconnected
       await waitForAnyDisconnectedPlayer(bobPage);
@@ -225,7 +225,7 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(bobPage, 2);
 
       // Disconnect Alice and trigger reconnection after delay
-      await disconnectAndReconnectSocket(alicePage, 2000);
+      await disconnectAndReconnectSocket(alicePage, 3000);
       await waitForAnyDisconnectedPlayer(bobPage);
 
       // Charlie joins while Alice is disconnected
