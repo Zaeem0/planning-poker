@@ -150,7 +150,9 @@ export function useSocket(
 
       newSocket.on('connect', () => {
         console.log('Socket connected');
-        joinGame();
+        if (displayNameRef.current) {
+          joinGame();
+        }
       });
 
       newSocket.on('reconnect', (attemptNumber) => {
@@ -244,6 +246,7 @@ export function useSocket(
 
   useEffect(() => {
     if (!displayName || !socketRef.current?.connected) return;
+
     const userId = getUserId();
     const gameCardSet = resolveCardSet(cardSetRef.current, gameId);
     socketRef.current.emit('join-game', {

@@ -9,7 +9,10 @@ import {
   disconnectSocket,
   disconnectAndReconnectSocket,
   closeContexts,
+  getPlayerCard,
 } from './utils/test-helpers';
+
+const RECONNECTION_DELAY_MS = 3000;
 
 test.describe('Connection Stability', () => {
   test.describe('Multiple Simultaneous Connections', () => {
@@ -135,6 +138,38 @@ test.describe('Connection Stability', () => {
       await expect(voteCard).toHaveClass(/selected/);
 
       await closeContexts(context);
+    });
+
+    test('should receive new vote broadcasts after reconnection', async ({
+      browser,
+    }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+
+      await waitForPlayerCount(alicePage, 2);
+      await waitForPlayerCount(bobPage, 2);
+
+      await disconnectAndReconnectSocket(alicePage, RECONNECTION_DELAY_MS);
+
+      await waitForAnyDisconnectedPlayer(bobPage);
+      await waitForDisconnectedPlayers(bobPage, 0);
+
+      const bobCardOnAliceScreen = getPlayerCard(alicePage, 'Bob');
+
+      await selectVoteCard(bobPage, 'm');
+
+      await expect(
+        bobCardOnAliceScreen.locator('.player-card-voted')
+      ).toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
     });
   });
 

@@ -24,18 +24,18 @@ export function getVoteForUser(
 }
 
 export function hasUnanimousVote(votes: Vote[]): boolean {
-  if (votes.length === 0) return false;
+  if (votes.length < 2) return false;
 
   const firstVote = votes[0].vote;
   return votes.every((v) => v.vote === firstVote);
 }
 
 export function getVoteAnalysis(votes: Vote[]): VoteAnalysis {
-  if (votes.length === 0) {
+  if (votes.length < 2) {
     return {
       isUnanimous: false,
       unanimousVote: null,
-      totalVotes: 0,
+      totalVotes: votes.length,
     };
   }
 

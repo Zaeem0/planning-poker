@@ -11,11 +11,14 @@ import {
   waitForAnyDisconnectedPlayer,
   waitForGamePageVisible,
   disconnectSocket,
+  disconnectAndReconnectSocket,
   reopenPageInContext,
   closeContexts,
   getVoteCard,
   getPlayerCard,
 } from './utils/test-helpers';
+
+const SOCKET_RECONNECTION_DELAY_MS = 3000;
 
 test.describe('Persistence', () => {
   test.describe('User ID', () => {
@@ -54,12 +57,27 @@ test.describe('Persistence', () => {
 
     test('should not show join form after reconnection', async ({ page }) => {
       const gameId = generateUniqueGameId();
-      await joinGameAsUser(page, gameId, 'ReconnectUser');
+      const username = 'ReconnectUser';
+      await joinGameAsUser(page, gameId, username);
 
-      await page.reload();
-      await waitForGamePageVisible(page);
+      await disconnectAndReconnectSocket(page, SOCKET_RECONNECTION_DELAY_MS);
 
-      await expect(page.locator('.join-game-form')).not.toBeVisible();
+      await expect
+        .poll(
+          async () =>
+            await page.evaluate(
+              () => window.__TEST_SOCKET__?.connected ?? false
+            ),
+          {
+            timeout: 15000,
+            intervals: [500, 1000, 1000],
+          }
+        )
+        .toBe(true);
+
+      await expect(page.getByText(`${username}(you)`)).toBeVisible();
+      await expect(page.locator('.join-form')).toHaveCount(0);
+      await expect(page.getByPlaceholder('Enter your name')).toHaveCount(0);
     });
   });
 

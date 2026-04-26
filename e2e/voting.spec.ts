@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import {
   generateUniqueGameId,
   joinGameAsUser,
+  joinGameAsSpectator,
   selectVoteCard,
   pressVoteKey,
   pressDeselectKey,
@@ -9,11 +10,16 @@ import {
   clickNewRound,
   navigateToGame,
   waitForJoinFormVisible,
+  waitForPlayerCount,
+  getPersistedUserId,
+  emitSocketEvent,
   getVoteCard,
   getRevealButton,
   getPlayerCard,
   closeContexts,
 } from './utils/test-helpers';
+
+const SERVER_EVENT_PROPAGATION_WAIT_MS = 500;
 
 test.describe('Voting', () => {
   test.describe('Card Selection', () => {
@@ -326,6 +332,84 @@ test.describe('Voting', () => {
 
       await expect(getVoteCard(page, 'm')).toHaveClass(/most-common/);
       await expect(getVoteCard(page, 'l')).not.toHaveClass(/selected/);
+    });
+  });
+
+  test.describe('Server Vote Guards', () => {
+    test('should ignore spectator votes emitted directly over the socket', async ({
+      browser,
+    }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const spectatorContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const spectatorPage = await spectatorContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsSpectator(spectatorPage, gameId, 'Spectator');
+
+      await waitForPlayerCount(alicePage, 2);
+
+      const spectatorUserId = await getPersistedUserId(spectatorPage);
+      const spectatorCardOnAliceScreen = getPlayerCard(alicePage, 'Spectator');
+
+      await emitSocketEvent(spectatorPage, 'vote', {
+        gameId,
+        userId: spectatorUserId,
+        vote: 'm',
+      });
+      await spectatorPage.waitForTimeout(SERVER_EVENT_PROPAGATION_WAIT_MS);
+
+      await expect(
+        spectatorCardOnAliceScreen.locator('.player-card-voted')
+      ).not.toBeVisible();
+      await expect(getRevealButton(alicePage)).toBeDisabled();
+
+      await closeContexts(aliceContext, spectatorContext);
+    });
+
+    test('should ignore votes emitted directly over the socket after reveal', async ({
+      browser,
+    }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+
+      await waitForPlayerCount(alicePage, 2);
+
+      await selectVoteCard(alicePage, 'm');
+      await selectVoteCard(bobPage, 's');
+      await clickRevealVotes(alicePage);
+
+      const aliceUserId = await getPersistedUserId(alicePage);
+      const aliceCardOnBobScreen = getPlayerCard(bobPage, 'Alice');
+      const largeVoteCard = getVoteCard(alicePage, 'l');
+
+      await expect(
+        aliceCardOnBobScreen.locator('.player-card-emoji')
+      ).toContainText('🐶');
+      await expect(largeVoteCard).toHaveClass(/no-votes/);
+
+      await emitSocketEvent(alicePage, 'vote', {
+        gameId,
+        userId: aliceUserId,
+        vote: 'l',
+      });
+      await alicePage.waitForTimeout(SERVER_EVENT_PROPAGATION_WAIT_MS);
+
+      await expect(
+        aliceCardOnBobScreen.locator('.player-card-emoji')
+      ).toContainText('🐶');
+      await expect(largeVoteCard).toHaveClass(/no-votes/);
+
+      await closeContexts(aliceContext, bobContext);
     });
   });
 
