@@ -39,6 +39,7 @@ interface Game {
   revealed: boolean;
   nextJoinOrder: number;
   cardSet?: CardSet;
+  lastActivityAt: number;
 }
 
 interface UserProfile {
@@ -88,6 +89,9 @@ interface UpdateCardSetPayload {
   cardSet: CardSet;
 }
 
+const GAME_CLEANUP_INTERVAL_10_MINUTES_MS = 10 * 60 * 1000;
+const GAME_INACTIVE_THRESHOLD_1_HOUR_MS = 60 * 60 * 1000;
+
 // In-memory state
 const games = new Map<string, Game>();
 const users = new Map<string, UserData>();
@@ -107,9 +111,43 @@ function getOrCreateGame(gameId: string): Game {
       votes: new Map(),
       revealed: false,
       nextJoinOrder: 0,
+      lastActivityAt: Date.now(),
     });
   }
   return games.get(gameId)!;
+}
+
+function updateGameActivity(game: Game): void {
+  game.lastActivityAt = Date.now();
+}
+
+function isUserInAnyGame(userId: string): boolean {
+  return Array.from(games.values()).some((game) => game.users.has(userId));
+}
+
+function cleanupInactiveGames(): void {
+  const now = Date.now();
+
+  games.forEach((game, gameId) => {
+    const allDisconnected = Array.from(game.users.values()).every(
+      (user) => !user.connected
+    );
+    const isInactive =
+      now - game.lastActivityAt > GAME_INACTIVE_THRESHOLD_1_HOUR_MS;
+
+    if (!allDisconnected || !isInactive) {
+      return;
+    }
+
+    const userIds = Array.from(game.users.keys());
+    games.delete(gameId);
+
+    userIds.forEach((userId) => {
+      if (!isUserInAnyGame(userId)) {
+        userProfiles.delete(userId);
+      }
+    });
+  });
 }
 
 function getSortedUsersByJoinOrder(game: Game): User[] {
@@ -242,6 +280,7 @@ app.prepare().then(() => {
         }
 
         const game = getOrCreateGame(gameId);
+        updateGameActivity(game);
 
         // Set card set if provided and game doesn't have one yet
         if (cardSet && !game.cardSet) {
@@ -307,8 +346,13 @@ app.prepare().then(() => {
     socket.on('vote', ({ gameId, userId, vote }: VotePayload) => {
       const game = games.get(gameId);
       if (!game) return;
+      if (game.revealed) return;
+
+      updateGameActivity(game);
 
       const user = game.users.get(userId);
+      if (user?.role === 'spectator') return;
+
       if (vote === null) {
         game.votes.delete(userId);
         if (user) {
@@ -332,6 +376,7 @@ app.prepare().then(() => {
       const game = games.get(gameId);
       if (!game) return;
 
+      updateGameActivity(game);
       game.revealed = true;
 
       // Broadcast all votes to all users
@@ -349,6 +394,7 @@ app.prepare().then(() => {
       const game = games.get(gameId);
       if (!game) return;
 
+      updateGameActivity(game);
       resetUserVotes(game);
 
       io.to(gameId).emit('votes-reset', {
@@ -390,6 +436,8 @@ app.prepare().then(() => {
       ({ gameId, cardSet }: UpdateCardSetPayload) => {
         const game = games.get(gameId);
         if (!game) return;
+
+        updateGameActivity(game);
 
         // Update the game's card set
         game.cardSet = cardSet;
@@ -437,7 +485,7 @@ app.prepare().then(() => {
           user.connected = true;
           user.socketId = socket.id;
 
-          // Update user data mapping
+          socket.join(gameId);
           users.set(socket.id, { userId, gameId });
 
           // If user was disconnected, notify others they're back
@@ -464,7 +512,7 @@ app.prepare().then(() => {
           user.connected = true;
           user.socketId = socket.id;
 
-          // Update user data mapping
+          socket.join(gameId);
           users.set(socket.id, { userId, gameId });
 
           // If user was disconnected, notify others they're back
@@ -503,6 +551,8 @@ app.prepare().then(() => {
       }
     });
   });
+
+  setInterval(cleanupInactiveGames, GAME_CLEANUP_INTERVAL_10_MINUTES_MS);
 
   httpServer
     .once('error', (err) => {

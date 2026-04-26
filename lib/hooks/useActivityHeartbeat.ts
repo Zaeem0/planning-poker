@@ -66,23 +66,22 @@ export function useActivityHeartbeat({
     if (typeof window === 'undefined') return;
 
     const activityEvents = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+    const listenerOptions: AddEventListenerOptions = { passive: true };
 
     const handleActivity = () => {
       sendHeartbeat();
     };
 
-    // Add listeners with passive option for better performance
     activityEvents.forEach((event) => {
-      window.addEventListener(event, handleActivity, { passive: true });
+      window.addEventListener(event, handleActivity, listenerOptions);
     });
 
     return () => {
       activityEvents.forEach((event) => {
-        window.removeEventListener(event, handleActivity);
+        window.removeEventListener(event, handleActivity, listenerOptions);
       });
     };
   }, [socket, gameId, userId, enabled, sendHeartbeat]);
 
   return { sendHeartbeat };
 }
-

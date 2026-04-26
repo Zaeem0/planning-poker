@@ -144,6 +144,21 @@ export async function disconnectSocket(page: Page) {
   });
 }
 
+export async function emitSocketEvent(
+  page: Page,
+  eventName: string,
+  payload: unknown
+) {
+  await page.evaluate(
+    ({ eventName: socketEventName, payload: socketPayload }) => {
+      if (window.__TEST_SOCKET__) {
+        window.__TEST_SOCKET__.emit(socketEventName, socketPayload);
+      }
+    },
+    { eventName, payload }
+  );
+}
+
 export async function disconnectAndReconnectSocket(page: Page, delayMs = 1000) {
   await page.evaluate((delay) => {
     if (window.__TEST_SOCKET__) {

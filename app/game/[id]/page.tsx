@@ -136,11 +136,6 @@ export default function GamePage() {
     onDeselect: handleKeyboardDeselect,
   });
 
-  if (!currentUserId) {
-    return <Loader />;
-  }
-
-  // If user hasn't joined this game yet, wait for game check and show form
   if (!hasJoinedThisGame) {
     if (isCreatingGame === null) {
       return <Loader />;
@@ -160,6 +155,10 @@ export default function GamePage() {
         isCreating={isCreatingGame}
       />
     );
+  }
+
+  if (!currentUserId) {
+    return <Loader />;
   }
 
   const hasAnyVotes = users.some((u) => u.hasVoted);
