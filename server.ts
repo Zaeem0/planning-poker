@@ -250,7 +250,11 @@ app.prepare().then(() => {
           : game.nextJoinOrder++;
 
         const userRole: UserRole =
-          existingUser?.role ?? (isSpectator ? 'spectator' : 'player');
+          isSpectator !== undefined
+            ? isSpectator
+              ? 'spectator'
+              : 'player'
+            : (existingUser?.role ?? 'player');
         game.users.set(userId, {
           id: userId,
           socketId: socket.id,
