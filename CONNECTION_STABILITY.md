@@ -7,80 +7,76 @@ This document describes the comprehensive connection stability solution implemen
 ## Problem Statement
 
 Users were appearing as disconnected when:
+
 - Switching between browser tabs
 - Switching between teams/windows
 - Returning to the app after a period of inactivity
 - Using mobile browsers (which aggressively throttle background tabs)
+- Joining or reconnecting to a game (socket teardown/rebuild cycle)
 
-This happened because browsers throttle background tabs to save resources, causing Socket.IO ping/pong responses to be delayed or missed.
+This happened because browsers throttle background tabs to save resources, causing Socket.IO ping/pong responses to be delayed or missed. Additionally, the client socket was being torn down and recreated whenever user form data changed, causing transient disconnects visible to other players.
 
 ## Solution Components
 
-We implemented a **multi-layered approach** combining four strategies:
+We implemented a **multi-layered approach** combining six strategies:
 
-### 1. ✅ Increased Socket.IO Timeouts
+### 1. Increased Socket.IO Timeouts
 
-**File:** `server.ts` (lines 149-152)
+**File:** `server.ts`
 
-**Changes:**
-- `pingTimeout`: 120s → **240s** (4 minutes)
-- `pingInterval`: 25s → **45s** (45 seconds)
+- `pingTimeout`: **240s** (4 minutes)
+- `pingInterval`: **45s** (45 seconds)
 
-**Why:** Gives more breathing room for throttled tabs to respond to pings before being marked as disconnected.
+Gives more breathing room for throttled tabs to respond to pings before being marked as disconnected.
 
-### 2. ✅ Page Visibility API
+### 2. Stable Socket Connection (Ref Pattern)
+
+**File:** `lib/socket.ts`
+
+The socket connection is kept stable across prop changes by storing `displayName`, `isSpectator`, and `cardSet` in React refs rather than as `useEffect` dependencies. This prevents the socket from being torn down and recreated when form data changes (e.g. when a user submits the join form).
+
+A separate `useEffect` watches for `displayName` changes and emits a `join-game` event on the existing socket instead of creating a new connection. The refs are updated inside an effect to comply with React's rules against mutating refs during render.
+
+### 3. Page Visibility API
 
 **File:** `lib/hooks/usePageVisibility.ts`
 
-**How it works:**
 - Listens for `visibilitychange` events
 - When tab becomes visible, sends a `user-active` event to server
 - Server marks user as connected and notifies other users
 - Includes 1-second debounce to prevent spam from rapid tab switching
 
-**Benefits:**
-- Proactive reconnection when user returns
-- No wasted resources on hidden tabs
-- Works with browser throttling instead of fighting it
-
-### 3. ✅ Activity-Based Heartbeats
+### 4. Activity-Based Heartbeats
 
 **File:** `lib/hooks/useActivityHeartbeat.ts`
 
-**How it works:**
 - Sends heartbeat every 30 seconds (configurable)
-- Also sends heartbeat on user activity:
-  - Mouse clicks (`mousedown`)
-  - Keyboard input (`keydown`)
-  - Touch events (`touchstart`)
-  - Scrolling (`scroll`)
+- Also sends heartbeat on user activity (mousedown, keydown, touchstart, scroll)
 - Includes 5-second debounce to prevent spam
 
-**Benefits:**
-- Proves user is actively using the app
-- Maintains connection during periods of viewing (no interaction)
-- Lightweight and efficient
+### 5. Server-Side Heartbeat Handlers
 
-### 4. ✅ Server-Side Heartbeat Handlers
+**File:** `server.ts`
 
-**File:** `server.ts` (lines 332-384)
+Two event handlers:
 
-**Two event handlers:**
+**`user-active`** (Page Visibility) — Triggered when tab becomes visible. Marks user as connected, updates socket ID mapping, notifies other users if previously disconnected.
 
-#### `user-active` (Page Visibility)
-- Triggered when tab becomes visible
-- Marks user as connected
-- Updates socket ID mapping
-- Notifies other users if user was previously disconnected
+**`heartbeat`** (Activity & Interval) — Triggered periodically and on user activity. Same logic as `user-active`.
 
-#### `heartbeat` (Activity & Interval)
-- Triggered periodically and on user activity
-- Same logic as `user-active`
-- Ensures connection is maintained
+### 6. Server-Side Disconnect Grace Period (Debouncing)
+
+**File:** `server.ts`
+
+When a socket disconnects, the server waits **2 seconds** before broadcasting the disconnected state to other users. If the user reconnects within that window (via `join-game`), the pending timer is cancelled via `clearTimeout` and no disconnect is ever broadcast.
+
+The timer also checks that the `socketId` still matches the disconnected socket, preventing a race condition where a user who already reconnected with a new socket would be incorrectly marked as disconnected.
+
+This absorbs Socket.IO's built-in reconnection cycle (~1 second for first retry) and brief network drops without any UI flicker for other players.
 
 ## Integration
 
-**File:** `app/game/[id]/page.tsx` (lines 71-84)
+**File:** `app/game/[id]/page.tsx`
 
 Both hooks are integrated into the game page:
 
@@ -97,15 +93,16 @@ useActivityHeartbeat({
   gameId,
   userId: currentUserId,
   enabled: !!currentUserName,
-  intervalMs: 30000, // 30 seconds
+  intervalMs: 30000,
 });
 ```
 
-**Enabled only when:** User has joined the game (has a username)
+Enabled only when user has joined the game (has a username).
 
 ## How It Works Together
 
 ### Scenario 1: User Switches Tabs
+
 1. Browser throttles the background tab
 2. Socket.IO pings may be delayed
 3. **4-minute timeout** prevents premature disconnection
@@ -113,57 +110,80 @@ useActivityHeartbeat({
 5. User immediately marked as connected
 
 ### Scenario 2: User is Inactive but Viewing
+
 1. User is reading/thinking (no interaction)
 2. **Interval heartbeat** (every 30s) maintains connection
 3. Server knows user is still there
 4. No false disconnection
 
 ### Scenario 3: User is Actively Voting
+
 1. User clicks cards, types, scrolls
 2. **Activity heartbeat** sends on each interaction
 3. Connection constantly refreshed
 4. Guaranteed to stay connected
 
 ### Scenario 4: Mobile Browser Background
+
 1. Mobile browser aggressively throttles
 2. **4-minute timeout** gives maximum grace period
 3. When app returns to foreground, **Page Visibility API** reconnects
 4. Seamless experience for mobile users
 
+### Scenario 5: User Joins or Reconnects
+
+1. User submits join form or socket reconnects
+2. **Stable socket** stays connected — no teardown/rebuild
+3. `join-game` emitted on existing socket
+4. **Grace period** absorbs any transient drops
+5. Other users never see a disconnect flash
+
 ## Performance Considerations
 
 ### Network Traffic
+
 - **Heartbeat interval:** 30 seconds (configurable)
 - **Activity debounce:** 5 seconds minimum between heartbeats
 - **Visibility debounce:** 1 second minimum between events
 - **Result:** Minimal network overhead (~2 events/minute during activity)
 
 ### Server Load
+
 - Heartbeat handlers are lightweight (simple user lookup and update)
+- Disconnect timers are simple `setTimeout`/`clearTimeout` pairs
 - No database queries or heavy operations
 - Scales well with many concurrent users
 
 ## Testing
 
-The existing E2E tests in `e2e/persistence.spec.ts` cover disconnect scenarios:
-- `should show disconnected state for offline users`
-- `should maintain users after reconnection`
+E2E tests covering disconnect/reconnect scenarios:
 
-These tests verify that the disconnect/reconnect flow works correctly.
+**`e2e/connection-stability.spec.ts`:**
+
+- Automatic reconnection after temporary disconnection
+- Vote preservation after reconnection
+- User list sync after reconnection
+- Revealed state maintenance after reconnection
+- Multiple rapid disconnects and reconnects
+- Tab switching simulation
+
+**`e2e/persistence.spec.ts`:**
+
+- Disconnected state for offline users
+- User maintenance after reconnection
 
 ## Configuration
 
 ### Adjusting Heartbeat Interval
 
 In `app/game/[id]/page.tsx`:
+
 ```typescript
 useActivityHeartbeat({
-  // ...
   intervalMs: 30000, // Change this value (in milliseconds)
 });
 ```
 
-**Recommendations:**
 - **Development:** 30000 (30 seconds)
 - **Production:** 30000-60000 (30-60 seconds)
 - **High-traffic:** 60000 (1 minute) to reduce server load
@@ -171,25 +191,18 @@ useActivityHeartbeat({
 ### Adjusting Server Timeouts
 
 In `server.ts`:
+
 ```typescript
-pingTimeout: 240000, // Increase for more tolerance
-pingInterval: 45000, // Increase to reduce ping frequency
+pingTimeout: 240000,  // Increase for more tolerance
+pingInterval: 45000,  // Increase to reduce ping frequency
 ```
 
-## Monitoring
+### Adjusting Disconnect Grace Period
 
-Server logs will show:
-- `Tab became visible - sending heartbeat` (client-side)
-- `User became active: [userId] in game: [gameId]` (server-side)
-- `User heartbeat restored connection: [userId]` (server-side)
+In `server.ts`:
 
-Monitor these logs to understand reconnection patterns.
+```typescript
+}, 2000); // Delay in ms before broadcasting disconnect
+```
 
-## Future Improvements
-
-Potential enhancements:
-1. **Adaptive heartbeat intervals** based on user activity patterns
-2. **Connection quality indicators** in the UI
-3. **Reconnection notifications** for users
-4. **Analytics** on disconnection/reconnection events
-
+Must be greater than Socket.IO's `reconnectionDelay` (default 1000ms) to absorb automatic retries.

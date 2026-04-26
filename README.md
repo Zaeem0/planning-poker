@@ -81,6 +81,10 @@ planning-poker/
 │   ├── EmojiProjectile.tsx    # Emoji animation component
 │   ├── GameHeader.tsx         # Header with controls
 │   ├── GameControls.tsx       # Reveal/Reset buttons
+│   ├── GameSettingsButton.tsx # Game settings dropdown menu
+│   ├── RoleToggle.tsx         # Player/Spectator role switch
+│   ├── ThemeToggle.tsx        # Light/Dark mode switch
+│   ├── CardSetSelector.tsx    # Voting scale selection
 │   ├── CreateGameButton.tsx   # Shared create game button
 │   ├── JoinGameForm.tsx       # Join game form
 │   ├── GitInfo.tsx            # Git commit info display
@@ -99,6 +103,9 @@ planning-poker/
 │   │   ├── useEmojiAnimations.ts    # Emoji throwing animations
 │   │   ├── useKeyboardVoting.ts     # Keyboard shortcuts
 │   │   ├── useGameActions.ts        # Game action handlers
+│   │   ├── usePageVisibility.ts     # Tab visibility tracking
+│   │   ├── useActivityHeartbeat.ts  # Idle detection & pings
+│   │   ├── useUnanimousChime.ts     # Audio feedback for reveals
 │   │   └── useCopyToClipboard.ts    # Clipboard functionality
 │   ├── store.ts               # Zustand state management
 │   ├── socket.ts              # Socket.io client hooks
@@ -108,6 +115,8 @@ planning-poker/
 │   ├── game-utils.ts          # Game ID generation
 │   └── clipboard.ts           # Clipboard helper
 ├── e2e/
+│   ├── connection-stability.spec.ts # Reconnect & timeout tests
+│   ├── role-switching.spec.ts       # Spectator/Player toggle tests
 │   ├── voting.spec.ts         # Voting E2E tests
 │   ├── multi-user-sync.spec.ts # Multi-user E2E tests
 │   ├── persistence.spec.ts    # Persistence E2E tests
