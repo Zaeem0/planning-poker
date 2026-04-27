@@ -11,15 +11,34 @@
 
 html {
   font-family:
+    'Inter',
     system-ui,
     -apple-system,
     sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
 body {
   background: $dark-bg;
+  background-image:
+    radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      rgba($primary, 0.25),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 50% at 100% 80%,
+      rgba($gradient-end, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 40% 40% at 0% 60%,
+      rgba($accent, 0.08),
+      transparent 70%
+    );
   color: $text-primary;
   min-height: 100vh;
 }
@@ -27,6 +46,11 @@ body {
 button,
 input {
   font-family: inherit;
+}
+
+::selection {
+  background: rgba($primary, 0.3);
+  color: $white;
 }
 
 .git-info {

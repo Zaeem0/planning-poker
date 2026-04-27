@@ -11,8 +11,20 @@
 
 .home-content {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   position: relative;
+  animation: fadeInUp 0.6s $transition-smooth;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .home-theme-toggle {
@@ -27,14 +39,24 @@
 }
 
 .home-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: $text-primary;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(
+    135deg,
+    $text-primary 0%,
+    $primary-hover 50%,
+    $accent 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 0.5rem;
+  letter-spacing: -0.03em;
 }
 
 .home-subtitle {
   color: $text-secondary;
+  font-size: 1.05rem;
 }
 
 .home-card {
@@ -58,14 +80,16 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: $dark-border;
+    background: linear-gradient(90deg, transparent, $glass-border, transparent);
   }
 }
 
 .home-divider-text {
   padding: 0 1rem;
   color: $text-muted;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .home-form {
@@ -81,9 +105,11 @@
 }
 
 .home-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: $text-secondary;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: $text-muted;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .home-input {
@@ -101,5 +127,6 @@
   text-align: center;
   margin-top: 1.75rem;
   color: $text-muted;
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
 }

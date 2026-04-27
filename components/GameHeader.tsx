@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Socket } from 'socket.io-client';
 import { GameControls } from '@/components/GameControls';
 import { CreateGameButton } from '@/components/CreateGameButton';
@@ -44,7 +45,11 @@ export function GameHeader({
         <CreateGameButton />
         <GameSettingsButton socket={socket} gameId={gameId} />
       </div>
-      <h1 className="game-header-title">Planning Poker</h1>
+      <h1 className="game-header-title">
+        <Link href="/" className="game-header-title-link">
+          Planning Poker
+        </Link>
+      </h1>
       <div className="game-header-right">
         <GameControls
           revealed={revealed}

@@ -4,18 +4,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: $dark-bg-elevated;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 0.5rem;
   border-radius: $radius;
-  border: 1px solid $dark-border;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.25s $transition-smooth;
   color: $text-muted;
 
   &:hover {
-    background: $dark-bg-hover;
-    border-color: $dark-border-light;
-    color: $text-secondary;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba($primary, 0.3);
+    color: $text-primary;
+    box-shadow: 0 0 15px rgba($primary, 0.1);
   }
 
   svg {
@@ -30,25 +33,54 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
+  animation: overlayFadeIn 0.2s ease;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .game-settings-dialog {
-  background: $dark-bg-elevated;
-  border-radius: 1rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  background: $glass-card-bg;
+  backdrop-filter: blur($glass-blur);
+  -webkit-backdrop-filter: blur($glass-blur);
+  border-radius: $radius-xl;
+  box-shadow:
+    $shadow-lg,
+    0 0 60px rgba($primary, 0.08);
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid $dark-border;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  animation: dialogSlideIn 0.3s $transition-smooth;
+}
+
+@keyframes dialogSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .game-settings-dialog-header {
@@ -56,28 +88,32 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid $dark-border;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .game-settings-dialog-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.35rem;
+  font-weight: 700;
   margin: 0;
-  color: $text-primary;
+  background: linear-gradient(135deg, $text-primary, $primary-hover);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
 }
 
 .game-settings-dialog-close {
   padding: 0.5rem;
   border: none;
   background: transparent;
-  color: $text-secondary;
+  color: $text-muted;
   font-size: 1.5rem;
   cursor: pointer;
   border-radius: $radius;
-  transition: all 0.2s ease;
+  transition: all 0.25s $transition-smooth;
 
   &:hover {
-    background: $dark-bg-hover;
+    background: rgba(255, 255, 255, 0.08);
     color: $text-primary;
   }
 }
@@ -93,23 +129,23 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1.5rem;
-  border-top: 1px solid $dark-border;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .game-settings-dialog-cancel {
   padding: 0.75rem 1.5rem;
-  border: 1px solid $dark-border;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: $radius;
-  background: $dark-bg;
+  background: transparent;
   color: $text-primary;
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s $transition-smooth;
 
   &:hover {
-    background: $dark-bg-hover;
-    border-color: $text-primary;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 }
 
@@ -117,15 +153,20 @@
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: $radius;
-  background: $primary;
+  background: linear-gradient(135deg, $primary, $gradient-end);
   color: $white;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s $transition-smooth;
 
   &:hover {
-    background: $primary-light;
-    transform: scale(1.02);
+    box-shadow: 0 4px 30px $primary-glow;
+    transform: translateY(-2px);
+    filter: brightness(1.15);
+  }
+
+  &:active {
+    transform: translateY(0) scale(0.97);
   }
 }

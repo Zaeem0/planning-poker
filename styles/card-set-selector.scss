@@ -8,7 +8,7 @@
 
 .card-set-selector-divider {
   height: 1px;
-  background: $dark-border;
+  background: $glass-border;
   margin: 0.5rem 0;
 }
 
@@ -31,25 +31,27 @@
 
 .card-set-preset-button {
   padding: 0.75rem 1rem;
-  border: 1px solid $dark-border;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: $radius;
-  background: $dark-bg-elevated;
+  background: rgba(255, 255, 255, 0.04);
   color: $text-primary;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms;
+  transition: all 0.25s $transition-smooth;
   text-align: center;
 
   &:hover:not(.selected) {
-    background: $dark-bg-hover;
-    border-color: $primary;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba($primary, 0.5);
+    box-shadow: 0 0 15px rgba($primary, 0.1);
   }
 
   &.selected {
-    background: $primary;
+    background: linear-gradient(135deg, $primary, $gradient-end);
     color: $white;
-    border-color: $primary;
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px $primary-glow;
   }
 }
 
@@ -69,10 +71,10 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.875rem;
-  background: $dark-bg;
-  border: 1px solid $dark-border;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: $radius;
-  animation: fadeIn 0.2s ease;
+  animation: fadeIn 0.25s $transition-smooth;
 }
 
 .card-set-editor-header {
@@ -87,15 +89,15 @@
   width: 1.75rem;
   height: 1.75rem;
   padding: 0;
-  border: 1px solid $dark-border;
-  border-radius: 4px;
-  background: $dark-bg-elevated;
+  border: 1px solid $glass-border;
+  border-radius: 6px;
+  background: $glass-bg;
   color: $text-secondary;
   cursor: pointer;
-  transition: all 150ms;
+  transition: all 0.25s $transition-smooth;
 
   &:hover {
-    background: $dark-bg-hover;
+    background: $glass-bg-hover;
     border-color: $primary;
     color: $primary;
   }
@@ -111,9 +113,9 @@
 .card-set-editor-card {
   width: 68px;
   height: 84px;
-  background: $dark-bg-elevated;
-  border: 1px solid $dark-border;
-  border-radius: 6px;
+  background: $glass-card-bg;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -121,7 +123,7 @@
   gap: 0.25rem;
   position: relative;
   cursor: grab;
-  transition: all 150ms;
+  transition: all 0.25s $transition-smooth;
 
   &:active {
     cursor: grabbing;
@@ -191,8 +193,8 @@
   line-height: 1.2;
   text-align: center;
   background: transparent;
-  border: 1px dashed $dark-border;
-  color: $slate-500;
+  border: 1px dashed $glass-border;
+  color: $text-muted;
   outline: none;
   width: 85%;
   padding: 0.25rem;
@@ -224,11 +226,11 @@
 .card-set-editor-card-value {
   font-size: 0.625rem;
   font-weight: 600;
-  color: $slate-500;
+  color: $text-muted;
   text-transform: uppercase;
   text-align: center;
   background: transparent;
-  border: 1px dashed $dark-border;
+  border: 1px dashed $glass-border;
   outline: none;
   width: 85%;
   padding: 0.125rem;
@@ -273,7 +275,7 @@
   justify-content: center;
   border: none;
   border-radius: 50%;
-  background: rgba($dark-border, 0.5);
+  background: rgba(255, 255, 255, 0.08);
   color: $text-secondary;
   font-size: 0.5rem;
   cursor: pointer;
@@ -299,21 +301,22 @@
   align-items: center;
   justify-content: center;
   padding: 0.75rem 0.5rem;
-  border: 2px dashed $dark-border;
-  border-radius: $radius;
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
   background: transparent;
-  color: $text-secondary;
+  color: $text-muted;
   font-size: 1.5rem;
   font-weight: 300;
   cursor: pointer;
-  transition: all 150ms;
+  transition: all 0.25s $transition-smooth;
   min-width: 68px;
   min-height: 84px;
 
   &:hover {
-    background: $primary;
-    border-color: $primary;
+    background: linear-gradient(135deg, $primary, $gradient-end);
+    border-color: transparent;
     border-style: solid;
     color: $white;
+    box-shadow: 0 4px 25px $primary-glow;
   }
 }
