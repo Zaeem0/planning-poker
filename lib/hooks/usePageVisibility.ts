@@ -35,9 +35,8 @@ export function usePageVisibility({
       if (now - lastVisibilityChangeRef.current < 1000) return;
       lastVisibilityChangeRef.current = now;
 
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && socket.connected) {
         console.log('Tab became visible - sending heartbeat');
-        // User returned to tab - send heartbeat to ensure connection
         socket.emit('user-active', { gameId, userId });
       }
     };
@@ -49,4 +48,3 @@ export function usePageVisibility({
     };
   }, [socket, gameId, userId, enabled]);
 }
-

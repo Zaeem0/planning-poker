@@ -188,17 +188,6 @@ export async function closeContexts(...contexts: BrowserContext[]) {
   }
 }
 
-export async function createTwoUserSession(browser: {
-  newContext: () => Promise<BrowserContext>;
-}) {
-  const aliceContext = await browser.newContext();
-  const bobContext = await browser.newContext();
-  const alicePage = await aliceContext.newPage();
-  const bobPage = await bobContext.newPage();
-
-  return { aliceContext, bobContext, alicePage, bobPage };
-}
-
 export function getVoteCard(page: Page, size: string) {
   return page.locator(`[data-card-size="${size}"]`);
 }
@@ -207,18 +196,6 @@ export function getRevealButton(page: Page) {
   return page.getByRole('button', { name: 'Reveal Votes', exact: true });
 }
 
-export function getNewRoundButton(page: Page) {
-  return page.getByRole('button', { name: /new round/i });
-}
-
 export function getPlayerCard(page: Page, username: string) {
   return page.locator('.table-player').filter({ hasText: username });
-}
-
-export function getVotedIndicator(page: Page, username: string) {
-  return getPlayerCard(page, username).locator('.player-card-voted');
-}
-
-export function getRevealedCard(page: Page, username: string) {
-  return getPlayerCard(page, username).locator('.player-card-revealed');
 }

@@ -46,6 +46,24 @@ function resolveCardSet(
   return resolved;
 }
 
+/**
+ * JOIN-GAME RULES
+ *
+ * There are two scenarios that send a 'join-game' event to the server:
+ *
+ * 1. CONNECT/RECONNECT — the socket's 'connect' event fires.
+ *    This always sends join-game, even without a displayName.
+ *    The server resolves the username from its stored profile using the userId.
+ *    This handles: initial page load (returning user), page refresh, tab reconnect.
+ *
+ * 2. DISPLAY NAME CHANGE — the displayName prop changes while already connected.
+ *    This happens when: the user submits the join form, or toggles spectator mode.
+ *    It sends join-game with the new displayName so the server updates the profile.
+ *
+ * DEDUP: When both fire at the same time (user has a displayName when the socket
+ * first connects), the connect handler sets `skipNextDisplayNameJoin` to prevent
+ * the displayName effect from sending a duplicate join-game.
+ */
 export function useSocket(
   gameId: string,
   displayName?: string,
@@ -58,8 +76,8 @@ export function useSocket(
   const displayNameRef = useRef(displayName);
   const isSpectatorRef = useRef(isSpectator);
   const cardSetRef = useRef(cardSet);
+  const skipNextDisplayNameJoinRef = useRef(false);
 
-  // Update refs in an effect to avoid mutating during render
   useEffect(() => {
     displayNameRef.current = displayName;
     isSpectatorRef.current = isSpectator;
@@ -74,7 +92,6 @@ export function useSocket(
     setRevealed,
     setSelectedVote,
     setCardSet,
-    reset,
   } = useGameStore();
 
   const subscribe = (callback: () => void) => {
@@ -88,138 +105,139 @@ export function useSocket(
     return socketRef.current;
   };
 
+  // --- Socket lifecycle effect: create, connect, listen, cleanup ---
   useEffect(() => {
     if (!gameId || !shouldConnect) return;
 
     const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || '';
     const listeners = listenersRef.current;
-    const connectionDelay = Math.random() * 1000;
+    const userId = getUserId();
 
-    const connectTimer = setTimeout(() => {
-      const newSocket = io(socketUrl, {
-        path: '/socket.io',
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 20000,
-        transports: ['websocket', 'polling'],
+    const emitJoinGame = (socket: Socket) => {
+      socket.emit('join-game', {
+        gameId,
+        userId,
+        username: displayNameRef.current,
+        isSpectator: isSpectatorRef.current,
+        cardSet: resolveCardSet(cardSetRef.current, gameId),
       });
+    };
 
-      socketRef.current = newSocket;
-      if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
-        window.__TEST_SOCKET__ = newSocket;
-      }
-      listeners.forEach((listener) => listener());
+    const newSocket = io(socketUrl, {
+      path: '/socket.io',
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      timeout: 20000,
+      transports: ['websocket', 'polling'],
+    });
 
-      const userId = getUserId();
+    socketRef.current = newSocket;
+    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_TEST_MODE) {
+      window.__TEST_SOCKET__ = newSocket;
+    }
+    listeners.forEach((listener) => listener());
 
-      const joinGame = () => {
-        const gameCardSet = resolveCardSet(cardSetRef.current, gameId);
-        newSocket.emit('join-game', {
-          gameId,
-          userId,
-          username: displayNameRef.current,
-          isSpectator: isSpectatorRef.current,
-          cardSet: gameCardSet,
-        });
-      };
-
-      newSocket.on(
-        'user-joined',
-        ({
-          userId: joinedUserId,
-          username,
-          users,
-          votes,
-          revealed,
-          cardSet: serverCardSet,
-        }) => {
-          setCurrentUserId(joinedUserId);
-          setCurrentUserName(username);
-          setUsers(users);
-          setVotes(votes);
-          setRevealed(revealed);
-          if (serverCardSet) {
-            setCardSet(serverCardSet);
-          }
-          const userVote = getVoteForUser(votes, joinedUserId);
-          setSelectedVote(userVote ?? null);
-        }
-      );
-
-      newSocket.on('connect', () => {
-        console.log('Socket connected');
-        joinGame();
-      });
-
-      newSocket.on('reconnect', (attemptNumber) => {
-        console.log('Reconnected after', attemptNumber, 'attempts');
-        joinGame();
-      });
-
-      newSocket.on('disconnect', (reason) => {
-        console.log('Socket disconnected:', reason);
-      });
-
-      newSocket.on('connect_error', (error) => {
-        console.error('Connection error:', error.message);
-      });
-
-      newSocket.on('reconnect_error', (error) => {
-        console.error('Reconnection error:', error.message);
-      });
-
-      newSocket.on('reconnect_failed', () => {
-        console.error('Failed to reconnect after all attempts');
-      });
-
-      newSocket.on('error', (error) => {
-        console.error('Socket error:', error);
-      });
-
-      newSocket.on('user-list-updated', ({ users }) => {
+    newSocket.on(
+      'user-joined',
+      ({
+        userId: joinedUserId,
+        username,
+        users,
+        votes,
+        revealed,
+        cardSet: serverCardSet,
+      }) => {
+        setCurrentUserId(joinedUserId);
+        setCurrentUserName(username);
         setUsers(users);
-      });
-
-      newSocket.on('votes-revealed', ({ votes, revealed }) => {
         setVotes(votes);
         setRevealed(revealed);
-      });
+        if (serverCardSet) {
+          setCardSet(serverCardSet);
+        }
+        const userVote = getVoteForUser(votes, joinedUserId);
+        setSelectedVote(userVote ?? null);
+      }
+    );
 
-      newSocket.on('votes-reset', ({ users }) => {
-        reset();
-        setUsers(users);
-      });
+    // Scenario 1: connect/reconnect — always join, server resolves username from profile
+    newSocket.on('connect', () => {
+      console.log('Socket connected');
+      skipNextDisplayNameJoinRef.current = !!displayNameRef.current;
+      emitJoinGame(newSocket);
+    });
 
-      newSocket.on(
-        'card-set-updated',
-        ({
-          cardSet: updatedCardSet,
-          invalidatedUserIds,
-        }: {
-          cardSet: CardSet;
-          invalidatedUserIds?: string[];
-        }) => {
-          setCardSet(updatedCardSet);
-          if (invalidatedUserIds?.length) {
-            const currentUserId = useGameStore.getState().currentUserId;
-            if (invalidatedUserIds.includes(currentUserId)) {
-              setSelectedVote(null);
-            }
-          }
-          if (typeof window !== 'undefined') {
-            localStorage.setItem(
-              `game-${gameId}-cardset`,
-              JSON.stringify(updatedCardSet)
-            );
+    newSocket.on('disconnect', (reason) => {
+      console.log('Socket disconnected:', reason);
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Connection error:', error.message);
+    });
+
+    newSocket.io.on('reconnect', (attemptNumber) => {
+      console.log('Reconnected after', attemptNumber, 'attempts');
+    });
+
+    newSocket.io.on('reconnect_error', (error) => {
+      console.error('Reconnection error:', error.message);
+    });
+
+    newSocket.io.on('reconnect_failed', () => {
+      console.error('Failed to reconnect after all attempts');
+    });
+
+    newSocket.on('error', (error) => {
+      console.error('Socket error:', error);
+    });
+
+    newSocket.on('user-list-updated', ({ users }) => {
+      setUsers(users);
+    });
+
+    newSocket.on('votes-revealed', ({ votes, revealed }) => {
+      setVotes(votes);
+      setRevealed(revealed);
+    });
+
+    newSocket.on('votes-reset', ({ users }) => {
+      useGameStore.setState({
+        selectedVote: null,
+        votes: [],
+        revealed: false,
+        users,
+      });
+    });
+
+    newSocket.on(
+      'card-set-updated',
+      ({
+        cardSet: updatedCardSet,
+        invalidatedUserIds,
+      }: {
+        cardSet: CardSet;
+        invalidatedUserIds?: string[];
+      }) => {
+        setCardSet(updatedCardSet);
+        if (invalidatedUserIds?.length) {
+          const currentUserId = useGameStore.getState().currentUserId;
+          if (invalidatedUserIds.includes(currentUserId)) {
+            setSelectedVote(null);
           }
         }
-      );
-    }, connectionDelay);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(
+            `game-${gameId}-cardset`,
+            JSON.stringify(updatedCardSet)
+          );
+        }
+      }
+    );
 
     return () => {
-      clearTimeout(connectTimer);
+      skipNextDisplayNameJoinRef.current = false;
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -239,24 +257,31 @@ export function useSocket(
     setRevealed,
     setSelectedVote,
     setCardSet,
-    reset,
   ]);
 
+  // --- Scenario 2: displayName/role changed while already connected ---
   useEffect(() => {
     if (!displayName || !socketRef.current?.connected) return;
 
-    const userId = getUserId();
-    const gameCardSet = resolveCardSet(cardSetRef.current, gameId);
+    if (skipNextDisplayNameJoinRef.current) {
+      skipNextDisplayNameJoinRef.current = false;
+      return;
+    }
+
     socketRef.current.emit('join-game', {
       gameId,
-      userId,
+      userId: getUserId(),
       username: displayName,
       isSpectator: isSpectatorRef.current,
-      cardSet: gameCardSet,
+      cardSet: resolveCardSet(cardSetRef.current, gameId),
     });
   }, [gameId, displayName, isSpectator]);
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
+function isConnected(socket: Socket | null): socket is Socket {
+  return socket !== null && socket.connected;
 }
 
 export function emitVote(
@@ -265,19 +290,19 @@ export function emitVote(
   userId: string,
   vote: string | null
 ) {
-  if (socket) {
+  if (isConnected(socket)) {
     socket.emit('vote', { gameId, userId, vote });
   }
 }
 
 export function emitReveal(socket: Socket | null, gameId: string) {
-  if (socket) {
+  if (isConnected(socket)) {
     socket.emit('reveal-votes', { gameId });
   }
 }
 
 export function emitReset(socket: Socket | null, gameId: string) {
-  if (socket) {
+  if (isConnected(socket)) {
     socket.emit('reset-votes', { gameId });
   }
 }
@@ -288,7 +313,7 @@ export function emitThrowEmoji(
   targetUserId: string,
   emoji: string
 ) {
-  if (socket) {
+  if (isConnected(socket)) {
     socket.emit('throw-emoji', { gameId, targetUserId, emoji });
   }
 }
@@ -298,27 +323,7 @@ export function emitToggleRole(
   gameId: string,
   userId: string
 ) {
-  if (socket) {
+  if (isConnected(socket)) {
     socket.emit('toggle-role', { gameId, userId });
-  }
-}
-
-export function emitUserActive(
-  socket: Socket | null,
-  gameId: string,
-  userId: string
-) {
-  if (socket) {
-    socket.emit('user-active', { gameId, userId });
-  }
-}
-
-export function emitHeartbeat(
-  socket: Socket | null,
-  gameId: string,
-  userId: string
-) {
-  if (socket) {
-    socket.emit('heartbeat', { gameId, userId });
   }
 }
