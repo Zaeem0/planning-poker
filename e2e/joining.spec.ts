@@ -96,6 +96,36 @@ test.describe('Joining a Game', () => {
 
       await closeContexts(context);
     });
+
+    test('should not bounce back to form when creating game after initial connection', async ({
+      browser,
+    }) => {
+      const context = await browser.newContext();
+      const page = await context.newPage();
+
+      const gameId = generateUniqueGameId();
+      await navigateToGame(page, gameId);
+      await waitForJoinFormVisible(page);
+
+      // Wait for initial socket connection and empty user-joined event to process
+      // This reproduces the scenario where currentUserId is populated but currentUserName is not
+      await page.waitForTimeout(1500);
+
+      const username = 'SlowJoinedUser';
+      await page.getByPlaceholder('Enter your name').fill(username);
+      await page.getByRole('button', { name: 'Create Game' }).click();
+
+      // Should go to game page and stay there
+      await expect(page.locator('.game-page')).toBeVisible();
+      await expect(page.getByText(`${username}(you)`)).toBeVisible();
+
+      // Wait a bit to ensure it doesn't bounce back
+      await page.waitForTimeout(500);
+      await expect(page.locator('.join-form')).not.toBeVisible();
+      await expect(page.locator('.game-page')).toBeVisible();
+
+      await closeContexts(context);
+    });
   });
 
   test.describe('Username Validation', () => {

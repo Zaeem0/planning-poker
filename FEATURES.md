@@ -236,6 +236,11 @@ Game State (In-Memory)
    - Vote restored
    - UI state synchronized
 
+5. **Server Restarts & Zombie Sessions:**
+   - If the server restarts and clears session memory, the client detects the mismatch
+   - Client safely redirects user back to the Join form instead of hanging
+   - Prevents "Zombie Sessions" while maintaining smooth reconnection flows
+
 ### Benefits
 
 - ✅ Seamless page refreshes

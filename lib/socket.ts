@@ -150,9 +150,7 @@ export function useSocket(
 
       newSocket.on('connect', () => {
         console.log('Socket connected');
-        if (displayNameRef.current) {
-          joinGame();
-        }
+        joinGame();
       });
 
       newSocket.on('reconnect', (attemptNumber) => {

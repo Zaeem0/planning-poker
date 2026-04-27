@@ -74,6 +74,19 @@ The timer also checks that the `socketId` still matches the disconnected socket,
 
 This absorbs Socket.IO's built-in reconnection cycle (~1 second for first retry) and brief network drops without any UI flicker for other players.
 
+### 7. Unconditional Rejoining on Refresh
+
+**File:** `lib/socket.ts`
+
+When a returning user refreshes the page, their React state (including their `displayName`) is cleared. However, the socket connection must still be established and emit a `join-game` event. By unconditionally emitting the `join-game` event even when `displayName` is empty, the server can use the client's `userId` (persisted in `localStorage`) to look up their session from its `userProfiles` memory mapping and immediately restore their session in the room without requiring them to re-enter their name.
+
+### 8. Zombie Session Recovery
+
+**File:** `app/game/[id]/page.tsx`
+
+In the event of a server restart or cache clear, the server loses all memory of the user's session (`userProfiles` is wiped). If a user then refreshes their page, their local state (`hasJoinedThisGame = true`) will cause the app to attempt to load the game directly, bypassing the join form. However, because the server has forgotten them, it will reply to the `join-game` event with an empty username.
+To handle this, a `useEffect` acts as a zombie session detector. If the user's client thinks it has joined, but the server's response confirms they have no name (and no name was just entered locally), the client resets its `hasJoinedThisGame` state and removes the `localStorage` token. This safely bumps the user back to the `JoinGameForm`.
+
 ## Integration
 
 **File:** `app/game/[id]/page.tsx`

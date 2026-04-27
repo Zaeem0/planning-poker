@@ -121,6 +121,29 @@ export default function GamePage() {
     };
   }, [gameId]);
 
+  useEffect(() => {
+    // If the server tells us we don't have a name (e.g. server restarted or session lost)
+    // and we don't have a locally typed name, but we thought we had joined,
+    // reset the join state so the form appears
+    if (
+      hasJoinedThisGame &&
+      currentUserId &&
+      !currentUserName &&
+      !joinFormData?.displayName
+    ) {
+      setTimeout(() => {
+        setHasJoinedThisGame(false);
+        localStorage.removeItem(getHasJoinedKey(gameId));
+      }, 0);
+    }
+  }, [
+    hasJoinedThisGame,
+    currentUserId,
+    currentUserName,
+    gameId,
+    joinFormData?.displayName,
+  ]);
+
   const currentUser = users.find((u) => u.id === currentUserId);
   const isCurrentUserSpectator = currentUser?.role === 'spectator';
 
