@@ -54,13 +54,13 @@ export function JoinGameForm({
           Game ID: <span className="join-game-id">{gameId}</span>
         </p>
 
-        <form className="join-form" onSubmit={handleSubmit}>
+        <form className="join-form" onSubmit={handleSubmit} autoComplete="off">
           <div className="join-form-group">
-            <label htmlFor="username" className="join-label">
+            <label htmlFor="display-name" className="join-label">
               Your name
             </label>
             <input
-              id="username"
+              id="display-name"
               type="text"
               value={formState.displayName}
               onChange={(e) =>
@@ -73,6 +73,8 @@ export function JoinGameForm({
               className="join-input"
               autoFocus
               required
+              autoComplete="nickname"
+              name="display-name"
             />
           </div>
           <div className="join-form-group">
