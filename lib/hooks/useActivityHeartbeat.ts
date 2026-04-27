@@ -30,11 +30,11 @@ export function useActivityHeartbeat({
 
   // Function to send a heartbeat (can be called manually on user activity)
   const sendHeartbeat = useCallback(() => {
-    if (!socket || !gameId || !userId || !enabled) return;
+    if (!socket?.connected || !gameId || !userId || !enabled) return;
 
     const now = Date.now();
-    // Debounce heartbeats to avoid spamming (min 5 seconds between heartbeats)
-    if (now - lastHeartbeatRef.current < 5000) return;
+    const HEARTBEAT_DEBOUNCE_MS = 5000;
+    if (now - lastHeartbeatRef.current < HEARTBEAT_DEBOUNCE_MS) return;
 
     lastHeartbeatRef.current = now;
     socket.emit('heartbeat', { gameId, userId });

@@ -48,6 +48,9 @@ export default function GamePage() {
     setCardSet,
   } = useGameStore();
 
+  // displayName is undefined until the user submits the join form.
+  // On page reload (returning user), the socket connects with undefined displayName
+  // and the server resolves the name from its stored profile. See JOIN-GAME RULES in socket.ts.
   const socket = useSocket(
     gameId,
     joinFormData?.displayName,

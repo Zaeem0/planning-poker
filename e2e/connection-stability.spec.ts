@@ -10,6 +10,7 @@ import {
   disconnectAndReconnectSocket,
   closeContexts,
   getPlayerCard,
+  getVoteCard,
 } from './utils/test-helpers';
 
 const RECONNECTION_DELAY_MS = 3000;
@@ -329,20 +330,87 @@ test.describe('Connection Stability', () => {
 
       await waitForPlayerCount(alicePage, 2);
 
-      // Disconnect and reconnect 3 times rapidly (tests reconnection resilience)
       for (let i = 0; i < 3; i++) {
         await disconnectSocket(alicePage);
         await alicePage.waitForTimeout(2000);
       }
 
-      // Alice should still be functional after multiple reconnects
       await expect(alicePage.getByText('Alice(you)')).toBeVisible();
       await waitForPlayerCount(alicePage, 2);
 
-      // Should be able to vote after reconnections
       await selectVoteCard(alicePage, 's');
       const voteCard = alicePage.locator('[data-card-value="s"]');
       await expect(voteCard).toHaveClass(/selected/);
+
+      await closeContexts(aliceContext, bobContext);
+    });
+  });
+
+  test.describe('Disconnected Emit Guard', () => {
+    test('should not send vote when socket is disconnected', async ({
+      browser,
+    }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await waitForPlayerCount(alicePage, 2);
+      await waitForPlayerCount(bobPage, 2);
+
+      await disconnectSocket(alicePage);
+      await alicePage.waitForTimeout(500);
+
+      const isConnected = await alicePage.evaluate(() => {
+        return window.__TEST_SOCKET__?.connected ?? false;
+      });
+      expect(isConnected).toBe(false);
+
+      await selectVoteCard(alicePage, 'l');
+
+      await alicePage.waitForTimeout(1000);
+      const aliceCardOnBobScreen = getPlayerCard(bobPage, 'Alice');
+      await expect(
+        aliceCardOnBobScreen.locator('.player-card-voted')
+      ).not.toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
+    });
+
+    test('should successfully vote after reconnection', async ({ browser }) => {
+      const gameId = generateUniqueGameId();
+
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await waitForPlayerCount(alicePage, 2);
+      await waitForPlayerCount(bobPage, 2);
+
+      await disconnectAndReconnectSocket(alicePage, RECONNECTION_DELAY_MS);
+      await alicePage.waitForTimeout(RECONNECTION_DELAY_MS);
+      await waitForPlayerCount(alicePage, 2);
+      await waitForDisconnectedPlayers(bobPage, 0);
+
+      const socketConnected = await alicePage.evaluate(() => {
+        return window.__TEST_SOCKET__?.connected ?? false;
+      });
+      expect(socketConnected).toBe(true);
+
+      await selectVoteCard(alicePage, 'l');
+      await expect(getVoteCard(alicePage, 'l')).toHaveClass(/selected/);
+
+      const aliceCardOnBobScreen = getPlayerCard(bobPage, 'Alice');
+      await expect(
+        aliceCardOnBobScreen.locator('.player-card-voted')
+      ).toBeVisible();
 
       await closeContexts(aliceContext, bobContext);
     });

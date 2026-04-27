@@ -18,7 +18,13 @@ This happened because browsers throttle background tabs to save resources, causi
 
 ## Solution Components
 
-We implemented a **multi-layered approach** combining six strategies:
+We implemented a **multi-layered approach** combining several strategies:
+
+### 0. Connection Guard on All Emitters
+
+**File:** `lib/socket.ts`
+
+All emit functions (`emitVote`, `emitReveal`, `emitReset`, `emitThrowEmoji`, `emitToggleRole`, `emitUserActive`, `emitHeartbeat`) use an `isConnected()` type guard that checks both `socket !== null` and `socket.connected`. This prevents Socket.IO from buffering stale events during disconnection that would be replayed on reconnect with potentially outdated game state.
 
 ### 1. Increased Socket.IO Timeouts
 
@@ -29,20 +35,33 @@ We implemented a **multi-layered approach** combining six strategies:
 
 Gives more breathing room for throttled tabs to respond to pings before being marked as disconnected.
 
-### 2. Stable Socket Connection (Ref Pattern)
+### 2. Stable Socket Connection & Join-Game Rules
 
 **File:** `lib/socket.ts`
 
 The socket connection is kept stable across prop changes by storing `displayName`, `isSpectator`, and `cardSet` in React refs rather than as `useEffect` dependencies. This prevents the socket from being torn down and recreated when form data changes (e.g. when a user submits the join form).
 
-A separate `useEffect` watches for `displayName` changes and emits a `join-game` event on the existing socket instead of creating a new connection. The refs are updated inside an effect to comply with React's rules against mutating refs during render.
+#### Join-Game Scenarios
+
+There are exactly two scenarios that send a `join-game` event to the server:
+
+| Scenario                | Trigger                                                     | displayName                                                           | Server behaviour                                                                                                                                                   |
+| ----------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Connect/Reconnect**   | Socket `connect` event                                      | May be undefined (page reload) or set (returning user with form data) | Server resolves username from stored profile using userId. If no profile exists and no name provided, responds with `username: null` which triggers the join form. |
+| **Display name change** | `displayName` or `isSpectator` prop changes while connected | Always set                                                            | Server updates stored profile with the new name.                                                                                                                   |
+
+**Dedup mechanism:** When both scenarios fire simultaneously (user already has a displayName when the socket first connects), the connect handler sets `skipNextDisplayNameJoinRef` to `true`. The displayName effect checks this flag and skips its emission to avoid a duplicate `join-game`.
+
+#### Key invariant
+
+On page reload, `displayName` is `undefined` (form state is not persisted — only `hasJoined` flag is in localStorage). The socket connects and sends `join-game` with no username. The server looks up the userId in its `userProfiles` map and responds with the stored display name. This is how persistence works without re-showing the join form.
 
 ### 3. Page Visibility API
 
 **File:** `lib/hooks/usePageVisibility.ts`
 
 - Listens for `visibilitychange` events
-- When tab becomes visible, sends a `user-active` event to server
+- When tab becomes visible, sends a `user-active` event to server **only if socket is connected**
 - Server marks user as connected and notifies other users
 - Includes 1-second debounce to prevent spam from rapid tab switching
 
@@ -53,6 +72,7 @@ A separate `useEffect` watches for `displayName` changes and emits a `join-game`
 - Sends heartbeat every 30 seconds (configurable)
 - Also sends heartbeat on user activity (mousedown, keydown, touchstart, scroll)
 - Includes 5-second debounce to prevent spam
+- Only emits when `socket.connected` is true to avoid buffering stale heartbeats
 
 ### 5. Server-Side Heartbeat Handlers
 
@@ -179,6 +199,8 @@ E2E tests covering disconnect/reconnect scenarios:
 - Revealed state maintenance after reconnection
 - Multiple rapid disconnects and reconnects
 - Tab switching simulation
+- Stale vote guard: votes emitted while disconnected are not applied after reconnection
+- Successful voting after reconnection
 
 **`e2e/persistence.spec.ts`:**
 

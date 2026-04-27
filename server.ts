@@ -127,6 +127,7 @@ function isUserInAnyGame(userId: string): boolean {
 
 function cleanupInactiveGames(): void {
   const now = Date.now();
+  const gameIdsToDelete: string[] = [];
 
   games.forEach((game, gameId) => {
     const allDisconnected = Array.from(game.users.values()).every(
@@ -135,9 +136,14 @@ function cleanupInactiveGames(): void {
     const isInactive =
       now - game.lastActivityAt > GAME_INACTIVE_THRESHOLD_1_HOUR_MS;
 
-    if (!allDisconnected || !isInactive) {
-      return;
+    if (allDisconnected && isInactive) {
+      gameIdsToDelete.push(gameId);
     }
+  });
+
+  gameIdsToDelete.forEach((gameId) => {
+    const game = games.get(gameId);
+    if (!game) return;
 
     const userIds = Array.from(game.users.keys());
     games.delete(gameId);
@@ -447,15 +453,19 @@ app.prepare().then(() => {
 
         // Clear votes for cards that no longer exist
         const invalidatedUserIds: string[] = [];
-        game.votes.forEach((vote, oderId) => {
+        const userIdsWithInvalidVotes: string[] = [];
+        game.votes.forEach((vote, voterId) => {
           if (!validValues.has(vote)) {
-            game.votes.delete(oderId);
-            const user = game.users.get(oderId);
-            if (user) {
-              user.hasVoted = false;
-            }
-            invalidatedUserIds.push(oderId);
+            userIdsWithInvalidVotes.push(voterId);
           }
+        });
+        userIdsWithInvalidVotes.forEach((voterId) => {
+          game.votes.delete(voterId);
+          const user = game.users.get(voterId);
+          if (user) {
+            user.hasVoted = false;
+          }
+          invalidatedUserIds.push(voterId);
         });
 
         // Broadcast card set update with invalidated user IDs

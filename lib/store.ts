@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Card, CardSet } from './constants';
+import { CardSet } from './constants';
 
 export type UserRole = 'player' | 'spectator';
 export type Theme = 'default' | 'christmas';
@@ -39,7 +39,6 @@ interface GameState {
   setIsMuted: (isMuted: boolean) => void;
   setTheme: (theme: Theme) => void;
   setCardSet: (cardSet: CardSet | null) => void;
-  reset: () => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
@@ -63,5 +62,4 @@ export const useGameStore = create<GameState>((set) => ({
   setIsMuted: (isMuted) => set({ isMuted }),
   setTheme: (theme) => set({ theme }),
   setCardSet: (cardSet) => set({ cardSet }),
-  reset: () => set({ selectedVote: null, votes: [], revealed: false }),
 }));
