@@ -29,54 +29,42 @@
 .player-card {
   width: 60px;
   height: 90px;
-  background: $glass-card-bg;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow:
-    $shadow,
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  transition: all 0.35s $transition-smooth;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .player-card-voted {
   background: repeating-linear-gradient(
-    135deg,
-    rgba($primary, 0.95) 0px,
-    rgba($primary, 0.95) 6px,
-    rgba($gradient-end, 0.92) 6px,
-    rgba($gradient-end, 0.92) 12px
+    45deg,
+    $primary 0px,
+    $primary 2px,
+    $primary-light 2px,
+    $primary-light 8px
   );
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow:
-    0 4px 25px $primary-glow,
-    0 0 50px $gradient-end-glow;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  border-color: $primary;
 }
 
 .player-card-revealed {
-  background: $glass-card-bg;
-  border: 1px solid rgba($primary, 0.28);
-  box-shadow:
-    $shadow,
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 22px rgba($primary, 0.22),
-    0 0 40px rgba($gradient-end, 0.08);
+  background: $dark-bg-elevated;
+  border-color: $primary;
 }
 
 .player-card-disconnected {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.05);
-  opacity: 0.4;
+  background: $dark-bg;
+  border-color: $slate-700;
+  opacity: 0.6;
 }
 
 .player-card-spectator {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-  border-style: dashed;
+  background: $dark-bg-elevated;
+  border-color: $slate-600;
 }
 
 .player-card-content {
@@ -106,10 +94,9 @@
 }
 
 .player-card-back {
-  display: block;
   width: 100%;
   height: 100%;
-  border-radius: inherit;
+  border-radius: 4px;
 }
 
 .player-name {
@@ -163,36 +150,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, $success-light, $success);
+  background: $success;
   border: none;
   border-radius: $radius;
   padding: 0.375rem 0.5rem;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
+  transition: all 0.2s ease;
   color: $white;
 
   svg {
     display: block;
-    animation: spin-in 1.2s ease-out 0.1s;
   }
 
   &:hover {
-    box-shadow: 0 4px 24px rgba($success, 0.4);
-    transform: scale(1.08);
-    filter: brightness(1.15);
-
-    svg {
-      animation: spin-in 1.4s ease;
-    }
-  }
-}
-
-@keyframes spin-in {
-  from {
-    transform: rotate(360deg);
-  }
-  to {
-    transform: rotate(0deg);
+    background: $success-hover;
+    transform: scale(1.05);
   }
 }
 
@@ -221,8 +193,8 @@
       pointer-events: none;
 
       &:hover {
-        background: $glass-card-bg;
-        border-color: rgba(255, 255, 255, 0.1);
+        background: $dark-bg-elevated;
+        border-color: $dark-border;
         transform: none;
       }
     }
@@ -232,39 +204,26 @@
 .voting-card-small {
   width: 68px;
   height: 84px;
-  background: $glass-card-bg;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 12px;
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 
-  &:hover:not(:disabled):not(.selected):not(.most-common):not(.has-votes):not(
-      .no-votes
-    ) {
-    background: rgba(255, 255, 255, 0.1);
+  &:hover:not(:disabled) {
+    background: $dark-bg-hover;
     border-color: $primary;
-    transform: translateY(-4px);
-    box-shadow:
-      0 8px 25px rgba(0, 0, 0, 0.3),
-      0 0 20px rgba($primary, 0.15);
+    transform: translateY(-2px);
   }
 
   &.selected {
-    background: linear-gradient(135deg, $primary, $gradient-end);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow:
-      0 4px 30px $primary-glow,
-      0 0 50px $gradient-end-glow;
-    transform: translateY(-2px);
+    background: $primary;
+    border-color: $primary-hover;
 
     .voting-card-title,
     .voting-card-emoji {
@@ -272,52 +231,43 @@
     }
 
     &:hover {
-      transform: translateY(-4px);
-      filter: brightness(1.1);
+      background: $primary;
+      border-color: $primary-hover;
+      transform: translateY(-2px);
     }
   }
 
   &.most-common {
-    cursor: default;
-    background: linear-gradient(
-      135deg,
-      rgba($success-light, calc(var(--vote-opacity, 0.3) + 0.15)),
-      rgba($success, calc(var(--vote-opacity, 0.25) + 0.1))
-    );
-    border-color: rgba($success, 0.7);
+    background: rgba($success, var(--vote-opacity, 0.3));
+    border-color: $success;
     transform: translateY(-4px);
-    box-shadow:
-      0 4px 24px rgba($success, 0.35),
-      0 0 40px rgba($success-light, 0.18);
 
-    .voting-card-emoji,
-    .voting-card-title,
-    .voting-card-percentage {
-      color: $white;
+    &:hover {
+      background: rgba($success, var(--vote-opacity, 0.3));
+      border-color: $success;
+      transform: translateY(-4px);
     }
   }
 
   &.has-votes {
-    cursor: default;
-    background: linear-gradient(
-      135deg,
-      rgba($success-light, calc(var(--vote-opacity, 0.16) + 0.06)),
-      rgba($success, calc(var(--vote-opacity, 0.12) + 0.04))
-    );
-    border-color: rgba($success, calc(var(--vote-opacity, 0.18) + 0.26));
-    box-shadow:
-      0 4px 18px rgba($success, calc(var(--vote-opacity, 0.2) + 0.08)),
-      0 0 32px rgba($success-light, calc(var(--vote-opacity, 0.08) + 0.03));
+    background: rgba($success, var(--vote-opacity, 0.15));
+    border-color: rgba($success, calc(var(--vote-opacity, 0.1) + 0.3));
 
-    .voting-card-emoji,
-    .voting-card-percentage {
-      color: $white;
+    &:hover {
+      background: rgba($success, var(--vote-opacity, 0.15));
+      border-color: rgba($success, calc(var(--vote-opacity, 0.1) + 0.3));
+      transform: none;
     }
   }
 
   &.no-votes {
-    cursor: default;
-    opacity: 0.2;
+    opacity: 0.3;
+
+    &:hover {
+      background: $dark-bg-elevated;
+      border-color: $dark-border;
+      transform: none;
+    }
   }
 
   &.unanimous {
@@ -414,8 +364,8 @@
 .voting-card-percentage {
   font-size: 0.75rem;
   font-weight: 700;
-  color: $white;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  color: color.scale($success, $lightness: 55%);
+  text-shadow: 0 0 30px $dark-bg;
 }
 
 .emoji-picker {
@@ -424,15 +374,10 @@
   display: flex;
   align-items: center;
   z-index: 100;
-  background: $glass-card-bg;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
   border-radius: $radius;
   overflow: hidden;
-  box-shadow:
-    $shadow-lg,
-    0 0 20px rgba($primary, 0.1);
 }
 
 .emoji-picker-button {
@@ -442,14 +387,14 @@
   background: transparent;
   cursor: pointer;
   font-size: 0.875rem;
-  transition: background 0.2s $transition-smooth;
+  transition: background 0.15s ease;
 
   &:hover {
-    background: $glass-bg-hover;
+    background: $dark-bg-hover;
   }
 
   &:not(:last-child) {
-    border-right: 1px solid $glass-border;
+    border-right: 1px solid $dark-border;
   }
 }
 

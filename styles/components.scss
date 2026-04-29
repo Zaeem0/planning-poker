@@ -1,44 +1,29 @@
 @use 'variables' as *;
 
 .card {
-  background: $glass-card-bg;
-  backdrop-filter: blur($glass-blur);
-  -webkit-backdrop-filter: blur($glass-blur);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: $radius-xl;
-  box-shadow:
-    $shadow,
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: $dark-bg-elevated;
+  border: 1px solid $dark-border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow;
 }
 
 .button-primary {
-  background: linear-gradient(135deg, $primary, $gradient-end);
+  background: $primary;
   color: $white;
   border: none;
   border-radius: $radius;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
-  position: relative;
+  transition: background 150ms;
 
   &:hover:not(:disabled) {
-    box-shadow:
-      0 4px 30px $primary-glow,
-      0 0 60px $gradient-end-glow;
-    transform: translateY(-2px);
-    filter: brightness(1.15);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
+    background: $primary-hover;
   }
 
   &:disabled {
-    background: rgba(255, 255, 255, 0.06);
+    background: $dark-border;
     color: $text-disabled;
     cursor: not-allowed;
-    box-shadow: none;
   }
 }
 
@@ -49,80 +34,59 @@
 }
 
 .button-secondary {
-  background: rgba(255, 255, 255, 0.06);
+  background: $dark-border;
   color: $text-primary;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: none;
   border-radius: $radius;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
+  transition: background 150ms;
 
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
+    background: $dark-bg-hover;
   }
 
   &:disabled {
-    background: rgba(255, 255, 255, 0.03);
+    background: $dark-border;
     color: $text-disabled;
     cursor: not-allowed;
   }
 }
 
 .button-success {
-  background: linear-gradient(135deg, $success-light, $success);
+  background: $success;
   color: $white;
   border: none;
   border-radius: $radius;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
+  transition: background 150ms;
 
   &:hover:not(:disabled) {
-    box-shadow: 0 4px 30px rgba($success, 0.4);
-    transform: translateY(-2px);
-    filter: brightness(1.15);
-  }
-
-  &:active:not(:disabled) {
-    transform: translateY(0) scale(0.97);
-  }
-
-  &:disabled {
-    background: rgba(255, 255, 255, 0.06);
-    color: $text-disabled;
-    cursor: not-allowed;
-    box-shadow: none;
+    background: $success-hover;
   }
 }
 
 .input {
   width: 100%;
   padding: 0.875rem 1rem;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: $dark-bg;
+  border: 1px solid $dark-border;
   border-radius: $radius;
   font-size: 1rem;
   color: $text-primary;
   outline: none;
-  transition: all 0.3s $transition-smooth;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
 
   &:focus {
     border-color: $primary;
-    box-shadow:
-      0 0 0 3px $primary-glow,
-      0 0 20px rgba($primary, 0.15);
-    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 0 3px rgba($primary, 0.2);
   }
 
   &::placeholder {
     color: $text-muted;
-    transition: opacity 0.2s;
-  }
-
-  &:focus::placeholder {
-    opacity: 0.4;
   }
 }
 
@@ -131,22 +95,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: $dark-bg-elevated;
   padding: 0.5rem;
   border-radius: $radius;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid $dark-border;
   cursor: pointer;
-  transition: all 0.3s $transition-smooth;
+  transition: all 0.15s ease;
   color: $text-muted;
   font-size: 1rem;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba($primary, 0.4);
-    color: $text-primary;
-    box-shadow: 0 0 20px rgba($primary, 0.15);
+    background: $dark-bg-hover;
+    border-color: $dark-border-light;
+    color: $text-secondary;
   }
 
   svg {
