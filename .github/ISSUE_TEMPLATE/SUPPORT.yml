@@ -1,0 +1,155 @@
+---
+name: SRE Support Request
+description: Raise an SRE support ticket for infrastructure issues
+title: '[SRE Support]: '
+labels: ['Support']
+body:
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Impact
+      description: Select the type of impact this request has
+      options:
+        - Access Issues
+        - Platform not available or not responding as expected
+        - New configuration required
+        - New request - should be linked to a SIP
+        - Is it linked to an incident
+        - Informational
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: proposition
+    attributes:
+      label: Proposition
+      description: Select all that apply
+      options:
+        - label: SKY-GLOBAL
+        - label: PEACOCK
+        - label: SKYSHOWTIME
+        - label: SHOWMAX
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Which environment is this request for
+      options:
+        - STUBBED-FUNCTIONAL (dev)
+        - STUBBED-NFT (dev)
+        - INT (dev)
+        - STUBBED-SHOWCASE (dev)
+        - STABLE-INT (dev)
+        - INT-NFT (stage)
+        - PROD
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component_technology
+    attributes:
+      label: Component / Technology
+      description: Select the primary technology involved
+      options:
+        - Cassandra
+        - MongoDB
+        - CouchBase
+        - Elasticache
+        - AWS Key Spaces
+        - DynamoDB
+        - Concourse
+        - API definitions - Swagger / Origin path updates
+        - PCI/Lambda
+        - IP whitelisting
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: other_technology
+    attributes:
+      label: Other Technology (optional)
+      description: If you selected "Other" above, please mention the technology here
+      placeholder: Write the technology name
+
+  - type: textarea
+    id: hostname_node
+    attributes:
+      label: Hostname or Node (optional)
+      description: Please share the hostname or the node where you see the issue
+      placeholder: Write something
+
+  - type: textarea
+    id: endpoint_api_path
+    attributes:
+      label: Endpoint or API Path
+      description: "Please add the endpoint or API path or web route/path for the request.\n\nHint: ID APIs - Rango / Cybertron / OAuth or web path e.g. /provider-sign-up"
+      placeholder: Write something
+
+  - type: textarea
+    id: cdn_property
+    attributes:
+      label: CDN Property (optional)
+      description: "Please share the property to be updated/looked in CDN.\n\nHint: Are we updating sas or www property? Please share full name with env."
+      placeholder: Write something
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Share Dependencies (optional)
+      description: Please share any dependency(ies) of the work
+      placeholder: Write something
+
+  - type: textarea
+    id: team_raising_request
+    attributes:
+      label: Team Raising the Request
+      description: Please share the team raising the request
+      placeholder: Write something
+    validations:
+      required: true
+
+  - type: textarea
+    id: sip_gsp_link
+    attributes:
+      label: Link to SIP or GSP Ticket (optional)
+      description: "Please paste the relevant details.\n\nHint: Link to SIP, Jira, or Change ID"
+      placeholder: Write something
+
+  - type: input
+    id: prod_delivery_date
+    attributes:
+      label: Prod Delivery Date (optional)
+      description: "If you have an estimated timeline for when this needs to be resolved by, please let us know.\n\nFormat: DD/MM/YYYY"
+      placeholder: DD/MM/YYYY
+
+  - type: textarea
+    id: expected_vs_actual
+    attributes:
+      label: Expected vs Actual Behaviour (optional)
+      description: If applicable to an error, describe what you expected vs what actually happened
+      placeholder: Write something
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs/Errors (optional)
+      description: Paste any relevant error messages or log output
+      placeholder: Write something
+      render: shell
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context (optional)
+      description: Any additional context for this request, such as URLs, relevant other issue links or other data that can speed things up
+      placeholder: Write something
+
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Attachments (optional)
+      description: Any attachments such as screenshots or applicable documents should be added here
+      placeholder: You can paste images or drag & drop files here
