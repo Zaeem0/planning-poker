@@ -3,6 +3,8 @@ name: SRE Support Request
 description: Raise an SRE support ticket for infrastructure issues
 title: '[SRE Support]: '
 labels: ['Support']
+validations:
+  required_body: true
 body:
   - type: dropdown
     id: impact
@@ -31,41 +33,38 @@ body:
         - label: SKYSHOWTIME
         - label: SHOWMAX
 
-  - type: dropdown
+  - type: checkboxes
     id: environment
     attributes:
       label: Environment
-      description: Which environment is this request for
+      description: Select all environments that apply
       options:
-        - STUBBED-FUNCTIONAL (dev)
-        - STUBBED-NFT (dev)
-        - INT (dev)
-        - STUBBED-SHOWCASE (dev)
-        - STABLE-INT (dev)
-        - INT-NFT (stage)
-        - PROD
-    validations:
-      required: true
+        - label: STUBBED-FUNCTIONAL (dev)
+        - label: STUBBED-NFT (dev)
+        - label: INT (dev)
+        - label: STUBBED-SHOWCASE (dev)
+        - label: STABLE-INT (dev)
+        - label: INT-NFT (stage)
+        - label: PROD
 
-  - type: dropdown
+  - type: checkboxes
     id: component_technology
     attributes:
       label: Component / Technology
-      description: Select the primary technology involved
+      description: Select all technologies involved
       options:
-        - Cassandra
-        - MongoDB
-        - CouchBase
-        - Elasticache
-        - AWS Key Spaces
-        - DynamoDB
-        - Concourse
-        - API definitions - Swagger / Origin path updates
-        - PCI/Lambda
-        - IP whitelisting
-        - Other
-    validations:
-      required: true
+        - label: Cassandra
+        - label: MongoDB
+        - label: CouchBase
+        - label: Elasticache
+        - label: AWS Key Spaces
+        - label: DynamoDB
+        - label: Concourse
+        - label: API definitions - Swagger / Origin path updates
+        - label: PCI/Lambda
+        - label: IP whitelisting
+        - label: Other
+          required: true
 
   - type: textarea
     id: other_technology
@@ -85,7 +84,7 @@ body:
     id: endpoint_api_path
     attributes:
       label: Endpoint or API Path
-      description: "Please add the endpoint or API path or web route/path for the request.\n\nHint: ID APIs - Rango / Cybertron / OAuth or web path e.g. /provider-sign-up"
+      description: "Please add the endpoint or API path or web route/path for the request.\n\ne.g ID APIs - Rango / Cybertron / OAuth or web path e.g. /provider-sign-up"
       placeholder: Write something
 
   - type: textarea
@@ -102,54 +101,44 @@ body:
       description: Please share any dependency(ies) of the work
       placeholder: Write something
 
-  - type: textarea
+  - type: input
     id: team_raising_request
     attributes:
       label: Team Raising the Request
       description: Please share the team raising the request
       placeholder: Write something
-    validations:
-      required: true
 
   - type: textarea
     id: sip_gsp_link
     attributes:
       label: Link to SIP or GSP Ticket (optional)
-      description: "Please paste the relevant details.\n\nHint: Link to SIP, Jira, or Change ID"
-      placeholder: Write something
+      placeholder: Please paste the relevant details
 
   - type: input
     id: prod_delivery_date
     attributes:
       label: Prod Delivery Date (optional)
-      description: "If you have an estimated timeline for when this needs to be resolved by, please let us know.\n\nFormat: DD/MM/YYYY"
+      description: 'If you have an estimated timeline for when this needs to be resolved by, please let us know.'
       placeholder: DD/MM/YYYY
 
   - type: textarea
     id: expected_vs_actual
     attributes:
-      label: Expected vs Actual Behaviour (optional)
+      label: Expected vs Actual Behaviour
       description: If applicable to an error, describe what you expected vs what actually happened
       placeholder: Write something
 
   - type: textarea
     id: logs
     attributes:
-      label: Relevant Logs/Errors (optional)
+      label: Relevant Logs/Errors
       description: Paste any relevant error messages or log output
       placeholder: Write something
       render: shell
 
   - type: textarea
-    id: context
-    attributes:
-      label: Context (optional)
-      description: Any additional context for this request, such as URLs, relevant other issue links or other data that can speed things up
-      placeholder: Write something
-
-  - type: textarea
     id: attachments
     attributes:
       label: Attachments (optional)
-      description: Any attachments such as screenshots or applicable documents should be added here
+      description: Any attachments such as screenshots or applicable documents should be added here,SRE AI Triage works better if you paste the details directly
       placeholder: You can paste images or drag & drop files here
