@@ -3,8 +3,7 @@ name: SRE Support Request
 description: Raise an SRE support ticket for infrastructure issues
 title: '[SRE Support]: '
 labels: ['Support']
-validations:
-  required_body: true
+
 body:
   - type: dropdown
     id: impact
