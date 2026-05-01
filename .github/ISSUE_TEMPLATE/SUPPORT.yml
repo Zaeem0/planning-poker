@@ -121,16 +121,29 @@ body:
       placeholder: DD/MM/YYYY
 
   - type: textarea
+    id: context
+    attributes:
+      label: Context(optional)
+      description: Any additonal context for this request, such as URLs, relevant other issue links or other data that can speed things up.
+      placeholder: Write something
+
+  - type: textarea
+    id: how_can_we_help
+    attributes:
+      label: How can we help?
+      placeholder: Write something
+
+  - type: textarea
     id: expected_vs_actual
     attributes:
-      label: Expected vs Actual Behaviour
+      label: Expected vs Actual Behaviour (if applicable)
       description: If applicable to an error, describe what you expected vs what actually happened
       placeholder: Write something
 
   - type: textarea
     id: logs
     attributes:
-      label: Relevant Logs/Errors
+      label: Relevant Logs/Errors(if applicable)
       description: Paste any relevant error messages or log output
       placeholder: Write something
       render: shell
