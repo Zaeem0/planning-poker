@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { User, useGameStore } from '@/lib/store';
 import { getVoteLabel, CARD_VALUES } from '@/lib/constants';
 import { EmojiAnimation } from '@/lib/hooks/useEmojiAnimations';
@@ -14,6 +15,7 @@ interface UserCardProps {
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   onThrowEmoji: (emoji: string) => void;
+  onEditName?: (newName: string) => void;
 }
 
 function getCardClassName(
@@ -51,12 +53,15 @@ export function UserCard({
   onMouseEnter,
   onMouseLeave,
   onThrowEmoji,
+  onEditName,
 }: UserCardProps) {
   const { hasVoted, connected: isConnected, role, displayName } = user;
   const { cardSet } = useGameStore();
   const cards = cardSet?.cards || CARD_VALUES;
   const isDisconnected = !isConnected;
   const isSpectator = role === 'spectator';
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(displayName);
 
   const cardClassName = getCardClassName(
     hasVoted,
@@ -123,8 +128,56 @@ export function UserCard({
       )}
 
       <span className={playerNameClassName}>
-        {displayName}
-        {isCurrentUser && <span className="player-you">(you)</span>}
+        {isEditing ? (
+          <form
+            className="player-name-edit-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const trimmed = editValue.trim();
+              if (trimmed && trimmed !== displayName) {
+                onEditName?.(trimmed);
+              }
+              setIsEditing(false);
+            }}
+          >
+            <input
+              className="player-name-edit-input"
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={() => {
+                const trimmed = editValue.trim();
+                if (trimmed && trimmed !== displayName) {
+                  onEditName?.(trimmed);
+                }
+                setIsEditing(false);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setEditValue(displayName);
+                  setIsEditing(false);
+                }
+              }}
+              autoFocus
+              aria-label="Edit your name"
+            />
+          </form>
+        ) : isCurrentUser ? (
+          <button
+            className="player-name-editable"
+            onClick={() => {
+              setEditValue(displayName);
+              setIsEditing(true);
+            }}
+            aria-label="Edit your name"
+            title="Edit your name"
+          >
+            <span className="player-name-text">{displayName}</span>
+            <span className="player-you">(you)</span>
+          </button>
+        ) : (
+          displayName
+        )}
         {isSpectator && <span className="player-spectator">(spectator)</span>}
       </span>
     </div>

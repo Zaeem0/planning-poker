@@ -30,7 +30,7 @@ export function JoinGameForm({
     preset: 'tshirt',
     cards: [...CARD_PRESETS.tshirt.cards],
   });
-  const [showCardSetOptions, setShowCardSetOptions] = useState(false);
+  const [showCardSetOptions, setShowCardSetOptions] = useState(isCreating);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

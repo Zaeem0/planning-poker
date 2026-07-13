@@ -138,6 +138,56 @@
   font-weight: 400;
 }
 
+.player-name-editable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.player-name-text {
+  display: block;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-name-editable:hover .player-name-text,
+.player-name-editable:focus-visible .player-name-text {
+  text-decoration: underline dotted $text-muted;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.player-name-edit-form {
+  display: flex;
+  width: 100%;
+}
+
+.player-name-edit-input {
+  width: 80px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.125rem 0.25rem;
+  border: 1px solid $primary;
+  border-radius: 4px;
+  background: $dark-bg-elevated;
+  color: $text-primary;
+  outline: none;
+
+  &:focus {
+    border-color: $primary-hover;
+    box-shadow: 0 0 0 1px $primary-hover;
+  }
+}
+
 .table-message-container {
   display: flex;
   align-items: center;

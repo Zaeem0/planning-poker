@@ -17,6 +17,9 @@ interface CardSetSelectorProps {
   hideHeader?: boolean;
 }
 
+const isTextLabel = (label: string): boolean =>
+  label.length > 0 && /^[a-zA-Z0-9]+$/.test(label);
+
 const initializePresetCards = (
   preset: CardPresetType,
   initialCardSet?: CardSet
@@ -307,7 +310,7 @@ export function CardSetSelector({
                           : null
                     }
                     type="text"
-                    className="card-set-editor-card-label"
+                    className={`card-set-editor-card-label ${isTextLabel(card.label) ? 'card-set-editor-card-label-text' : ''}`}
                     placeholder=" "
                     value={card.label}
                     onChange={(e) =>

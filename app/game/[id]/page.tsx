@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useGameStore } from '@/lib/store';
 import { useSocket } from '@/lib/socket';
 import { useKeyboardVoting } from '@/lib/hooks/useKeyboardVoting';
@@ -156,6 +156,12 @@ export default function GamePage() {
     }
   }, [isCurrentUserSpectator, selectedVote, setSelectedVote]);
 
+  const handleEditName = useCallback((newName: string) => {
+    setJoinFormData((prev) =>
+      prev ? { ...prev, displayName: newName } : null
+    );
+  }, []);
+
   useKeyboardVoting({
     enabled: !!currentUserName && !revealed && !isCurrentUserSpectator,
     onVote: handleKeyboardVote,
@@ -222,6 +228,7 @@ export default function GamePage() {
             onVote={handleCardClick}
             onReveal={handleReveal}
             onReset={handleReset}
+            onEditName={handleEditName}
             getAnimationsForUser={getAnimationsForUser}
           />
         </div>

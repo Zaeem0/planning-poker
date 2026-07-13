@@ -20,6 +20,7 @@ interface PokerTableProps {
   onVote: (value: string) => void;
   onReveal: () => void;
   onReset: () => void;
+  onEditName: (newName: string) => void;
   getAnimationsForUser: (userId: string) => EmojiAnimation[];
 }
 
@@ -34,6 +35,7 @@ export function PokerTable({
   onVote,
   onReveal,
   onReset,
+  onEditName,
   getAnimationsForUser,
 }: PokerTableProps) {
   const [hoveredUserId, setHoveredUserId] = useState<string | null>(null);
@@ -63,6 +65,7 @@ export function PokerTable({
         onMouseEnter={() => !isCurrentUser && setHoveredUserId(user.id)}
         onMouseLeave={() => setHoveredUserId(null)}
         onThrowEmoji={(emoji) => handleThrowEmoji(user.id, emoji)}
+        onEditName={isCurrentUser ? onEditName : undefined}
       />
     );
   };

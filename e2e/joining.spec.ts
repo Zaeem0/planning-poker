@@ -154,6 +154,101 @@ test.describe('Joining a Game', () => {
     });
   });
 
+  test.describe('Inline Name Editing', () => {
+    test('should make current user name clickable to edit', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'TestUser');
+
+      await expect(
+        page.getByRole('button', { name: 'Edit your name' })
+      ).toBeVisible();
+    });
+
+    test('should open inline edit input when clicking name', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'TestUser');
+
+      await page.getByRole('button', { name: 'Edit your name' }).click();
+      const input = page.getByLabel('Edit your name');
+      await expect(input).toBeVisible();
+      await expect(input).toHaveValue('TestUser');
+    });
+
+    test('should update name when submitting edit', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'OldName');
+
+      await page.getByRole('button', { name: 'Edit your name' }).click();
+      const input = page.getByLabel('Edit your name');
+      await input.clear();
+      await input.fill('NewName');
+      await input.press('Enter');
+
+      await expect(page.getByText('NewName')).toBeVisible();
+      await expect(page.getByText('OldName')).not.toBeVisible();
+    });
+
+    test('should cancel edit on escape key', async ({ page }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'KeepThisName');
+
+      await page.getByRole('button', { name: 'Edit your name' }).click();
+      const input = page.getByLabel('Edit your name');
+      await input.clear();
+      await input.fill('ShouldNotSave');
+      await input.press('Escape');
+
+      await expect(page.getByText('KeepThisName')).toBeVisible();
+      await expect(page.getByText('ShouldNotSave')).not.toBeVisible();
+    });
+
+    test('should update name visible to other players', async ({ browser }) => {
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      const gameId = generateUniqueGameId();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+
+      // Bob should see Alice
+      await expect(bobPage.getByText('Alice')).toBeVisible();
+
+      // Alice edits her name
+      await alicePage.getByRole('button', { name: 'Edit your name' }).click();
+      const input = alicePage.getByLabel('Edit your name');
+      await input.clear();
+      await input.fill('AliceRenamed');
+      await input.press('Enter');
+
+      // Bob should see the updated name
+      await expect(bobPage.getByText('AliceRenamed')).toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
+    });
+
+    test('should not update name when submitting empty value', async ({
+      page,
+    }) => {
+      const gameId = generateUniqueGameId();
+      await joinGameAsUser(page, gameId, 'KeepName');
+
+      await page.getByRole('button', { name: 'Edit your name' }).click();
+      const input = page.getByLabel('Edit your name');
+      await input.clear();
+      await input.press('Enter');
+
+      // Name should remain unchanged
+      await expect(page.getByText('KeepName')).toBeVisible();
+    });
+  });
+
   test.describe('Game ID Handling', () => {
     test('should handle game ID with hyphens and numbers', async ({
       browser,
