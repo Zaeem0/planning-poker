@@ -90,14 +90,21 @@ export function UserCard({
 
     if (revealed && vote) {
       const isFibonacci = cardSet?.preset === 'fibonacci';
+      const label = getVoteLabel(vote, cards);
+      // Hide the size sublabel when it would duplicate the label already shown
+      // as the "emoji" (e.g. numeric sets like Fibonacci where label === value).
+      const showSize =
+        vote !== 'unknown' &&
+        vote !== '?' &&
+        label.toUpperCase() !== vote.toUpperCase();
       return (
         <div className="player-card-content">
           <span
             className={`player-card-emoji ${isFibonacci ? 'player-card-emoji-text' : ''}`}
           >
-            {getVoteLabel(vote, cards)}
+            {label}
           </span>
-          {vote !== 'unknown' && vote !== '?' && (
+          {showSize && (
             <span className="player-card-size">{vote.toUpperCase()}</span>
           )}
         </div>

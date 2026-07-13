@@ -340,5 +340,47 @@ test.describe('Visual Regression Tests', () => {
         fullPage: true,
       });
     });
+
+    test('should match snapshot of revealed fibonacci votes (no duplicate size)', async ({
+      browser,
+    }) => {
+      const context1 = await browser.newContext();
+      const context2 = await browser.newContext();
+      const page1 = await context1.newPage();
+      const page2 = await context2.newPage();
+      const gameId = generateUniqueGameId();
+
+      // User1 creates the game with the Fibonacci preset selected.
+      await navigateToGame(page1, gameId);
+      await expect(
+        page1.getByRole('heading', { name: 'Create Game' })
+      ).toBeVisible({ timeout: 10000 });
+      await page1.getByRole('button', { name: 'Fibonacci' }).click();
+      await page1.getByPlaceholder('Enter your name').fill('User1');
+      await page1.getByRole('button', { name: 'Create Game' }).click();
+      await expect(page1.getByText('User1(you)')).toBeVisible();
+      await page1.click('[data-card-size="5"]');
+
+      // User2 joins the existing fibonacci game and votes.
+      await joinGameAsUser(page2, gameId, 'User2');
+      await expect(page2.locator('[data-card-size="8"]')).toBeVisible();
+      await page2.click('[data-card-size="8"]');
+
+      await page1
+        .locator('button:has-text("Reveal Votes")')
+        .click({ force: true });
+      await expect(
+        page1.locator('.voting-card-percentage').first()
+      ).toBeVisible();
+      await page1.waitForTimeout(1000);
+
+      // The revealed player cards should show the number once (no duplicate
+      // .player-card-size beneath the numeric label).
+      await expect(page1).toHaveScreenshot('game-fibonacci-revealed.png', {
+        fullPage: true,
+      });
+
+      await closeContexts(context1, context2);
+    });
   });
 });

@@ -108,8 +108,14 @@ export function VotingCards({
               : undefined;
 
           const showPercentage = revealed && stats.hasVotes;
+          // Hide the title sublabel when it would duplicate the label already
+          // shown as the "emoji" (e.g. numeric sets like Fibonacci where
+          // label === value).
           const showTitle =
-            !showPercentage && card.value !== 'unknown' && card.value !== '?';
+            !showPercentage &&
+            card.value !== 'unknown' &&
+            card.value !== '?' &&
+            card.label.toUpperCase() !== card.value.toUpperCase();
 
           return (
             <button
