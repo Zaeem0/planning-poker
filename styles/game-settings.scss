@@ -129,3 +129,33 @@
     transform: scale(1.02);
   }
 }
+
+@media (max-width: $breakpoint-mobile) {
+  .game-settings-dialog-overlay {
+    padding: 0.75rem;
+  }
+
+  .game-settings-dialog {
+    max-height: 92vh;
+  }
+
+  .game-settings-dialog-header,
+  .game-settings-dialog-content,
+  .game-settings-dialog-footer {
+    padding: 1rem;
+  }
+
+  .game-settings-dialog-title {
+    font-size: 1.25rem;
+  }
+
+  // Stack the action buttons full-width so they're easy to tap.
+  .game-settings-dialog-footer {
+    flex-direction: column-reverse;
+  }
+
+  .game-settings-dialog-cancel,
+  .game-settings-dialog-submit {
+    width: 100%;
+  }
+}

@@ -44,3 +44,7 @@ $shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 $shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
 
 $font-mono: ui-monospace, SFMono-Regular, monospace;
+
+// Responsive breakpoints
+$breakpoint-mobile: 640px; // Phones
+$breakpoint-tablet: 900px; // Small tablets / large phones landscape

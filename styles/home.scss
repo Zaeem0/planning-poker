@@ -103,3 +103,21 @@
   color: $text-muted;
   font-size: 0.875rem;
 }
+
+@media (max-width: $breakpoint-mobile) {
+  .home-page {
+    padding: 1rem;
+  }
+
+  .home-card {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .home-title {
+    font-size: 1.75rem;
+  }
+
+  .home-header {
+    margin-bottom: 2rem;
+  }
+}
