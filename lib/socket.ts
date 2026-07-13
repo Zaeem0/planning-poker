@@ -25,27 +25,6 @@ function getUserId(): string {
   return userId;
 }
 
-function resolveCardSet(
-  cardSet: CardSet | undefined,
-  gameId: string
-): CardSet | undefined {
-  let resolved = cardSet;
-  if (!resolved && typeof window !== 'undefined') {
-    const saved = localStorage.getItem(`game-${gameId}-cardset`);
-    if (saved) {
-      try {
-        resolved = JSON.parse(saved);
-      } catch {
-        // Ignore parse errors
-      }
-    }
-  }
-  if (resolved && typeof window !== 'undefined') {
-    localStorage.setItem(`game-${gameId}-cardset`, JSON.stringify(resolved));
-  }
-  return resolved;
-}
-
 /**
  * JOIN-GAME RULES
  *
@@ -119,7 +98,7 @@ export function useSocket(
         userId,
         username: displayNameRef.current,
         isSpectator: isSpectatorRef.current,
-        cardSet: resolveCardSet(cardSetRef.current, gameId),
+        cardSet: cardSetRef.current,
       });
     };
 
@@ -154,9 +133,7 @@ export function useSocket(
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
-        if (serverCardSet) {
-          setCardSet(serverCardSet);
-        }
+        setCardSet(serverCardSet ?? null);
         const userVote = getVoteForUser(votes, joinedUserId);
         setSelectedVote(userVote ?? null);
       }
@@ -227,12 +204,6 @@ export function useSocket(
             setSelectedVote(null);
           }
         }
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(
-            `game-${gameId}-cardset`,
-            JSON.stringify(updatedCardSet)
-          );
-        }
       }
     );
 
@@ -273,7 +244,7 @@ export function useSocket(
       userId: getUserId(),
       username: displayName,
       isSpectator: isSpectatorRef.current,
-      cardSet: resolveCardSet(cardSetRef.current, gameId),
+      cardSet: cardSetRef.current,
     });
   }, [gameId, displayName, isSpectator]);
 

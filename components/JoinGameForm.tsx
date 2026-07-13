@@ -6,7 +6,7 @@ import { GearIcon } from '@/components/icons';
 export interface JoinFormData {
   displayName: string;
   isSpectator: boolean;
-  cardSet: CardSet;
+  cardSet?: CardSet;
 }
 
 interface JoinGameFormProps {
@@ -40,7 +40,7 @@ export function JoinGameForm({
     onSubmit({
       displayName: trimmedName,
       isSpectator: formState.isSpectator,
-      cardSet,
+      ...(isCreating ? { cardSet } : {}),
     });
   };
 

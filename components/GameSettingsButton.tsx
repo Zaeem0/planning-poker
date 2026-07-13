@@ -34,14 +34,6 @@ export function GameSettingsButton({
   const handleUpdateSettings = () => {
     if (!socket || !gameId) return;
 
-    // Save card set to localStorage for this game
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(`game-${gameId}-cardset`, JSON.stringify(cardSet));
-      // Also save as default preference
-      localStorage.setItem('default-cardset', JSON.stringify(cardSet));
-    }
-
-    // Emit socket event to update card set for all players
     socket.emit('update-card-set', {
       gameId,
       cardSet,

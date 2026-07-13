@@ -315,7 +315,7 @@ test.describe('Joining a Game', () => {
 
       const gameId = generateUniqueGameId();
 
-      // Alice sees card set toggle button when creating
+      // Alice sees card set selector expanded by default when creating
       await navigateToGame(alicePage, gameId);
       await waitForJoinFormVisible(alicePage);
       await expect(
@@ -325,10 +325,11 @@ test.describe('Joining a Game', () => {
         alicePage.getByRole('button', { name: /Settings/ })
       ).toBeVisible();
 
-      await expect(alicePage.locator('.card-set-selector')).not.toBeVisible();
-
-      await alicePage.getByRole('button', { name: /Settings/ }).click();
       await expect(alicePage.locator('.card-set-selector')).toBeVisible();
+
+      // Clicking Settings collapses it
+      await alicePage.getByRole('button', { name: /Settings/ }).click();
+      await expect(alicePage.locator('.card-set-selector')).not.toBeVisible();
 
       await alicePage.getByPlaceholder('Enter your name').fill('Alice');
       await alicePage.getByRole('button', { name: 'Create Game' }).click();
@@ -382,7 +383,8 @@ test.describe('Joining a Game', () => {
         alicePage.getByRole('heading', { name: 'Create Game' })
       ).toBeVisible({ timeout: 10000 });
 
-      await alicePage.getByRole('button', { name: /Settings/ }).click();
+      // Card set selector is visible by default when creating
+      await expect(alicePage.locator('.card-set-selector')).toBeVisible();
 
       // Select Fibonacci preset
       const fibButton = alicePage
@@ -594,7 +596,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
+      // Card set selector is visible by default when creating
       await expect(page.locator('.card-set-selector')).toBeVisible();
 
       await expect(page.locator('.card-set-editor')).toBeVisible();
@@ -608,8 +610,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set editor is visible by default when creating
       const labelInputs = page.locator('.card-set-editor-card-label');
       await expect(labelInputs.first()).toHaveValue('🐜');
 
@@ -623,8 +624,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set editor is visible by default when creating
       const labelInputs = page.locator('.card-set-editor-card-label');
       await labelInputs.first().clear();
       await labelInputs.first().fill('🎯');
@@ -645,8 +645,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set selector is visible by default when creating
       const fibButton = page
         .locator('.card-set-preset-button')
         .filter({ hasText: 'Fibonacci' });
@@ -657,7 +656,7 @@ test.describe('Joining a Game', () => {
 
       await expect(page.locator('.game-page')).toBeVisible();
       await expect(page.locator('.voting-card-emoji').first()).toContainText(
-        '1️⃣'
+        '1'
       );
       await expect(
         page.locator('.voting-card-emoji').first()
@@ -671,8 +670,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set editor is visible by default when creating
       const labelInputs = page.locator('.card-set-editor-card-label');
       await labelInputs.first().clear();
       await labelInputs.first().fill('🌟');
@@ -681,7 +679,7 @@ test.describe('Joining a Game', () => {
         .locator('.card-set-preset-button')
         .filter({ hasText: 'Fibonacci' });
       await fibButton.click();
-      await expect(labelInputs.first()).toHaveValue('1️⃣');
+      await expect(labelInputs.first()).toHaveValue('1');
 
       const tshirtButton = page
         .locator('.card-set-preset-button')
@@ -697,8 +695,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set editor is visible by default when creating
       const labelInputs = page.locator('.card-set-editor-card-label');
       await expect(labelInputs.first()).toHaveValue('🐜');
 
@@ -715,8 +712,7 @@ test.describe('Joining a Game', () => {
       await navigateToGame(page, gameId);
       await waitForJoinFormVisible(page);
 
-      await page.getByRole('button', { name: /Settings/ }).click();
-
+      // Card set editor is visible by default when creating
       const labelInputs = page.locator('.card-set-editor-card-label');
       await expect(labelInputs.first()).toHaveValue('🐜');
       await expect(labelInputs.nth(1)).toHaveValue('🐰');

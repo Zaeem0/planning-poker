@@ -176,7 +176,7 @@ export default function GamePage() {
       <JoinGameForm
         gameId={gameId}
         onSubmit={(data) => {
-          if (data.cardSet) {
+          if (isCreatingGame && data.cardSet) {
             setCardSet(data.cardSet);
           }
           setJoinFormData(data);
