@@ -80,6 +80,11 @@
   line-height: 1;
 }
 
+.player-card-emoji-text {
+  color: $text-primary;
+  font-weight: 700;
+}
+
 .player-card-size {
   font-size: 0.75rem;
   font-weight: 600;
@@ -351,7 +356,12 @@
   text-align: center;
   line-height: 1.2;
   max-width: 100%;
-  color: $slate-500; // Same default color as voting-card-title
+  color: $slate-500;
+
+  .preset-fibonacci & {
+    color: $text-primary;
+    font-weight: 700;
+  }
 }
 
 .voting-card-title {

@@ -37,23 +37,28 @@ export function VotingCards({
 
     // Generate hint based on card values (exclude "unknown")
     // Use label if value is empty, and only include alphanumeric values
+    const isUnknownCard = (c: { value: string }) =>
+      c.value === 'unknown' || c.value === '?';
+
     const cardValues = cards
-      .filter((c) => c.value !== 'unknown')
+      .filter((c) => !isUnknownCard(c))
       .map((c, index) => {
-        // Use value if it exists, otherwise use label if alphanumeric, otherwise use index+1
         let displayValue = c.value || c.label;
 
-        // Check if displayValue is alphanumeric (letters/numbers only)
         const isAlphanumeric = /^[a-zA-Z0-9]+$/.test(displayValue);
 
         if (!isAlphanumeric || !displayValue) {
-          // Use sequential number if not alphanumeric or empty
           displayValue = String(index + 1);
         }
 
         return displayValue.toUpperCase();
       })
-      .filter((v) => v); // Remove any empty values
+      .filter((v) => v);
+
+    const hasUnknownCard = cards.some((c) => isUnknownCard(c));
+    if (hasUnknownCard) {
+      cardValues.push('?');
+    }
 
     if (cardValues.length === 0) {
       return `Click a card to vote`;
@@ -75,7 +80,7 @@ export function VotingCards({
     <div className="voting-section-bottom">
       <p className="voting-hint">{getVotingHint()}</p>
       <div
-        className={`voting-cards-bottom ${isSpectator ? 'spectator-mode' : ''}`}
+        className={`voting-cards-bottom ${isSpectator ? 'spectator-mode' : ''} ${cardSet?.preset === 'fibonacci' ? 'preset-fibonacci' : ''}`}
       >
         {cards.map((card, index) => {
           // Use label as vote value if card.value is empty
@@ -103,7 +108,8 @@ export function VotingCards({
               : undefined;
 
           const showPercentage = revealed && stats.hasVotes;
-          const showTitle = !showPercentage && card.value !== 'unknown';
+          const showTitle =
+            !showPercentage && card.value !== 'unknown' && card.value !== '?';
 
           return (
             <button

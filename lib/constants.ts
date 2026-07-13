@@ -31,18 +31,18 @@ export const TSHIRT_CARDS: ReadonlyArray<Card> = [
   { value: 'm', label: '🐶', description: 'Medium (1 week)' },
   { value: 'l', label: '🦒', description: 'Large (2 weeks)' },
   { value: 'xl', label: '🦕', description: 'Extra Large (2+ weeks)' },
-  { value: 'unknown', label: '❓', description: 'Unknown' },
+  { value: '?', label: '❓', description: 'Unknown' },
 ];
 
 // Fibonacci sequence preset
 export const FIBONACCI_CARDS: ReadonlyArray<Card> = [
-  { value: '1', label: '1️⃣', description: '1 point' },
-  { value: '2', label: '2️⃣', description: '2 points' },
-  { value: '3', label: '3️⃣', description: '3 points' },
-  { value: '5', label: '5️⃣', description: '5 points' },
-  { value: '8', label: '8️⃣', description: '8 points' },
-  { value: '13', label: '1️⃣3️⃣', description: '13 points' },
-  { value: 'unknown', label: '❓', description: 'Unknown' },
+  { value: '1', label: '1', description: '1 point' },
+  { value: '2', label: '2', description: '2 points' },
+  { value: '3', label: '3', description: '3 points' },
+  { value: '5', label: '5', description: '5 points' },
+  { value: '8', label: '8', description: '8 points' },
+  { value: '13', label: '13', description: '13 points' },
+  { value: '?', label: '❓', description: 'Unknown' },
 ];
 
 // Week-based preset
@@ -53,7 +53,7 @@ export const WEEKS_CARDS: ReadonlyArray<Card> = [
   { value: '4w', label: '4️⃣', description: '4 weeks' },
   { value: '5w', label: '5️⃣', description: '4 weeks' },
   { value: '6w', label: '6️⃣', description: '6 weeks' },
-  { value: 'unknown', label: '❓', description: 'Unknown' },
+  { value: '?', label: '❓', description: 'Unknown' },
 ];
 
 // Default card values (for backward compatibility)

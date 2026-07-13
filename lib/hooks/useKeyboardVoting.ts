@@ -5,7 +5,7 @@ import { useGameStore } from '@/lib/store';
 const isDeselectKey = (key: string): boolean =>
   key === 'Escape' || key === 'Backspace';
 
-const TWO_CHAR_TIMEOUT_MS = 1000;
+const TWO_CHAR_TIMEOUT_MS = 400;
 
 interface UseKeyboardVotingOptions {
   enabled: boolean;
@@ -54,9 +54,9 @@ export function useKeyboardVoting({
     const votableCards = cards.filter((c) => c.value !== 'unknown');
 
     cards.forEach((card) => {
-      // Handle "unknown" card separately (always use "?" key)
-      if (card.value === 'unknown') {
-        return; // Skip - handled separately in the keydown handler
+      // Handle "unknown" / "?" card separately (always use "?" key)
+      if (card.value === 'unknown' || card.value === '?') {
+        return;
       }
 
       // Determine the actual vote value (what gets sent to the server)
@@ -110,7 +110,9 @@ export function useKeyboardVoting({
       // Handle "?" for unknown
       if (e.key === '?') {
         clearPendingTimeout();
-        const unknownCard = cards.find((c) => c.value === 'unknown');
+        const unknownCard = cards.find(
+          (c) => c.value === 'unknown' || c.value === '?'
+        );
         if (unknownCard) {
           return onVote(unknownCard.value);
         }
@@ -120,23 +122,31 @@ export function useKeyboardVoting({
       // Add key to buffer
       bufferRef.current += key;
 
-      // Check if buffer matches any card value
       const matchedValue = keyMap.get(bufferRef.current);
+      const couldBeLongerMatch = Array.from(keyMap.keys()).some(
+        (k) =>
+          k.length > bufferRef.current.length && k.startsWith(bufferRef.current)
+      );
 
-      if (matchedValue) {
-        // Exact match found
+      if (matchedValue && !couldBeLongerMatch) {
         clearPendingTimeout();
         onVote(matchedValue);
         return;
       }
 
-      // Check if buffer is a prefix of any card value
-      const hasPrefix = Array.from(keyMap.keys()).some((k) =>
-        k.startsWith(bufferRef.current)
-      );
+      if (matchedValue && couldBeLongerMatch) {
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
+        const pendingValue = matchedValue;
+        timeoutRef.current = setTimeout(() => {
+          onVote(pendingValue);
+          clearPendingTimeout();
+        }, TWO_CHAR_TIMEOUT_MS);
+        return;
+      }
 
-      if (hasPrefix) {
-        // Wait for more keys
+      if (couldBeLongerMatch) {
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
@@ -145,7 +155,6 @@ export function useKeyboardVoting({
           TWO_CHAR_TIMEOUT_MS
         );
       } else {
-        // No match, clear buffer
         clearPendingTimeout();
       }
     };

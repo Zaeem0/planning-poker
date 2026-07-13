@@ -84,9 +84,14 @@ export function UserCard({
     }
 
     if (revealed && vote) {
+      const isFibonacci = cardSet?.preset === 'fibonacci';
       return (
         <div className="player-card-content">
-          <span className="player-card-emoji">{getVoteLabel(vote, cards)}</span>
+          <span
+            className={`player-card-emoji ${isFibonacci ? 'player-card-emoji-text' : ''}`}
+          >
+            {getVoteLabel(vote, cards)}
+          </span>
           {vote !== 'unknown' && (
             <span className="player-card-size">{vote.toUpperCase()}</span>
           )}
