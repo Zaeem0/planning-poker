@@ -72,6 +72,7 @@ export default function GamePage() {
     userId: currentUserId,
     selectedVote,
     setSelectedVote,
+    revealed,
   });
 
   const confettiOrigin = useConfettiOrigin(votes, revealed);
@@ -97,7 +98,11 @@ export default function GamePage() {
 
   useEffect(() => {
     setGameId(gameId);
-  }, [gameId, setGameId]);
+    // Clear any card set carried over from a previously viewed game (SPA
+    // navigation keeps the store alive). The authoritative set for this game
+    // arrives via the socket's user-joined / card-set-updated events.
+    setCardSet(null);
+  }, [gameId, setGameId, setCardSet]);
 
   // Check if game exists on mount using HTTP API
   useEffect(() => {
@@ -156,11 +161,18 @@ export default function GamePage() {
     }
   }, [isCurrentUserSpectator, selectedVote, setSelectedVote]);
 
-  const handleEditName = useCallback((newName: string) => {
-    setJoinFormData((prev) =>
-      prev ? { ...prev, displayName: newName } : null
-    );
-  }, []);
+  const handleEditName = useCallback(
+    (newName: string) => {
+      // Returning/refreshed users have no joinFormData (they never submitted the
+      // form this session). Seed it so the rename still propagates to the server.
+      setJoinFormData((prev) =>
+        prev
+          ? { ...prev, displayName: newName }
+          : { displayName: newName, isSpectator: isCurrentUserSpectator }
+      );
+    },
+    [isCurrentUserSpectator]
+  );
 
   useKeyboardVoting({
     enabled: !!currentUserName && !revealed && !isCurrentUserSpectator,

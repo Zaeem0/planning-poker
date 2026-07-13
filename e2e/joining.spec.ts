@@ -5,6 +5,10 @@ import {
   joinGameAsSpectator,
   navigateToGame,
   waitForJoinFormVisible,
+  waitForPlayerCount,
+  waitForDisconnectedPlayers,
+  disconnectAndReconnectSocket,
+  waitForSocketConnected,
   closeContexts,
 } from './utils/test-helpers';
 
@@ -190,6 +194,38 @@ test.describe('Joining a Game', () => {
 
       await expect(page.getByText('NewName')).toBeVisible();
       await expect(page.getByText('OldName')).not.toBeVisible();
+    });
+
+    test('should update name after a reconnect', async ({ browser }) => {
+      // Regression: a stale skip-join flag used to swallow the first rename
+      // that happened after the socket reconnected.
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      const gameId = generateUniqueGameId();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await waitForPlayerCount(bobPage, 2);
+
+      // Drop and restore Alice's socket, then wait for the reconnect to settle.
+      await disconnectAndReconnectSocket(alicePage, 1000);
+      await waitForSocketConnected(alicePage);
+      await waitForDisconnectedPlayers(bobPage, 0);
+
+      // The rename must still reach the server and propagate to other players.
+      await alicePage.getByRole('button', { name: 'Edit your name' }).click();
+      const input = alicePage.getByLabel('Edit your name');
+      await input.clear();
+      await input.fill('AliceRenamed');
+      await input.press('Enter');
+
+      await expect(alicePage.getByText('AliceRenamed')).toBeVisible();
+      await expect(bobPage.getByText('AliceRenamed')).toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
     });
 
     test('should cancel edit on escape key', async ({ page }) => {

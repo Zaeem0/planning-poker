@@ -56,8 +56,12 @@ export async function joinGameAsSpectator(
   await expect(page.getByText('(spectator)')).toBeVisible();
 }
 
+// The unknown card's value is '?'; tests still refer to it semantically as
+// 'unknown', so normalize here.
+const toCardSize = (size: string) => (size === 'unknown' ? '?' : size);
+
 export async function selectVoteCard(page: Page, size: string) {
-  await page.locator(`[data-card-size="${size}"]`).click();
+  await page.locator(`[data-card-size="${toCardSize(size)}"]`).click();
 }
 
 export async function pressVoteKey(page: Page, size: string) {
@@ -144,6 +148,18 @@ export async function disconnectSocket(page: Page) {
   });
 }
 
+export async function waitForSocketConnected(page: Page) {
+  await expect
+    .poll(
+      async () =>
+        await page.evaluate(
+          () => window.__TEST_SOCKET__?.connected ?? false
+        ),
+      { timeout: 15000, intervals: [250, 500, 1000] }
+    )
+    .toBe(true);
+}
+
 export async function emitSocketEvent(
   page: Page,
   eventName: string,
@@ -189,7 +205,7 @@ export async function closeContexts(...contexts: BrowserContext[]) {
 }
 
 export function getVoteCard(page: Page, size: string) {
-  return page.locator(`[data-card-size="${size}"]`);
+  return page.locator(`[data-card-size="${toCardSize(size)}"]`);
 }
 
 export function getRevealButton(page: Page) {

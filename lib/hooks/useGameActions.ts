@@ -8,6 +8,7 @@ interface UseGameActionsParams {
   userId: string;
   selectedVote: string | null;
   setSelectedVote: (vote: string | null) => void;
+  revealed: boolean;
 }
 
 interface UseGameActionsResult {
@@ -24,34 +25,35 @@ export function useGameActions({
   userId,
   selectedVote,
   setSelectedVote,
+  revealed,
 }: UseGameActionsParams): UseGameActionsResult {
+  // Only apply the optimistic local selection when the vote can actually reach
+  // the server (connected socket, round not revealed). Otherwise the local
+  // state would diverge from the authoritative server state until resync.
   const handleCardClick = useCallback(
     (value: string) => {
+      if (revealed || !socket?.connected || !userId) return;
       const newVote = selectedVote === value ? null : value;
       setSelectedVote(newVote);
-      if (socket && userId) {
-        emitVote(socket, gameId, userId, newVote);
-      }
+      emitVote(socket, gameId, userId, newVote);
     },
-    [socket, userId, gameId, selectedVote, setSelectedVote]
+    [socket, userId, gameId, selectedVote, setSelectedVote, revealed]
   );
 
   const handleKeyboardVote = useCallback(
     (value: string) => {
+      if (revealed || !socket?.connected || !userId) return;
       setSelectedVote(value);
-      if (socket && userId) {
-        emitVote(socket, gameId, userId, value);
-      }
+      emitVote(socket, gameId, userId, value);
     },
-    [socket, userId, gameId, setSelectedVote]
+    [socket, userId, gameId, setSelectedVote, revealed]
   );
 
   const handleKeyboardDeselect = useCallback(() => {
+    if (revealed || !socket?.connected || !userId) return;
     setSelectedVote(null);
-    if (socket && userId) {
-      emitVote(socket, gameId, userId, null);
-    }
-  }, [socket, userId, gameId, setSelectedVote]);
+    emitVote(socket, gameId, userId, null);
+  }, [socket, userId, gameId, setSelectedVote, revealed]);
 
   const handleReveal = useCallback(() => {
     if (socket) emitReveal(socket, gameId);

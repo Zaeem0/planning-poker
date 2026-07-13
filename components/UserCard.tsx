@@ -97,7 +97,7 @@ export function UserCard({
           >
             {getVoteLabel(vote, cards)}
           </span>
-          {vote !== 'unknown' && (
+          {vote !== 'unknown' && vote !== '?' && (
             <span className="player-card-size">{vote.toUpperCase()}</span>
           )}
         </div>

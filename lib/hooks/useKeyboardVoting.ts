@@ -51,7 +51,9 @@ export function useKeyboardVoting({
     const keyMap = new Map<string, string>();
 
     // Filter out "unknown" cards for sequential numbering (to match voting hint logic)
-    const votableCards = cards.filter((c) => c.value !== 'unknown');
+    const votableCards = cards.filter(
+      (c) => c.value !== 'unknown' && c.value !== '?'
+    );
 
     cards.forEach((card) => {
       // Handle "unknown" / "?" card separately (always use "?" key)

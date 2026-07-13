@@ -8,9 +8,11 @@ import {
   waitForAnyDisconnectedPlayer,
   disconnectSocket,
   disconnectAndReconnectSocket,
+  waitForSocketConnected,
   closeContexts,
   getPlayerCard,
   getVoteCard,
+  navigateToGame,
 } from './utils/test-helpers';
 
 const RECONNECTION_DELAY_MS = 3000;
@@ -312,6 +314,40 @@ test.describe('Connection Stability', () => {
 
       await closeContexts(aliceContext, bobContext);
     });
+
+    test('should keep the card set after reconnection', async ({ browser }) => {
+      // Regression: the user-joined resync must not wipe a valid card set when
+      // the response omits one.
+      const context = await browser.newContext();
+      const page = await context.newPage();
+
+      const gameId = generateUniqueGameId();
+
+      // Create a game with the (non-default) Fibonacci card set.
+      await navigateToGame(page, gameId);
+      await expect(page.locator('.card-set-selector')).toBeVisible();
+      await page
+        .locator('.card-set-preset-button')
+        .filter({ hasText: 'Fibonacci' })
+        .click();
+      await page.getByPlaceholder('Enter your name').fill('Alice');
+      await page.getByRole('button', { name: 'Create Game' }).click();
+      await expect(page.locator('.game-page')).toBeVisible();
+
+      // Fibonacci cards are present before the reconnect.
+      await expect(page.locator('[data-card-value="5"]')).toBeVisible();
+
+      // Disconnect and wait for auto-reconnection.
+      await disconnectSocket(page);
+      await page.waitForTimeout(RECONNECTION_DELAY_MS);
+      await waitForPlayerCount(page, 1);
+
+      // Fibonacci cards should still be present (not reverted to T-shirt).
+      await expect(page.locator('[data-card-value="5"]')).toBeVisible();
+      await expect(page.locator('[data-card-value="8"]')).toBeVisible();
+
+      await closeContexts(context);
+    });
   });
 
   test.describe('Connection Error Handling', () => {
@@ -331,12 +367,19 @@ test.describe('Connection Stability', () => {
       await waitForPlayerCount(alicePage, 2);
 
       for (let i = 0; i < 3; i++) {
-        await disconnectSocket(alicePage);
-        await alicePage.waitForTimeout(2000);
+        // Drop and restore the socket each cycle. A bare disconnect() is a
+        // deliberate client close that never auto-reconnects, so we explicitly
+        // reconnect to exercise the reconnect path.
+        await disconnectAndReconnectSocket(alicePage, 500);
+        await waitForSocketConnected(alicePage);
       }
 
       await expect(alicePage.getByText('Alice(you)')).toBeVisible();
       await waitForPlayerCount(alicePage, 2);
+
+      // Voting requires a live connection: the optimistic selection only applies
+      // once the socket is actually reconnected.
+      await waitForSocketConnected(alicePage);
 
       await selectVoteCard(alicePage, 's');
       const voteCard = alicePage.locator('[data-card-value="s"]');

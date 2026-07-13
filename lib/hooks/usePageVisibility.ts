@@ -35,6 +35,8 @@ export function usePageVisibility({
       if (now - lastVisibilityChangeRef.current < 1000) return;
       lastVisibilityChangeRef.current = now;
 
+      // INVARIANT: gate on socket.connected. user-active only refreshes
+      // presence; full state resync is owned by the socket connect handler.
       if (document.visibilityState === 'visible' && socket.connected) {
         console.log('Tab became visible - sending heartbeat');
         socket.emit('user-active', { gameId, userId });

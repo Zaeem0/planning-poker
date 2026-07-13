@@ -29,6 +29,9 @@ export function useActivityHeartbeat({
   const lastHeartbeatRef = useRef<number>(0);
 
   // Function to send a heartbeat (can be called manually on user activity)
+  // INVARIANT: the socket.connected gate is required. Heartbeats only refresh
+  // presence; the socket's connect handler owns full state resync, so emitting
+  // while disconnected would be lost and must not be relied upon.
   const sendHeartbeat = useCallback(() => {
     if (!socket?.connected || !gameId || !userId || !enabled) return;
 

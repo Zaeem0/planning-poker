@@ -25,6 +25,12 @@ function getUserId(): string {
   return userId;
 }
 
+// Identifies a distinct join-game payload. Used to dedup redundant joins:
+// we only re-emit when the (username, isSpectator) pair actually changes.
+function joinKey(username?: string, isSpectator?: boolean): string {
+  return `${username ?? ''}|${isSpectator ? '1' : '0'}`;
+}
+
 /**
  * JOIN-GAME RULES
  *
@@ -39,9 +45,11 @@ function getUserId(): string {
  *    This happens when: the user submits the join form, or toggles spectator mode.
  *    It sends join-game with the new displayName so the server updates the profile.
  *
- * DEDUP: When both fire at the same time (user has a displayName when the socket
- * first connects), the connect handler sets `skipNextDisplayNameJoin` to prevent
- * the displayName effect from sending a duplicate join-game.
+ * DEDUP: Both paths record the payload they sent via `lastJoinKeyRef`. The
+ * displayName effect (scenario 2) skips emitting when the current key already
+ * matches the last one sent, so it never duplicates the connect handler's join.
+ * Because it compares actual payloads (not a one-shot flag), a rename that
+ * happens after a reconnect is still emitted correctly.
  */
 export function useSocket(
   gameId: string,
@@ -55,7 +63,7 @@ export function useSocket(
   const displayNameRef = useRef(displayName);
   const isSpectatorRef = useRef(isSpectator);
   const cardSetRef = useRef(cardSet);
-  const skipNextDisplayNameJoinRef = useRef(false);
+  const lastJoinKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     displayNameRef.current = displayName;
@@ -93,6 +101,10 @@ export function useSocket(
     const userId = getUserId();
 
     const emitJoinGame = (socket: Socket) => {
+      lastJoinKeyRef.current = joinKey(
+        displayNameRef.current,
+        isSpectatorRef.current
+      );
       socket.emit('join-game', {
         gameId,
         userId,
@@ -133,7 +145,13 @@ export function useSocket(
         setUsers(users);
         setVotes(votes);
         setRevealed(revealed);
-        setCardSet(serverCardSet ?? null);
+        // Only adopt the server's card set when it actually sent one. An empty
+        // value means "no change" (e.g. a presence-only join response) and must
+        // not clobber a card set we already have. Cross-game staleness is
+        // handled by resetting the card set when the gameId changes (page.tsx).
+        if (serverCardSet) {
+          setCardSet(serverCardSet);
+        }
         const userVote = getVoteForUser(votes, joinedUserId);
         setSelectedVote(userVote ?? null);
       }
@@ -142,7 +160,6 @@ export function useSocket(
     // Scenario 1: connect/reconnect — always join, server resolves username from profile
     newSocket.on('connect', () => {
       console.log('Socket connected');
-      skipNextDisplayNameJoinRef.current = !!displayNameRef.current;
       emitJoinGame(newSocket);
     });
 
@@ -208,7 +225,7 @@ export function useSocket(
     );
 
     return () => {
-      skipNextDisplayNameJoinRef.current = false;
+      lastJoinKeyRef.current = null;
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -234,10 +251,10 @@ export function useSocket(
   useEffect(() => {
     if (!displayName || !socketRef.current?.connected) return;
 
-    if (skipNextDisplayNameJoinRef.current) {
-      skipNextDisplayNameJoinRef.current = false;
-      return;
-    }
+    // Skip if this exact payload was already sent (e.g. by the connect handler).
+    const key = joinKey(displayName, isSpectatorRef.current);
+    if (key === lastJoinKeyRef.current) return;
+    lastJoinKeyRef.current = key;
 
     socketRef.current.emit('join-game', {
       gameId,
