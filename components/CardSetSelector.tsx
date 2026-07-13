@@ -90,7 +90,7 @@ export function CardSetSelector({
   };
 
   const handlePresetChange = (preset: CardPresetType) => {
-    focusTargetRef.current = 'first';
+    focusTargetRef.current = preset === 'custom' ? 'first' : null;
     setSelectedPreset(preset);
     const cards = presetCards[preset];
     onCardSetChange({
@@ -100,7 +100,7 @@ export function CardSetSelector({
   };
 
   const handleResetPreset = () => {
-    focusTargetRef.current = 'first';
+    focusTargetRef.current = selectedPreset === 'custom' ? 'first' : null;
     const defaultCards =
       selectedPreset === 'custom'
         ? [{ value: '', label: '', description: '' }]

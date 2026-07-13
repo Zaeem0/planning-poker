@@ -341,7 +341,7 @@ test.describe('Joining a Game', () => {
       await closeContexts(aliceContext, bobContext);
     });
 
-    test('should show card set toggle only when creating game', async ({
+    test('should show card set selector only when creating game', async ({
       browser,
     }) => {
       const aliceContext = await browser.newContext();
@@ -351,21 +351,14 @@ test.describe('Joining a Game', () => {
 
       const gameId = generateUniqueGameId();
 
-      // Alice sees card set selector expanded by default when creating
+      // Alice sees the card set selector expanded by default when creating
       await navigateToGame(alicePage, gameId);
       await waitForJoinFormVisible(alicePage);
       await expect(
         alicePage.getByRole('heading', { name: 'Create Game' })
       ).toBeVisible({ timeout: 10000 });
-      await expect(
-        alicePage.getByRole('button', { name: /Settings/ })
-      ).toBeVisible();
 
       await expect(alicePage.locator('.card-set-selector')).toBeVisible();
-
-      // Clicking Settings collapses it
-      await alicePage.getByRole('button', { name: /Settings/ }).click();
-      await expect(alicePage.locator('.card-set-selector')).not.toBeVisible();
 
       await alicePage.getByPlaceholder('Enter your name').fill('Alice');
       await alicePage.getByRole('button', { name: 'Create Game' }).click();
@@ -378,9 +371,7 @@ test.describe('Joining a Game', () => {
       await expect(
         bobPage.getByRole('heading', { name: 'Join Game' })
       ).toBeVisible({ timeout: 10000 });
-      await expect(
-        bobPage.getByRole('button', { name: /Settings/ })
-      ).not.toBeVisible();
+      await expect(bobPage.locator('.card-set-selector')).not.toBeVisible();
 
       await closeContexts(aliceContext, bobContext);
     });

@@ -194,9 +194,7 @@ test.describe('Visual Regression Tests', () => {
       await expect(
         page.getByRole('heading', { name: 'Create Game' })
       ).toBeVisible({ timeout: 10000 });
-      await expect(
-        page.getByRole('button', { name: /Settings/ })
-      ).toBeVisible();
+      await expect(page.locator('.card-set-selector')).toBeVisible();
 
       await page.waitForTimeout(300);
 
@@ -215,7 +213,6 @@ test.describe('Visual Regression Tests', () => {
       await expect(
         page.getByRole('heading', { name: 'Create Game' })
       ).toBeVisible({ timeout: 10000 });
-      await page.getByRole('button', { name: /Settings/ }).click();
       await expect(page.locator('.card-set-selector')).toBeVisible();
 
       await page.waitForTimeout(300);
@@ -268,7 +265,6 @@ test.describe('Visual Regression Tests', () => {
       await navigateToGame(page, gameId);
 
       await expect(page.locator('.join-form')).toBeVisible();
-      await page.getByRole('button', { name: /Settings/ }).click();
       await expect(page.locator('.card-set-selector')).toBeVisible();
       await expect(page.locator('.card-set-editor')).toBeVisible();
       await page.waitForTimeout(300);
@@ -326,7 +322,6 @@ test.describe('Visual Regression Tests', () => {
       await navigateToGame(page, gameId);
 
       await expect(page.locator('.join-form')).toBeVisible();
-      await page.getByRole('button', { name: /Settings/ }).click();
       await expect(page.locator('.card-set-selector')).toBeVisible();
 
       const labelInputs = page.locator('.card-set-editor-card-label');

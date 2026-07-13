@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { CardSet, CARD_PRESETS } from '@/lib/constants';
 import { CardSetSelector } from '@/components/CardSetSelector';
-import { GearIcon } from '@/components/icons';
 
 export interface JoinFormData {
   displayName: string;
@@ -30,7 +29,6 @@ export function JoinGameForm({
     preset: 'tshirt',
     cards: [...CARD_PRESETS.tshirt.cards],
   });
-  const [showCardSetOptions, setShowCardSetOptions] = useState(isCreating);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,36 +93,35 @@ export function JoinGameForm({
             </label>
           </div>
 
-          {isCreating && (
+          {isCreating ? (
             <>
               <button
-                type="button"
-                className={`settings-toggle-button ${showCardSetOptions ? 'expanded' : ''}`}
-                onClick={() => setShowCardSetOptions(!showCardSetOptions)}
-                aria-expanded={showCardSetOptions}
+                type="submit"
+                disabled={!formState.displayName?.trim()}
+                className="join-button"
               >
-                <GearIcon />
-                <span>Settings</span>
+                Create Game
               </button>
-              {showCardSetOptions && (
-                <div className="join-form-group settings-options-container">
-                  <CardSetSelector
-                    initialCardSet={cardSet}
-                    onCardSetChange={setCardSet}
-                    hideHeader
-                  />
-                </div>
-              )}
+              <div className="join-divider">
+                <span className="join-divider-text">Card Set</span>
+              </div>
+              <div className="join-form-group settings-options-container">
+                <CardSetSelector
+                  initialCardSet={cardSet}
+                  onCardSetChange={setCardSet}
+                  hideHeader
+                />
+              </div>
             </>
+          ) : (
+            <button
+              type="submit"
+              disabled={!formState.displayName?.trim()}
+              className="join-button"
+            >
+              Join Game
+            </button>
           )}
-
-          <button
-            type="submit"
-            disabled={!formState.displayName?.trim()}
-            className="join-button"
-          >
-            {isCreating ? 'Create Game' : 'Join Game'}
-          </button>
         </form>
       </div>
     </div>
