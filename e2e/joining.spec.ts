@@ -616,6 +616,65 @@ test.describe('Joining a Game', () => {
       await closeContexts(aliceContext, bobContext);
     });
 
+    test('should reset the round when card set changes after votes are revealed', async ({
+      browser,
+    }) => {
+      const aliceContext = await browser.newContext();
+      const bobContext = await browser.newContext();
+      const alicePage = await aliceContext.newPage();
+      const bobPage = await bobContext.newPage();
+
+      const gameId = generateUniqueGameId();
+
+      await joinGameAsUser(alicePage, gameId, 'Alice');
+      await expect(alicePage.getByText('Alice(you)')).toBeVisible();
+
+      await joinGameAsUser(bobPage, gameId, 'Bob');
+      await expect(bobPage.getByText('Bob(you)')).toBeVisible();
+
+      // Both players vote, then Alice reveals.
+      await alicePage.locator('[data-card-size="m"]').click();
+      await bobPage.locator('[data-card-size="l"]').click();
+      await alicePage.locator('.reveal-button').click({ force: true });
+
+      // Confirm the round is revealed for both.
+      await expect(alicePage.locator('.reset-button')).toBeVisible();
+      await expect(bobPage.locator('.reset-button')).toBeVisible();
+      await expect(
+        alicePage.locator('.player-card-revealed').first()
+      ).toBeVisible();
+
+      // Alice changes the card set to Fibonacci while votes are revealed.
+      await alicePage.locator('.game-settings-button').click();
+      await expect(alicePage.locator('.game-settings-dialog')).toBeVisible();
+      await alicePage
+        .locator('.card-set-preset-button')
+        .filter({ hasText: 'Fibonacci' })
+        .click();
+      await alicePage.getByRole('button', { name: 'Update Settings' }).click();
+      await expect(
+        alicePage.locator('.game-settings-dialog')
+      ).not.toBeVisible();
+      await alicePage.waitForTimeout(500);
+
+      // The round should be reset for both players (same as "Start New Round"):
+      // back to the pre-reveal control, no revealed/voted cards, no selection.
+      await expect(alicePage.locator('.reveal-button')).toBeVisible();
+      await expect(bobPage.locator('.reveal-button')).toBeVisible();
+      await expect(alicePage.locator('.player-card-revealed')).toHaveCount(0);
+      await expect(bobPage.locator('.player-card-revealed')).toHaveCount(0);
+      await expect(alicePage.locator('.player-card-voted')).toHaveCount(0);
+      await expect(bobPage.locator('.player-card-voted')).toHaveCount(0);
+      await expect(alicePage.locator('.voting-card.selected')).toHaveCount(0);
+      await expect(bobPage.locator('.voting-card.selected')).toHaveCount(0);
+
+      // And the new (Fibonacci) card set is in effect for both.
+      await expect(alicePage.locator('[data-card-value="1"]')).toBeVisible();
+      await expect(bobPage.locator('[data-card-value="1"]')).toBeVisible();
+
+      await closeContexts(aliceContext, bobContext);
+    });
+
     test('should show editable cards for preset card sets', async ({
       page,
     }) => {

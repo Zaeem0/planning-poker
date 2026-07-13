@@ -448,6 +448,24 @@ app.prepare().then(() => {
         // Update the game's card set
         game.cardSet = cardSet;
 
+        // If the round is already revealed, changing the card set invalidates
+        // the tally, so reset the round entirely (same as "Start New Round").
+        if (game.revealed) {
+          resetUserVotes(game);
+          io.to(gameId).emit('card-set-updated', {
+            cardSet,
+            invalidatedUserIds: [],
+          });
+          io.to(gameId).emit('votes-reset', {
+            users: getSortedUsersByJoinOrder(game),
+          });
+          console.log(
+            `Card set updated for game ${gameId} (round reset):`,
+            cardSet.preset
+          );
+          return;
+        }
+
         // Get valid card values from the new card set
         const validValues = new Set(cardSet.cards.map((card) => card.value));
 
